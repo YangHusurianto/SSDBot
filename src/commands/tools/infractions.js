@@ -2,7 +2,7 @@ const Guild = require('../../schemas/guild');
 
 const {
   SlashCommandBuilder,
-  PermissionsBitField,
+  PermissionFlagsBits,
   EmbedBuilder,
   escapeMarkdown,
   ActionRowBuilder,

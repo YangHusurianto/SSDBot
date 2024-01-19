@@ -2,7 +2,7 @@ const Guild = require('../../schemas/guild');
 
 const {
   SlashCommandBuilder,
-  PermissionsBitField,
+  PermissionFlagsBits,
   escapeMarkdown,
 } = require('discord.js');
 const mongoose = require('mongoose');

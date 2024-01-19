@@ -1,6 +1,6 @@
 const Guild = require('../../schemas/guild');
 
-const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 require('dotenv').config();
 
