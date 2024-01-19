@@ -62,16 +62,16 @@ module.exports = (client) => {
     //   console.error(error);
     // }
 
-    // // delete all global commands
-    // rest
-    //   .put(
-    //     Routes.applicationCommands(
-    //       process.env.CLIENT_ID
-    //     ),
-    //     { body: [] }
-    //   )
-    //   .then(() => console.log('Successfully deleted all application commands.'))
-    //   .catch(console.error);
+    // delete all global commands
+    rest
+      .put(
+        Routes.applicationCommands(
+          process.env.CLIENT_ID
+        ),
+        { body: [] }
+      )
+      .then(() => console.log('Successfully deleted all application commands.'))
+      .catch(console.error);
 
     try {
       console.log(

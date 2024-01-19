@@ -53,15 +53,15 @@ module.exports = {
 
     try {
       if (options.getSubcommand() === 'create') {
-        createTag(guild, tag, options.getString('warn_reason'));
+        return await interaction.reply(createTag(guild, tag, options.getString('warn_reason')));
       }
 
       if (options.getSubcommand() === 'remove') {
-        return await removeTag(guild, tag);
+        return await interaction.reply(removeTag(guild, tag));
       }
 
       if (options.getSubcommand() === 'list') {
-        return interaction.reply({ embeds: [tagsListEmbed(guild)] });
+        return await interaction.reply({ embeds: [tagsListEmbed(guild)] });
       }
     } catch (err) {
       console.error(err);
@@ -88,42 +88,34 @@ const createTag = async (guild, tag, reason) => {
 
   guildDoc.autoTags.set(tag, reason);
 
-  await interaction.reply(`AutoTag ${tag} created with reason ${reason}.`);
+  await guildDoc.save().catch(console.error);
 
-  return await guildDoc.save().catch(console.error);
+  return `AutoTag ${tag} created with reason ${reason}.`;
 };
 
 const removeTag = async (guild, tag) => {
   let guildDoc = await Guild.findOne({ guildId: guild.id });
 
   if (!guildDoc) {
-    await interaction.reply(`This server has no auto tags!`);
-    return;
+    return `This server has no auto tags!`;
   }
 
   if (!guildDoc.autoTags.has(tag)) {
-    await interaction.reply(`This server has no auto tag with that name!`);
-    return;
+    return `This server has no auto tag with that name!`;
   }
 
   guildDoc.autoTags.delete(tag);
 
-  await interaction.reply(`AutoTag ${tag} removed.`);
+  await guildDoc.save().catch(console.error);
 
-  return await guildDoc.save().catch(console.error);
+  return `AutoTag ${tag} removed.`;
 };
 
 const tagsListEmbed = async (guild) => {
   let guildDoc = await Guild.findOne({ guildId: guild.id });
 
-  if (!guildDoc) {
-    await interaction.reply(`This server has no auto tags!`);
-    return;
-  }
-
-  if (guildDoc.autoTags.size === 0) {
-    await interaction.reply(`This server has no auto tags!`);
-    return;
+  if (!guildDoc || guildDoc.autoTags.size === 0) {
+    return 'This server has no auto tags!';
   }
 
   let tags = guildDoc.autoTags;
