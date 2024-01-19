@@ -90,32 +90,32 @@ const createTag = async (guild, tag, reason) => {
 
   await guildDoc.save().catch(console.error);
 
-  return `AutoTag ${tag} created with reason ${reason}.`;
+  return(`AutoTag ${tag} created with reason ${reason}.`);
 };
 
 const removeTag = async (guild, tag) => {
   let guildDoc = await Guild.findOne({ guildId: guild.id });
 
   if (!guildDoc) {
-    return `This server has no auto tags!`;
+    return(`This server has no auto tags!`);
   }
 
   if (!guildDoc.autoTags.has(tag)) {
-    return `This server has no auto tag with that name!`;
+    return(`This server has no auto tag with that name!`);
   }
 
   guildDoc.autoTags.delete(tag);
 
   await guildDoc.save().catch(console.error);
 
-  return `AutoTag ${tag} removed.`;
+  return(`AutoTag ${tag} removed.`);
 };
 
 const tagsListEmbed = async (guild) => {
   let guildDoc = await Guild.findOne({ guildId: guild.id });
 
   if (!guildDoc || guildDoc.autoTags.size === 0) {
-    return 'This server has no auto tags!';
+    return('This server has no auto tags!');
   }
 
   let tags = guildDoc.autoTags;
