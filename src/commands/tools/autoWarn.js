@@ -41,6 +41,9 @@ module.exports = {
             .setRequired(true)
         )
     )
+    .addSubcommand((subcommand) =>
+      subcommand.setName('list').setDescription('List all auto warn tags')
+    )
     .setDMPermission(false)
     .setDefaultMemberPermissions(PermissionsBitField.DEAFEN_MEMBERS),
 
@@ -50,56 +53,93 @@ module.exports = {
 
     try {
       if (options.getSubcommand() === 'create') {
-        const reason = options.getString('warn_reason');
-
-        let guildDoc = await Guild.findOneAndUpdate(
-          { guildId: guild.id },
-          {
-            $setOnInsert: {
-              _id: new mongoose.Types.ObjectId(),
-              guildId: guild.id,
-              guildName: guild.name,
-              guildIcon: guild.iconURL(),
-              caseNumber: 0,
-              users: [],
-              autoTags: new Map(),
-            },
-          },
-          { upsert: true, new: true }
-        );
-
-        guildDoc.autoTags.set(tag, reason);
-
-        await interaction.reply(
-          `AutoTag ${tag} created with reason ${reason}.`
-        );
-
-        return await guildDoc.save().catch(console.error);
+        createTag(guild, tag, options.getString('warn_reason'));
       }
 
       if (options.getSubcommand() === 'remove') {
-        let guildDoc = await Guild.findOne({ guildId: guild.id });
+        return await removeTag(guild, tag);
+      }
 
-        if (!guildDoc) {
-          await interaction.reply(`This server has no auto tags!`);
-          return;
-        }
-
-        if (!guildDoc.autoTags.has(tag)) {
-          await interaction.reply(
-            `This server has no auto tag with that name!`
-          );
-          return;
-        }
-
-        guildDoc.autoTags.delete(tag);
-
-        await interaction.reply(`AutoTag ${tag} removed.`);
-
-        return await guildDoc.save().catch(console.error);
+      if (options.getSubcommand() === 'list') {
+        return interaction.reply({ embeds: [tagsListEmbed(guild)] });
       }
     } catch (err) {
       console.error(err);
     }
   },
+};
+
+const createTag = async (guild, tag, reason) => {
+  let guildDoc = await Guild.findOneAndUpdate(
+    { guildId: guild.id },
+    {
+      $setOnInsert: {
+        _id: new mongoose.Types.ObjectId(),
+        guildId: guild.id,
+        guildName: guild.name,
+        guildIcon: guild.iconURL(),
+        caseNumber: 0,
+        users: [],
+        autoTags: new Map(),
+      },
+    },
+    { upsert: true, new: true }
+  );
+
+  guildDoc.autoTags.set(tag, reason);
+
+  await interaction.reply(`AutoTag ${tag} created with reason ${reason}.`);
+
+  return await guildDoc.save().catch(console.error);
+};
+
+const removeTag = async (guild, tag) => {
+  let guildDoc = await Guild.findOne({ guildId: guild.id });
+
+  if (!guildDoc) {
+    await interaction.reply(`This server has no auto tags!`);
+    return;
+  }
+
+  if (!guildDoc.autoTags.has(tag)) {
+    await interaction.reply(`This server has no auto tag with that name!`);
+    return;
+  }
+
+  guildDoc.autoTags.delete(tag);
+
+  await interaction.reply(`AutoTag ${tag} removed.`);
+
+  return await guildDoc.save().catch(console.error);
+};
+
+const tagsListEmbed = async (guild) => {
+  let guildDoc = await Guild.findOne({ guildId: guild.id });
+
+  if (!guildDoc) {
+    await interaction.reply(`This server has no auto tags!`);
+    return;
+  }
+
+  if (guildDoc.autoTags.size === 0) {
+    await interaction.reply(`This server has no auto tags!`);
+    return;
+  }
+
+  let tags = guildDoc.autoTags;
+
+  const embed = {
+    title: `Auto Tags`,
+    description: `List of all auto tags`,
+    fields: [],
+  };
+
+  tags.forEach((value, key) => {
+    embed.fields.push({
+      name: key,
+      value: value,
+    });
+  });
+
+  return embed;
 };
