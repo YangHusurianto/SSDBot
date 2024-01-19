@@ -30,8 +30,8 @@ module.exports = {
 
   async autocomplete(interaction) {
     const focusedValue = interaction.options.getFocused();
-    let tags = await Guild.findOne({ guildId: interaction.guild.id });
-    tags = tags.autoTags;
+    const guild = await findGuild(interaction.guild);
+    let tags = guild.autoTags;
 
     const filtered = Array.from(tags).filter(([key, _value]) =>
       key.startsWith(focusedValue)
@@ -48,21 +48,7 @@ module.exports = {
     const date = new Date();
 
     try {
-      let guildDoc = await Guild.findOneAndUpdate(
-        { guildId: guild.id },
-        {
-          $setOnInsert: {
-            _id: new mongoose.Types.ObjectId(),
-            guildId: guild.id,
-            guildName: guild.name,
-            guildIcon: guild.iconURL(),
-            caseNumber: 0,
-            users: [],
-            autoTags: new Map(),
-          },
-        },
-        { upsert: true, new: true }
-      );
+      const guildDoc = await findGuild(guild);
 
       // create the warning first so we can insert regardless of whether the user exists
       const warning = {
@@ -108,15 +94,33 @@ module.exports = {
       if (target.id === client.user.id) return;
       client.users.send(
         target.id,
-        'You have been warned in Sweet Sugar Dreams, ' + 
-        'these warnings are to inform you that a rule ' +
-        'may have been broken and for us to keep track ' +
-        'of your history on the server. Warnings are not ' +
-        'serious, unless you keep repeating what we warned you for.\n\n' +
-        `Warning: ${reason}`
+        'You have been warned in Sweet Sugar Dreams, ' +
+          'these warnings are to inform you that a rule ' +
+          'may have been broken and for us to keep track ' +
+          'of your history on the server. Warnings are not ' +
+          'serious, unless you keep repeating what we warned you for.\n\n' +
+          `Warning: ${reason}`
       );
     } catch (err) {
       console.error(err);
     }
   },
+};
+
+const findGuild = async (guild) => {
+  return await Guild.findOneAndUpdate(
+    { guildId: guild.id },
+    {
+      $setOnInsert: {
+        _id: new mongoose.Types.ObjectId(),
+        guildId: guild.id,
+        guildName: guild.name,
+        guildIcon: guild.iconURL(),
+        caseNumber: 0,
+        users: [],
+        autoTags: new Map(),
+      },
+    },
+    { upsert: true, new: true }
+  );
 };
