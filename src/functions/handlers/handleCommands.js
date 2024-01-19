@@ -20,9 +20,6 @@ module.exports = (client) => {
 
         commands.set(command.data.name, command);
         commandArray.push(command.data.toJSON());
-        if(command.data.name === "warn") {
-          console.log(command.data.toJSON());
-        }
       }
     }
 
