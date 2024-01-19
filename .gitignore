@@ -1,0 +1,4 @@
+# Basic
+node_modules
+.env
+config.json
