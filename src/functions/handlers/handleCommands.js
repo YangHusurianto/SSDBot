@@ -33,37 +33,37 @@ module.exports = (client) => {
 
     const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
-    // // delete all guild-based commands
-    // rest
-    //   .put(
-    //     Routes.applicationGuildCommands(
-    //       process.env.CLIENT_ID,
-    //       process.env.DEV_GUILD_ID
-    //     ),
-    //     { body: [] }
-    //   )
-    //   .then(() => console.log('Successfully deleted all guild commands.'))
-    //   .catch(console.error);
-
-    try {
-      console.log(
-        `Started refreshing ${client.commandArray.length} application (/) commands.`
-      );
-
-      await rest.put(
+    // delete all guild-based commands
+    rest
+      .put(
         Routes.applicationGuildCommands(
           process.env.CLIENT_ID,
           process.env.DEV_GUILD_ID
         ),
-        { body: client.commandArray }
-      );
+        { body: [] }
+      )
+      .then(() => console.log('Successfully deleted all guild commands.'))
+      .catch(console.error);
 
-      console.log(
-        `Successfully reloaded ${client.commandArray.length} application (/) commands.`
-      );
-    } catch (error) {
-      console.error(error);
-    }
+    // try {
+    //   console.log(
+    //     `Started refreshing ${client.commandArray.length} application (/) commands.`
+    //   );
+
+    //   await rest.put(
+    //     Routes.applicationGuildCommands(
+    //       process.env.CLIENT_ID,
+    //       process.env.DEV_GUILD_ID
+    //     ),
+    //     { body: client.commandArray }
+    //   );
+
+    //   console.log(
+    //     `Successfully reloaded ${client.commandArray.length} application (/) commands.`
+    //   );
+    // } catch (error) {
+    //   console.error(error);
+    // }
 
     // // delete all global commands
     // rest
@@ -76,23 +76,23 @@ module.exports = (client) => {
     //   .then(() => console.log('Successfully deleted all application commands.'))
     //   .catch(console.error);
 
-    // try {
-    //   console.log(
-    //     `Started refreshing ${client.commandArray.length} application (/) commands.`
-    //   );
+    try {
+      console.log(
+        `Started refreshing ${client.commandArray.length} application (/) commands.`
+      );
 
-    //   await rest.put(
-    //     Routes.applicationCommands(
-    //       process.env.CLIENT_ID
-    //     ),
-    //     { body: client.commandArray }
-    //   );
+      await rest.put(
+        Routes.applicationCommands(
+          process.env.CLIENT_ID
+        ),
+        { body: client.commandArray }
+      );
 
-    //   console.log(
-    //     `Successfully reloaded ${client.commandArray.length} application (/) commands.`
-    //   );
-    // } catch (error) {
-    //   console.error(error);
-    // }
+      console.log(
+        `Successfully reloaded ${client.commandArray.length} application (/) commands.`
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 };
