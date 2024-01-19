@@ -111,7 +111,7 @@ module.exports = {
         .setMaxValue(100)
     )
     .setDMPermission(false)
-    .setDefaultMemberPermissions(PermissionsBitField.DEAFEN_MEMBERS),
+    .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild, member } = interaction;

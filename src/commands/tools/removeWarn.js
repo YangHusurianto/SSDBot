@@ -20,7 +20,7 @@ module.exports = {
         .setDescription('The user to warn (used to verify the warning)')
     )
     .setDMPermission(false)
-    .setDefaultMemberPermissions(PermissionsBitField.DEAFEN_MEMBERS),
+    .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild, member } = interaction;

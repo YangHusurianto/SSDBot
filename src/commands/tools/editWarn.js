@@ -21,7 +21,7 @@ module.exports = {
       option.setName('notes').setDescription('Notes about the warning')
     )
     .setDMPermission(false)
-    .setDefaultMemberPermissions(PermissionsBitField.DEAFEN_MEMBERS),
+    .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild } = interaction;

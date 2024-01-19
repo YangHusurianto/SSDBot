@@ -45,7 +45,7 @@ module.exports = {
       subcommand.setName('list').setDescription('List all auto warn tags')
     )
     .setDMPermission(false)
-    .setDefaultMemberPermissions(PermissionsBitField.DEAFEN_MEMBERS),
+    .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild, member } = interaction;
@@ -53,7 +53,9 @@ module.exports = {
 
     try {
       if (options.getSubcommand() === 'create') {
-        return await interaction.reply(createTag(guild, tag, options.getString('warn_reason')));
+        const test = await createTag(guild, tag, options.getString('warn_reason'));
+        console.log(test);
+        return await interaction.reply(test);
       }
 
       if (options.getSubcommand() === 'remove') {

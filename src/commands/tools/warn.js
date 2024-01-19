@@ -2,7 +2,7 @@ const Guild = require('../../schemas/guild');
 
 const {
   SlashCommandBuilder,
-  PermissionsBitField,
+  PermissionFlagsBits,
   escapeMarkdown,
 } = require('discord.js');
 const mongoose = require('mongoose');
@@ -26,7 +26,7 @@ module.exports = {
         .setAutocomplete(true)
     )
     .setDMPermission(false)
-    .setDefaultMemberPermissions(PermissionsBitField.DEAFEN_MEMBERS),
+    .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async autocomplete(interaction) {
     const focusedValue = interaction.options.getFocused();
