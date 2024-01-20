@@ -128,7 +128,7 @@ const tagsListEmbed = async (guild) => {
   });
 
   tags.forEach((value, key) => {
-    embed.fields.push({
+    embed.addFields({
       name: key,
       value: value,
     });
