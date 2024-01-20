@@ -26,7 +26,7 @@ module.exports = {
         .setAutocomplete(true)
     )
     .setDMPermission(false),
-    // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
+  // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async autocomplete(interaction) {
     const focusedValue = interaction.options.getFocused();
@@ -75,8 +75,7 @@ module.exports = {
         guildDoc.users.push(userDoc);
       } else userDoc.warns.push(warning);
 
-      let warnConfirmation =
-        `<:check:1196693134067896370> ${target} has been warned.\n` +
+      let warnData =
         `**WARN** | Case #${guildDoc.caseNumber++}\n` +
         `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
           code: true,
@@ -87,11 +86,15 @@ module.exports = {
         )})\n` +
         `**Reason:** ${reason}\n`;
 
+      let warnConfirmation =
+        `<:check:1196693134067896370> ${target} has been warned.\n` +
+        warnData;
+
       await guildDoc.save().catch(console.error);
 
       await interaction.reply(warnConfirmation);
 
-      if (target.id === client.user.id) return;
+      if (target.id === client.user.id) return; // don't send a message to the bot
       client.users.send(
         target.id,
         'You have been warned in Sweet Sugar Dreams, ' +
@@ -101,6 +104,14 @@ module.exports = {
           'serious, unless you keep repeating what we warned you for.\n\n' +
           `Warning: ${reason}`
       );
+
+      //log to channel
+      if (guildDoc.loggingChannel) {
+        const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
+        if (!logChannel) return;
+
+        await logChannel.send(warnData);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -117,6 +128,7 @@ const findGuild = async (guild) => {
         guildName: guild.name,
         guildIcon: guild.iconURL(),
         caseNumber: 0,
+        loggingChannel: '',
         users: [],
         autoTags: new Map(),
       },

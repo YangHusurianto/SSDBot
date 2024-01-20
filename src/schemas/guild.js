@@ -7,6 +7,7 @@ const guildSchema = new Schema({
   guildName: String,
   guildIcon: String,
   caseNumber: Number,
+  loggingChannel: String,
   users: { type: [userSchema], default: [] },
   autoTags: { type: Map, of: String }
 });
