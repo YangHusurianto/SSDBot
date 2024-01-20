@@ -25,7 +25,7 @@ module.exports = (client) => {
 
     if (process.env.NODE_ENV === 'production') return;
 
-    const refresh = true;
+    const refresh = false;
     if (!refresh) return;
 
     const rest = new REST().setToken(process.env.DISCORD_TOKEN);

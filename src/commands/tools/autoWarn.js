@@ -3,7 +3,6 @@ const Guild = require('../../schemas/guild');
 const {
   SlashCommandBuilder,
   PermissionFlagsBits,
-  escapeMarkdown,
   EmbedBuilder,
 } = require('discord.js');
 const mongoose = require('mongoose');
@@ -54,17 +53,18 @@ module.exports = {
 
     try {
       if (options.getSubcommand() === 'create') {
-        const test = await createTag(guild, tag, options.getString('warn_reason'));
-        console.log(test);
-        return await interaction.reply(test);
+        const tag = await createTag(guild, tag, options.getString('warn_reason'));
+        return await interaction.reply(tag);
       }
 
       if (options.getSubcommand() === 'remove') {
-        return await interaction.reply(removeTag(guild, tag));
+        const removedTag = await removeTag(guild, tag);
+        return await interaction.reply(removedTag);
       }
 
       if (options.getSubcommand() === 'list') {
-        return await interaction.reply({ embeds: [tagsListEmbed(guild)] });
+        const tagsList = await tagsListEmbed(guild);
+        return await interaction.reply({ embeds: [tagsList] });
       }
     } catch (err) {
       console.error(err);
