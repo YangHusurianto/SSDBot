@@ -44,8 +44,8 @@ module.exports = {
     .addSubcommand((subcommand) =>
       subcommand.setName('list').setDescription('List all auto warn tags')
     )
-    .setDMPermission(false)
-    .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
+    .setDMPermission(false),
+    // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild, member } = interaction;

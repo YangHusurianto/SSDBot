@@ -110,8 +110,8 @@ module.exports = {
         .setMinValue(1)
         .setMaxValue(100)
     )
-    .setDMPermission(false)
-    .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
+    .setDMPermission(false),
+    // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild, member } = interaction;

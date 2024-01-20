@@ -30,17 +30,17 @@ module.exports = (client) => {
 
     const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
-    // delete all guild-based commands
-    rest
-      .put(
-        Routes.applicationGuildCommands(
-          process.env.CLIENT_ID,
-          process.env.DEV_GUILD_ID
-        ),
-        { body: [] }
-      )
-      .then(() => console.log('Successfully deleted all guild commands.'))
-      .catch(console.error);
+    // // delete all guild-based commands
+    // rest
+    //   .put(
+    //     Routes.applicationGuildCommands(
+    //       process.env.CLIENT_ID,
+    //       process.env.DEV_GUILD_ID
+    //     ),
+    //     { body: [] }
+    //   )
+    //   .then(() => console.log('Successfully deleted all guild commands.'))
+    //   .catch(console.error);
 
     // try {
     //   console.log(

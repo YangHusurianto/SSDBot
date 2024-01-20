@@ -25,8 +25,8 @@ module.exports = {
         .setDescription('The reason')
         .setAutocomplete(true)
     )
-    .setDMPermission(false)
-    .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
+    .setDMPermission(false),
+    // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async autocomplete(interaction) {
     const focusedValue = interaction.options.getFocused();
