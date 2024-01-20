@@ -65,7 +65,7 @@ module.exports = {
       );
 
       await interaction.reply(
-        `<:check:1196693134067896370> Warning #${warnNumber} edited with new reason: ${reason}.`
+        `<:check:1196693134067896370> Warning #${warnNumber} edited with new reason: ${reason}`
       );
     } catch (err) {
       console.error(err);
