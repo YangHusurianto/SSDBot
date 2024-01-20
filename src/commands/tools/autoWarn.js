@@ -4,6 +4,7 @@ const {
   SlashCommandBuilder,
   PermissionFlagsBits,
   escapeMarkdown,
+  EmbedBuilder,
 } = require('discord.js');
 const mongoose = require('mongoose');
 
@@ -122,11 +123,9 @@ const tagsListEmbed = async (guild) => {
 
   let tags = guildDoc.autoTags;
 
-  const embed = {
-    title: `Auto Tags`,
-    description: `List of all auto tags`,
-    fields: [],
-  };
+  const embed = new EmbedBuilder().setAuthor({
+    name: 'Auto Tags'
+  });
 
   tags.forEach((value, key) => {
     embed.fields.push({

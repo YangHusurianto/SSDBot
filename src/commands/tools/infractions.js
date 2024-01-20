@@ -26,73 +26,6 @@ const dateOptions = {
 
 const INFRACTIONS_PER_PAGE = 5;
 
-const getRecentWarns = async (guildId, userId, timeLimit) => {
-  // const afterDate = new Date(Date.now() - timeLimit);
-  const afterDate = new Date();
-  afterDate.setDate(afterDate.getDate() - timeLimit);
-
-  const warningsAfterDate = await Guild.aggregate([
-    { $match: { guildId: guildId } },
-    { $unwind: '$users' },
-    { $match: { 'users.userId': userId } },
-    { $unwind: '$users.warns' },
-    { $match: { 'users.warns.warnDate': { $gte: afterDate } } },
-    { $project: { _id: 0, warns: '$users.warns' } },
-  ]);
-
-  return warningsAfterDate.length;
-};
-
-// logs embed builder function
-const logsEmbed = (target, page, warnings, recents) => {
-  const embed = new EmbedBuilder().setAuthor({
-    name: `${target.username} (${target.id})`,
-    iconURL: target.avatarURL(),
-  });
-
-  if (warnings.length > 5) {
-    embed.setFooter({
-      text: `Page ${page}/${Math.ceil(warnings.length / 5)}`,
-    });
-  }
-
-  embed.addFields({
-    name: `**Total Infractions:** ${warnings.length}\n`,
-    value:
-      `Infractions within the last 24 hours: ${recents[0].value}\n` +
-      `Infractions within the last 7 days: ${recents[1].value}\n` +
-      `Infractions within the last 30 days: ${recents[2].value}`,
-  });
-
-  const startWarnIndex = (page - 1) * 5;
-  const endWarnIndex =
-    startWarnIndex + 5 > warnings.length ? warnings.length : startWarnIndex + 5;
-
-  for (const warning of warnings.slice(startWarnIndex, endWarnIndex)) {
-    const warnDate = new Intl.DateTimeFormat('en-US', dateOptions).format(
-      warning.warnDate
-    );
-    const moderator = warning.moderatorUserId;
-
-    const notes = warning.moderatorNotes
-      ? `**Notes:** ${warning.moderatorNotes}\n`
-      : '';
-
-    embed.addFields({
-      name: `WARN | Case #${warning.warnNumber}`,
-      value:
-        `**Reason:** ${warning.warnReason}\n` +
-        notes +
-        `**Moderator:** <@${moderator}> ${escapeMarkdown(`(${moderator})`, {
-          code: true,
-        })}\n` +
-        `**Date:** ${warnDate}`,
-    });
-  }
-
-  return embed;
-};
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('infractions')
@@ -111,7 +44,7 @@ module.exports = {
         .setMaxValue(100)
     )
     .setDMPermission(false),
-    // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
+  // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild, member } = interaction;
@@ -206,4 +139,71 @@ module.exports = {
       console.error(err);
     }
   },
+};
+
+const getRecentWarns = async (guildId, userId, timeLimit) => {
+  // const afterDate = new Date(Date.now() - timeLimit);
+  const afterDate = new Date();
+  afterDate.setDate(afterDate.getDate() - timeLimit);
+
+  const warningsAfterDate = await Guild.aggregate([
+    { $match: { guildId: guildId } },
+    { $unwind: '$users' },
+    { $match: { 'users.userId': userId } },
+    { $unwind: '$users.warns' },
+    { $match: { 'users.warns.warnDate': { $gte: afterDate } } },
+    { $project: { _id: 0, warns: '$users.warns' } },
+  ]);
+
+  return warningsAfterDate.length;
+};
+
+// logs embed builder function
+const logsEmbed = (target, page, warnings, recents) => {
+  const embed = new EmbedBuilder().setAuthor({
+    name: `${target.username} (${target.id})`,
+    iconURL: target.avatarURL(),
+  });
+
+  if (warnings.length > 5) {
+    embed.setFooter({
+      text: `Page ${page}/${Math.ceil(warnings.length / 5)}`,
+    });
+  }
+
+  embed.addFields({
+    name: `**Total Infractions:** ${warnings.length}\n`,
+    value:
+      `Infractions within the last 24 hours: ${recents[0].value}\n` +
+      `Infractions within the last 7 days: ${recents[1].value}\n` +
+      `Infractions within the last 30 days: ${recents[2].value}`,
+  });
+
+  const startWarnIndex = (page - 1) * 5;
+  const endWarnIndex =
+    startWarnIndex + 5 > warnings.length ? warnings.length : startWarnIndex + 5;
+
+  for (const warning of warnings.slice(startWarnIndex, endWarnIndex)) {
+    const warnDate = new Intl.DateTimeFormat('en-US', dateOptions).format(
+      warning.warnDate
+    );
+    const moderator = warning.moderatorUserId;
+
+    const notes = warning.moderatorNotes
+      ? `**Notes:** ${warning.moderatorNotes}\n`
+      : '';
+
+    embed.addFields({
+      name: `WARN | Case #${warning.warnNumber}`,
+      value:
+        `**Reason:** ${warning.warnReason}\n` +
+        notes +
+        `**Moderator:** <@${moderator}> ${escapeMarkdown(`(${moderator})`, {
+          code: true,
+        })}\n` +
+        `**Date:** ${warnDate}`,
+    });
+  }
+
+  return embed;
 };
