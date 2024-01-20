@@ -26,8 +26,8 @@ module.exports = {
   async execute(interaction, _client) {
     const { options, guild } = interaction;
     const warnNumber = options.getInteger('warn_number');
-    const reason = options.getString('reason') ?? '';
-    const notes = options.getString('notes') ?? '';
+    let reason = options.getString('reason') ?? '';
+    let notes = options.getString('notes') ?? '';
 
     try {
       const guildDoc = await Guild.findOne(
