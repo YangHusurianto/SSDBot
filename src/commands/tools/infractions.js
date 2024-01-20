@@ -127,6 +127,8 @@ module.exports = {
       console.log(warnings);
       const maxPages = Math.ceil(warnings.length / INFRACTIONS_PER_PAGE);
 
+      if (pages > maxPages) page = maxPages;
+
       if (!targetDoc || !warnings?.length) {
         return interaction.reply({
           embeds: [
