@@ -124,7 +124,6 @@ module.exports = {
         { 'users.$': 1 }
       );
       const warnings = targetDoc.users[0].warns;
-      console.log(warnings);
       const maxPages = Math.ceil(warnings.length / INFRACTIONS_PER_PAGE);
 
       if (page > maxPages) page = maxPages;
