@@ -87,8 +87,7 @@ module.exports = {
         `**Reason:** ${reason}\n`;
 
       let warnConfirmation =
-        `<:check:1196693134067896370> ${target} has been warned.\n` +
-        warnData;
+        `<:check:1196693134067896370> ${target} has been warned.`
 
       await guildDoc.save().catch(console.error);
 
