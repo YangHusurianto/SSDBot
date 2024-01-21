@@ -53,8 +53,8 @@ module.exports = {
 
     try {
       if (options.getSubcommand() === 'create') {
-        const tag = await createTag(guild, tag, options.getString('warn_reason'));
-        return await interaction.reply(tag);
+        const createdTag = await createTag(guild, tag, options.getString('warn_reason'));
+        return await interaction.reply(createdTag);
       }
 
       if (options.getSubcommand() === 'remove') {
