@@ -127,6 +127,9 @@ const tagsListEmbed = async (guild) => {
     name: 'Auto Tags'
   });
 
+  // sort by alphabetical key
+  tags = new Map([...tags.entries()].sort());
+
   tags.forEach((value, key) => {
     embed.addFields({
       name: key,
