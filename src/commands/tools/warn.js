@@ -102,7 +102,7 @@ module.exports = {
           'of your history on the server. Warnings are not ' +
           'serious, unless you keep repeating what we warned you for.\n\n' +
           `Warning: ${reason}`
-      );
+      ).catch(console.error);
 
       //log to channel
       if (guildDoc.loggingChannel) {
