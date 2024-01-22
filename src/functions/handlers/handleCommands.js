@@ -19,6 +19,7 @@ module.exports = (client) => {
         const command = require(`../../commands/${folder}/${file}`);
 
         if (process.env.NODE_ENV === 'test' && folder !== 'dev') continue;
+        if (process.env.NODE_ENV === 'production' && folder === 'dev') continue;
 
         commands.set(command.data.name, command);
         commandArray.push(command.data.toJSON());

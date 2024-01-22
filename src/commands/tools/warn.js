@@ -58,7 +58,7 @@ module.exports = {
 
       if (target.id == '145959145319694336')
         return await interaction.reply({
-          content: 'L + Bozo. Puff is too princess to be warned.',
+          content: 'L + Bozo. Puff is too princess to be warned!',
           ephemeral: true,
         });
 
