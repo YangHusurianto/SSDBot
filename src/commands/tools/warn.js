@@ -54,6 +54,10 @@ module.exports = {
 
     try {
       const guildDoc = await findGuild(guild);
+      
+      if (target.id == '145959145319694336') await interaction.reply(
+        'L + Bozo. Puff is too princess to be warned.', { ephemeral: true }
+      )
 
       // create the warning first so we can insert regardless of whether the user exists
       const warning = {
