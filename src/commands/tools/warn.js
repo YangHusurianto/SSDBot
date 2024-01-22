@@ -36,8 +36,13 @@ module.exports = {
     const filtered = Array.from(tags).filter(([key, _value]) =>
       key.startsWith(focusedValue)
     );
+
+    if (!filtered.length) interaction.respond(
+      tags.map(([key, _value]) => ({ name: key, value: key }))
+    )
+
     await interaction.respond(
-      filtered.map(([key, value]) => ({ name: key, value: value }))
+      filtered.map(([key, _value]) => ({ name: key, value: key }))
     );
   },
 
