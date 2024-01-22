@@ -18,17 +18,48 @@ module.exports = (client) => {
       for (const file of commandFiles) {
         const command = require(`../../commands/${folder}/${file}`);
 
+        if (process.env.NODE_ENV === 'test' && folder !== 'dev') continue;
+
         commands.set(command.data.name, command);
         commandArray.push(command.data.toJSON());
       }
     }
 
-    if (process.env.NODE_ENV === 'production') return;
-
-    const refresh = false;
-    if (!refresh) return;
-
+    const REFRESH_COMMANDS = true;
     const rest = new REST().setToken(process.env.DISCORD_TOKEN);
+
+    if (!REFRESH_COMMANDS) return;
+    console.log(
+      `Started refreshing ${client.commandArray.length} application (/) commands.`
+    );
+
+    if (process.env.NODE_ENV === 'production') {
+      try {
+        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+          body: client.commandArray,
+        });
+      } catch (error) {
+        return console.error(error);
+      }
+    }
+
+    try {
+      await rest.put(
+        Routes.applicationGuildCommands(
+          process.env.CLIENT_ID,
+          process.env.DEV_GUILD_ID
+        ),
+        { body: client.commandArray }
+      );
+    } catch (error) {
+      return console.error(error);
+    }
+
+    console.log(
+      `Successfully reloaded ${client.commandArray.length} application (/) commands.`
+    );
+
+    return;
 
     // // delete all guild-based commands
     // rest
@@ -42,26 +73,6 @@ module.exports = (client) => {
     //   .then(() => console.log('Successfully deleted all guild commands.'))
     //   .catch(console.error);
 
-    // try {
-    //   console.log(
-    //     `Started refreshing ${client.commandArray.length} application (/) commands.`
-    //   );
-
-    //   await rest.put(
-    //     Routes.applicationGuildCommands(
-    //       process.env.CLIENT_ID,
-    //       process.env.DEV_GUILD_ID
-    //     ),
-    //     { body: client.commandArray }
-    //   );
-
-    //   console.log(
-    //     `Successfully reloaded ${client.commandArray.length} application (/) commands.`
-    //   );
-    // } catch (error) {
-    //   console.error(error);
-    // }
-
     // // delete all global commands
     // rest
     //   .put(
@@ -72,24 +83,5 @@ module.exports = (client) => {
     //   )
     //   .then(() => console.log('Successfully deleted all application commands.'))
     //   .catch(console.error);
-
-    try {
-      console.log(
-        `Started refreshing ${client.commandArray.length} application (/) commands.`
-      );
-
-      await rest.put(
-        Routes.applicationCommands(
-          process.env.CLIENT_ID
-        ),
-        { body: client.commandArray }
-      );
-
-      console.log(
-        `Successfully reloaded ${client.commandArray.length} application (/) commands.`
-      );
-    } catch (error) {
-      console.error(error);
-    }
   };
 };
