@@ -37,9 +37,10 @@ module.exports = {
       key.startsWith(focusedValue)
     );
 
-    if (!filtered.length) interaction.respond(
-      tags.map(([key, _value]) => ({ name: key, value: key }))
-    )
+    if (!filtered.length)
+      interaction.respond(
+        tags.map(([key, _value]) => ({ name: key, value: key }))
+      );
 
     await interaction.respond(
       filtered.map(([key, _value]) => ({ name: key, value: key }))
@@ -54,10 +55,12 @@ module.exports = {
 
     try {
       const guildDoc = await findGuild(guild);
-      
-      if (target.id == '145959145319694336') await interaction.reply(
-        'L + Bozo. Puff is too princess to be warned.', { ephemeral: true }
-      )
+
+      if (target.id == '145959145319694336')
+        return await interaction.reply({
+          content: 'L + Bozo. Puff is too princess to be warned.',
+          ephemeral: true,
+        });
 
       // create the warning first so we can insert regardless of whether the user exists
       const warning = {
@@ -95,23 +98,24 @@ module.exports = {
         )})\n` +
         `**Reason:** ${reason}\n`;
 
-      let warnConfirmation =
-        `<:check:1196693134067896370> ${target} has been warned.`
+      let warnConfirmation = `<:check:1196693134067896370> ${target} has been warned.`;
 
       await guildDoc.save().catch(console.error);
 
       await interaction.reply(warnConfirmation);
 
       if (target.id === client.user.id) return; // don't send a message to the bot
-      client.users.send(
-        target.id,
-        'You have been warned in Sweet Sugar Dreams, ' +
-          'these warnings are to inform you that a rule ' +
-          'may have been broken and for us to keep track ' +
-          'of your history on the server. Warnings are not ' +
-          'serious, unless you keep repeating what we warned you for.\n\n' +
-          `Warning: ${reason}`
-      ).catch(console.error);
+      client.users
+        .send(
+          target.id,
+          'You have been warned in Sweet Sugar Dreams, ' +
+            'these warnings are to inform you that a rule ' +
+            'may have been broken and for us to keep track ' +
+            'of your history on the server. Warnings are not ' +
+            'serious, unless you keep repeating what we warned you for.\n\n' +
+            `Warning: ${reason}`
+        )
+        .catch(console.error);
 
       //log to channel
       if (guildDoc.loggingChannel) {
