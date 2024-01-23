@@ -29,6 +29,7 @@ module.exports = {
     delete require.cache[require.resolve(`./commands/tools/${command.data.name}.js`)];
 
     try {
+      await execCommand('git reset --hard');
       await execCommand('git fetch');
       await execCommand('git pull');
     } catch (error) {
@@ -56,6 +57,6 @@ module.exports = {
 
 async function execCommand(command) {
   const { stdout, stderr } = await exec(command);
-  console.log('stdout:', stdout);
-  console.log('stderr:', stderr);
+  if (stdout) console.log('stdout:', stdout);
+  if (stderr) console.log('stderr:', stderr);
 }
