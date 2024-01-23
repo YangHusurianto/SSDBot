@@ -154,7 +154,7 @@ module.exports = {
             nextWarnPage.setDisabled(false);
             if (warnPage - 1 == 1) previousWarnPage.setDisabled(true);
             await i.update({
-              embeds: [logsEmbed(target, --warnPage, warnings, notes)],
+              embeds: [logsEmbed(target, --warnPage, warnings, recents, notes)],
               components: [warnPageControls],
             });
             break;
@@ -162,7 +162,7 @@ module.exports = {
             previousWarnPage.setDisabled(false);
             if (warnPage + 1 == maxWarnPages) nextWarnPage.setDisabled(true);
             await i.update({
-              embeds: [logsEmbed(target, ++warnPage, warnings, notes)],
+              embeds: [logsEmbed(target, ++warnPage, warnings, recents, notes)],
               components: [warnPageControls],
             });
             break;
@@ -191,7 +191,7 @@ module.exports = {
             break;
           case 'return':
             await i.update({
-              embeds: [logsEmbed(target, warnPage, warnings, notes)],
+              embeds: [logsEmbed(target, warnPage, warnings, recents, notes)],
               components: [warnPageControls],
             });
             break;
