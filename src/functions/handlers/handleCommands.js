@@ -26,10 +26,8 @@ module.exports = (client) => {
       }
     }
 
-    const REFRESH_COMMANDS = true;
     const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
-    if (!REFRESH_COMMANDS) return;
     // // delete all guild-based commands
     // rest
     //   .put(
@@ -44,14 +42,12 @@ module.exports = (client) => {
 
     // // delete all global commands
     // rest
-    //   .put(
-    //     Routes.applicationCommands(
-    //       process.env.CLIENT_ID
-    //     ),
-    //     { body: [] }
-    //   )
+    //   .put(Routes.applicationCommands(process.env.CLIENT_ID), { body: [] })
     //   .then(() => console.log('Successfully deleted all application commands.'))
     //   .catch(console.error);
+
+    const REFRESH_COMMANDS = true;
+    if (!REFRESH_COMMANDS) return;
 
     console.log(
       `Started refreshing ${client.commandArray.length} application (/) commands.`
