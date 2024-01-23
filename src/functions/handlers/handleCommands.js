@@ -68,7 +68,7 @@ module.exports = (client) => {
     );
 
     console.log(
-      `Started refreshing ${client.testingCommandArray.length} guild application (/) commands.`
+      `Started refreshing ${client.guildCommandArray.length} guild application (/) commands.`
     );
 
     try {
@@ -77,14 +77,14 @@ module.exports = (client) => {
           process.env.CLIENT_ID,
           process.env.DEV_GUILD_ID
         ),
-        { body: client.testingCommandArray }
+        { body: client.guildCommandArray }
       );
     } catch (error) {
       return console.error(error);
     }
 
     console.log(
-      `Successfully reloaded ${client.testingCommandArray.length} guild application (/) commands.`
+      `Successfully reloaded ${client.guildCommandArray.length} guild application (/) commands.`
     );
 
     
