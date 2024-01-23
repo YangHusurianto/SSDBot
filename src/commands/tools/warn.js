@@ -39,12 +39,12 @@ module.exports = {
 
     if (!filtered.length) {
       return await interaction.respond(
-        Array.from(tags).map(([key, _value]) => ({ name: key, value: _key }))
+        Array.from(tags).map(([key, _value]) => ({ name: key, value: _value }))
       );
     }
 
     return await interaction.respond(
-      filtered.map(([key, _value]) => ({ name: key, value: _key }))
+      filtered.map(([key, _value]) => ({ name: key, value: _value }))
     );
   },
 
@@ -65,7 +65,7 @@ module.exports = {
       
       // pull the tags list and convert to value
       let tags = guildDoc.autoTags;
-      reason = tags.get(reason) ?? reason;
+      reason = tags.get(reason) ?? reasong;
 
       // create the warning first so we can insert regardless of whether the user exists
       const warning = {
