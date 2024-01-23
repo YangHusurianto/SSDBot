@@ -39,12 +39,12 @@ module.exports = {
 
     if (!filtered.length) {
       return await interaction.respond(
-        Array.from(tags).map(([key, _value]) => ({ name: key, value: _value }))
+        Array.from(tags).map(([key, _value]) => ({ name: key, value: key }))
       );
     }
 
     return await interaction.respond(
-      filtered.map(([key, _value]) => ({ name: key, value: _value }))
+      filtered.map(([key, _value]) => ({ name: key, value: key }))
     );
   },
 
