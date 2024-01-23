@@ -84,7 +84,7 @@ module.exports = {
         },
       ];
 
-      const embed = logsEmbed(target, page, warnings, recents);
+      const embed = logsEmbed(target, page, warnings, recents, notes);
 
       const previousButton = new ButtonBuilder()
         .setCustomId('previous')
