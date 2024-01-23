@@ -18,8 +18,11 @@ module.exports = (client) => {
       for (const file of commandFiles) {
         const command = require(`../../commands/${folder}/${file}`);
 
-        if (process.env.NODE_ENV === 'test' && folder !== 'dev') continue;
-        if (process.env.NODE_ENV === 'production' && folder === 'dev') continue;
+        if (folder === 'dev') {
+          client.testingCommands.set(command.data.name, command);
+          client.testingCommandArray.push(command.data.toJSON());
+          continue;
+        }
 
         commands.set(command.data.name, command);
         commandArray.push(command.data.toJSON());
@@ -53,34 +56,39 @@ module.exports = (client) => {
       `Started refreshing ${client.commandArray.length} application (/) commands.`
     );
 
-    if (process.env.NODE_ENV === 'production') {
-      try {
-        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
-          body: client.commandArray,
-        });
-      } catch (error) {
-        return console.error(error);
-      }
-    }
-
-    if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
-      try {
-        await rest.put(
-          Routes.applicationGuildCommands(
-            process.env.CLIENT_ID,
-            process.env.DEV_GUILD_ID
-          ),
-          { body: client.commandArray }
-        );
-      } catch (error) {
-        return console.error(error);
-      }
+    try {
+      await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+        body: client.commandArray,
+      });
+    } catch (error) {
+      return console.error(error);
     }
 
     console.log(
       `Successfully reloaded ${client.commandArray.length} application (/) commands.`
     );
 
+    console.log(
+      `Started refreshing ${client.testingCommandArray.length} guild application (/) commands.`
+    );
+
+    try {
+      await rest.put(
+        Routes.applicationGuildCommands(
+          process.env.CLIENT_ID,
+          process.env.DEV_GUILD_ID
+        ),
+        { body: client.testingCommandArray }
+      );
+    } catch (error) {
+      return console.error(error);
+    }
+
+    console.log(
+      `Successfully reloaded ${client.testingCommandArray.length} guild application (/) commands.`
+    );
+
+    
     return;
   };
 };
