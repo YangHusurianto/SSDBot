@@ -30,6 +30,29 @@ module.exports = (client) => {
     const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
     if (!REFRESH_COMMANDS) return;
+    // // delete all guild-based commands
+    // rest
+    //   .put(
+    //     Routes.applicationGuildCommands(
+    //       process.env.CLIENT_ID,
+    //       process.env.DEV_GUILD_ID
+    //     ),
+    //     { body: [] }
+    //   )
+    //   .then(() => console.log('Successfully deleted all guild commands.'))
+    //   .catch(console.error);
+
+    // // delete all global commands
+    // rest
+    //   .put(
+    //     Routes.applicationCommands(
+    //       process.env.CLIENT_ID
+    //     ),
+    //     { body: [] }
+    //   )
+    //   .then(() => console.log('Successfully deleted all application commands.'))
+    //   .catch(console.error);
+
     console.log(
       `Started refreshing ${client.commandArray.length} application (/) commands.`
     );
@@ -61,28 +84,5 @@ module.exports = (client) => {
     );
 
     return;
-
-    // // delete all guild-based commands
-    // rest
-    //   .put(
-    //     Routes.applicationGuildCommands(
-    //       process.env.CLIENT_ID,
-    //       process.env.DEV_GUILD_ID
-    //     ),
-    //     { body: [] }
-    //   )
-    //   .then(() => console.log('Successfully deleted all guild commands.'))
-    //   .catch(console.error);
-
-    // // delete all global commands
-    // rest
-    //   .put(
-    //     Routes.applicationCommands(
-    //       process.env.CLIENT_ID
-    //     ),
-    //     { body: [] }
-    //   )
-    //   .then(() => console.log('Successfully deleted all application commands.'))
-    //   .catch(console.error);
   };
 };
