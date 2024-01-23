@@ -28,8 +28,8 @@ module.exports = (client) => {
         case 'mongo':
           for (const file of eventFiles) {
             const event = require(`../../events/mongo/${file}`)
-            if (event.once) connection.once(event.name, (...args) => event.execute(...args));
-            else connection.on(event.name, (...args) => event.execute(...args));
+            if (event.once) connection.once(event.name, (...args) => event.execute(...args, client));
+            else connection.on(event.name, (...args) => event.execute(...args, client));
           }
         default:
           break;
