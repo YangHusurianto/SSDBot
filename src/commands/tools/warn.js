@@ -39,12 +39,12 @@ module.exports = {
 
     if (!filtered.length) {
       return await interaction.respond(
-        Array.from(tags).map(([key, value]) => ({ name: key, value: value }))
+        Array.from(tags).map(([key, _value]) => ({ name: key, value: _key }))
       );
     }
 
     return await interaction.respond(
-      filtered.map(([key, value]) => ({ name: key, value: value }))
+      filtered.map(([key, _value]) => ({ name: key, value: _key }))
     );
   },
 
@@ -62,6 +62,10 @@ module.exports = {
           content: 'L + Bozo. Puff is too princess to be warned!',
           ephemeral: true,
         });
+      
+      // pull the tags list and convert to value
+      let tags = guildDoc.autoTags;
+      reason = tags.get(reason) ?? reason;
 
       // create the warning first so we can insert regardless of whether the user exists
       const warning = {
