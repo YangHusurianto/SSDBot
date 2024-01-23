@@ -26,7 +26,9 @@ module.exports = {
       );
     }
 
-    delete require.cache[require.resolve(`./commands/tools/${command.data.name}.js`)];
+    const commandPath = `../tools/${command.data.name}.js`
+
+    delete require.cache[require.resolve(commandPath)];
 
     try {
       await execCommand('git reset --hard');
@@ -41,7 +43,7 @@ module.exports = {
 
     try {
       interaction.client.commands.delete(command.data.name);
-      const newCommand = require(`./commands/tools/${command.data.name}.js`);
+      const newCommand = require(commandPath);
       interaction.client.commands.set(newCommand.data.name, newCommand);
       await interaction.reply(
         `Command \`${newCommand.data.name}\` was reloaded!`
