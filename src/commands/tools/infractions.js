@@ -47,7 +47,7 @@ module.exports = {
   async execute(interaction, _client) {
     const { options, guild } = interaction;
     const target = options.getUser('user');
-    let page = options.getInteger('page') ?? 1;
+    var warnPage = options.getInteger('page') ?? 1;
 
     try {
       const targetDoc = await Guild.findOne(
@@ -55,12 +55,15 @@ module.exports = {
         { 'users.$': 1 }
       );
       const warnings = targetDoc.users[0].warns;
+      const maxWarnPages = Math.ceil(warnings.length / INFRACTIONS_PER_PAGE);
+
       const notes = targetDoc.users[0].notes;
-      const maxPages = Math.ceil(warnings.length / INFRACTIONS_PER_PAGE);
+      const maxNotesPages = Math.ceil(notes.length / INFRACTIONS_PER_PAGE);
+      var notesPage = 1;
 
-      if (page > maxPages) page = maxPages;
+      if (warnPage > maxWarnPages) warnPage = maxWarnPages;
 
-      if (!targetDoc || !warnings?.length) {
+      if (!targetDoc || !warnings?.length || !notes?.length) {
         return interaction.reply({
           embeds: [
             new EmbedBuilder()
@@ -69,7 +72,7 @@ module.exports = {
                 iconURL: target.avatarURL(),
               })
               .addFields({
-                'This user has no infractions': '🎉',
+                'This user has no infractions or notes!': '🎉',
               }),
           ],
         });
@@ -84,15 +87,15 @@ module.exports = {
         },
       ];
 
-      const embed = logsEmbed(target, page, warnings, recents, notes);
+      const embed = logsEmbed(target, warnPage, warnings, recents, notes);
 
-      const previousButton = new ButtonBuilder()
-        .setCustomId('previous')
+      const previousWarnPage = new ButtonBuilder()
+        .setCustomId('previousWarn')
         .setLabel('◀')
         .setStyle('Primary');
 
-      const nextButton = new ButtonBuilder()
-        .setCustomId('next')
+      const nextWarnPage = new ButtonBuilder()
+        .setCustomId('nextWarn')
         .setLabel('▶')
         .setStyle('Primary');
 
@@ -101,27 +104,44 @@ module.exports = {
         .setLabel('Notes')
         .setStyle('Secondary');
 
-      if (page == 1) previousButton.setDisabled(true);
-      if (page == maxPages) nextButton.setDisabled(true);
-      if (!notes.length) notesButton.setDisabled(true);
+      const previousNotesPage = new ButtonBuilder()
+        .setCustomId('previousNotes')
+        .setLabel('◀')
+        .setStyle('Primary');
 
-      const pageControls = new ActionRowBuilder().addComponents(
-        previousButton,
-        nextButton,
-        notesButton
-      );
-
-      const response = await interaction.reply({
-        embeds: [embed],
-        components: [pageControls],
-      });
+      const nextNotesPage = new ButtonBuilder()
+        .setCustomId('nextNotes')
+        .setLabel('▶')
+        .setStyle('Primary');
 
       const returnButton = new ButtonBuilder()
         .setCustomId('return')
         .setLabel('Return')
         .setStyle('Primary');
 
-      const returnControls = new ActionRowBuilder().addComponents(returnButton);
+      if (warnPage == 1) previousWarnPage.setDisabled(true);
+      if (warnPage == maxWarnPages) nextWarnPage.setDisabled(true);
+      if (!notes.length) notesButton.setDisabled(true);
+
+      if (notesPage == 1) previousNotesPage.setDisabled(true);
+      if (notesPage == maxNotesPages) nextNotesPage.setDisabled(true);
+
+      const warnPageControls = new ActionRowBuilder().addComponents(
+        previousWarnPage,
+        nextWarnPage,
+        notesButton
+      );
+
+      const notesPageControls = new ActionRowBuilder().addComponents(
+        previousNotesPage,
+        nextNotesPage,
+        returnButton
+      );
+
+      const response = await interaction.reply({
+        embeds: [embed],
+        components: [warnPageControls],
+      });
 
       const collector = response.createMessageComponentCollector({
         componentType: ComponentType.Button,
@@ -130,32 +150,49 @@ module.exports = {
 
       collector.on('collect', async (i) => {
         switch (i.customId) {
-          case 'previous':
-            nextButton.setDisabled(false);
-            if (page - 1 == 1) previousButton.setDisabled(true);
+          case 'previousWarn':
+            nextWarnPage.setDisabled(false);
+            if (warnPage - 1 == 1) previousWarnPage.setDisabled(true);
             await i.update({
-              embeds: [logsEmbed(target, --page, warnings, notes)],
-              components: [pageControls],
+              embeds: [logsEmbed(target, --warnPage, warnings, notes)],
+              components: [warnPageControls],
             });
             break;
-          case 'next':
-            previousButton.setDisabled(false);
-            if (page + 1 == maxPages) nextButton.setDisabled(true);
+          case 'nextWarn':
+            previousWarnPage.setDisabled(false);
+            if (warnPage + 1 == maxWarnPages) nextWarnPage.setDisabled(true);
             await i.update({
-              embeds: [logsEmbed(target, ++page, warnings, notes)],
-              components: [pageControls],
+              embeds: [logsEmbed(target, ++warnPage, warnings, notes)],
+              components: [warnPageControls],
             });
             break;
           case 'notes':
             await i.update({
               embeds: [notesEmbed(target, notes)],
-              components: [returnControls],
+              components: [notesPageControls],
+            });
+            break;
+          case 'previousNotes':
+            nextNotesPage.setDisabled(false);
+            if (notesPage - 1 == 1) previousNotesPage.setDisabled(true);
+            await i.update({
+              embeds: [notesEmbed(target, --notesPage, notes)],
+              components: [notesPageControls],
+            });
+            break;
+          case 'nextNotes':
+            previousNotesPage.setDisabled(false);
+            if (notesPage + 1 == maxNotesPages)
+              nextNotesPage.setDisabled(true);
+            await i.update({
+              embeds: [notesEmbed(target, ++notesPage, notes)],
+              components: [notesPageControls],
             });
             break;
           case 'return':
             await i.update({
-              embeds: [logsEmbed(target, page, warnings, notes)],
-              components: [pageControls],
+              embeds: [logsEmbed(target, warnPage, warnings, notes)],
+              components: [warnPageControls],
             });
             break;
         }
@@ -203,6 +240,8 @@ const logsEmbed = (target, page, warnings, recents, notes) => {
       `Infractions within the last 7 days: ${recents[1].value}\n` +
       `Infractions within the last 30 days: ${recents[2].value}`,
   });
+
+  if (warnings.length === 0) return embed;
 
   const startWarnIndex = (page - 1) * 5;
   const endWarnIndex =
