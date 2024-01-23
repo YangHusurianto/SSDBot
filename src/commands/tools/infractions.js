@@ -168,7 +168,7 @@ module.exports = {
             break;
           case 'notes':
             await i.update({
-              embeds: [notesEmbed(target, notes)],
+              embeds: [notesEmbed(target, notesPage, notes)],
               components: [notesPageControls],
             });
             break;
