@@ -11,7 +11,18 @@ module.exports = {
         .setName('command')
         .setDescription('The command to reload.')
         .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName('type')
+        .setDescription('The type of reload.')
+        .setRequired(true)
+        .addChoices(
+          { name: 'Github', value: 'git' },
+          { name: 'Local', value: 'local' }
+        )
     ),
+
   async execute(interaction) {
     if (interaction.member.id !== '147869832275034112') return;
 
@@ -26,19 +37,21 @@ module.exports = {
       );
     }
 
-    const commandPath = `../tools/${command.data.name}.js`
+    const commandPath = `../tools/${command.data.name}.js`;
 
     delete require.cache[require.resolve(commandPath)];
 
-    try {
-      await execCommand('git reset --hard');
-      await execCommand('git fetch');
-      await execCommand('git pull');
-    } catch (error) {
-      console.error(error);
-      return await interaction.reply(
-        `There was an error while reloading a command \`${command.data.name}\`:\n\`${error.message}\``
-      );
+    if (interaction.options.getString('type', true) === 'git') {
+      try {
+        await execCommand('git reset --hard');
+        await execCommand('git fetch');
+        await execCommand('git pull');
+      } catch (error) {
+        console.error(error);
+        return await interaction.reply(
+          `There was a git error while reloading a command \`${command.data.name}\`:\n\`${error.message}\``
+        );
+      }
     }
 
     try {
