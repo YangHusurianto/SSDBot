@@ -64,17 +64,16 @@ module.exports = {
       if (warnPage > maxWarnPages) warnPage = maxWarnPages;
 
       if (!targetDoc || !warnings?.length || !notes?.length) {
+        const embed = new EmbedBuilder().setAuthor({
+          name: `${target.username} (${target.id})`,
+          iconURL: target.avatarURL(),
+        });
+        embed.addFields({
+          'This user has no infractions or notes!': '🎉',
+        });
+
         return interaction.reply({
-          embeds: [
-            new EmbedBuilder()
-              .setAuthor({
-                name: `${target.username} (${target.id})`,
-                iconURL: target.avatarURL(),
-              })
-              .addFields({
-                'This user has no infractions or notes!': '🎉',
-              }),
-          ],
+          embeds: [embed],
         });
       }
 
@@ -182,8 +181,7 @@ module.exports = {
             break;
           case 'nextNotes':
             previousNotesPage.setDisabled(false);
-            if (notesPage + 1 == maxNotesPages)
-              nextNotesPage.setDisabled(true);
+            if (notesPage + 1 == maxNotesPages) nextNotesPage.setDisabled(true);
             await i.update({
               embeds: [notesEmbed(target, ++notesPage, notes)],
               components: [notesPageControls],
