@@ -11,6 +11,4 @@ const warnSchema = new Schema({
   moderatorNotes: String
 });
 
-// let Warn = model("warningSchema", warnSchema, "userWarns");
-// module.exports = { Warn, warnSchema }
 module.exports = { warnSchema }

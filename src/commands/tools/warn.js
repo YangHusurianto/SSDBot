@@ -2,7 +2,6 @@ const Guild = require('../../schemas/guild');
 
 const {
   SlashCommandBuilder,
-  PermissionFlagsBits,
   escapeMarkdown,
 } = require('discord.js');
 const mongoose = require('mongoose');
@@ -86,6 +85,7 @@ module.exports = {
           userId: target.id,
           userName: target.username,
           userNick: target.displayName,
+          notes: [],
           warns: [warning],
         };
 

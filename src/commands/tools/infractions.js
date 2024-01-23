@@ -2,7 +2,6 @@ const Guild = require('../../schemas/guild');
 
 const {
   SlashCommandBuilder,
-  PermissionFlagsBits,
   EmbedBuilder,
   escapeMarkdown,
   ActionRowBuilder,
@@ -44,10 +43,9 @@ module.exports = {
         .setMaxValue(100)
     )
     .setDMPermission(false),
-  // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
-    const { options, guild, member } = interaction;
+    const { options, guild } = interaction;
     const target = options.getUser('user');
     let page = options.getInteger('page') ?? 1;
 
@@ -57,6 +55,7 @@ module.exports = {
         { 'users.$': 1 }
       );
       const warnings = targetDoc.users[0].warns;
+      const notes = targetDoc.users[0].notes;
       const maxPages = Math.ceil(warnings.length / INFRACTIONS_PER_PAGE);
 
       if (page > maxPages) page = maxPages;
@@ -97,18 +96,32 @@ module.exports = {
         .setLabel('▶')
         .setStyle('Primary');
 
+      const notesButton = new ButtonBuilder()
+        .setCustomId('notes')
+        .setLabel('Notes')
+        .setStyle('Secondary');
+
       if (page == 1) previousButton.setDisabled(true);
       if (page == maxPages) nextButton.setDisabled(true);
+      if (!notes.length) notes.setDisabled(true);
 
       const pageControls = new ActionRowBuilder().addComponents(
         previousButton,
-        nextButton
+        nextButton,
+        notesButton
       );
 
       const response = await interaction.reply({
         embeds: [embed],
         components: [pageControls],
       });
+
+      const returnButton = new ButtonBuilder()
+        .setCustomId('return')
+        .setLabel('Return')
+        .setStyle('Primary');
+
+      const returnControls = new ActionRowBuilder().addComponents(returnButton);
 
       const collector = response.createMessageComponentCollector({
         componentType: ComponentType.Button,
@@ -121,7 +134,7 @@ module.exports = {
             nextButton.setDisabled(false);
             if (page - 1 == 1) previousButton.setDisabled(true);
             await i.update({
-              embeds: [logsEmbed(target, --page, warnings)],
+              embeds: [logsEmbed(target, --page, warnings, notes)],
               components: [pageControls],
             });
             break;
@@ -129,7 +142,19 @@ module.exports = {
             previousButton.setDisabled(false);
             if (page + 1 == maxPages) nextButton.setDisabled(true);
             await i.update({
-              embeds: [logsEmbed(target, ++page, warnings)],
+              embeds: [logsEmbed(target, ++page, warnings, notes)],
+              components: [pageControls],
+            });
+            break;
+          case 'notes':
+            await i.update({
+              embeds: [notesEmbed(target, notes)],
+              components: [returnControls],
+            });
+            break;
+          case 'return':
+            await i.update({
+              embeds: [logsEmbed(target, page, warnings, notes)],
               components: [pageControls],
             });
             break;
@@ -159,7 +184,7 @@ const getRecentWarns = async (guildId, userId, timeLimit) => {
 };
 
 // logs embed builder function
-const logsEmbed = (target, page, warnings, recents) => {
+const logsEmbed = (target, page, warnings, recents, notes) => {
   const embed = new EmbedBuilder().setAuthor({
     name: `${target.username} (${target.id})`,
     iconURL: target.avatarURL(),
@@ -172,7 +197,7 @@ const logsEmbed = (target, page, warnings, recents) => {
   }
 
   embed.addFields({
-    name: `**Total Infractions:** ${warnings.length}\n`,
+    name: `**Total Infractions:** ${warnings.length} | **Total Notes:** ${notes.length}`,
     value:
       `Infractions within the last 24 hours: ${recents[0].value}\n` +
       `Infractions within the last 7 days: ${recents[1].value}\n` +
@@ -202,6 +227,42 @@ const logsEmbed = (target, page, warnings, recents) => {
           code: true,
         })}\n` +
         `**Date:** ${warnDate}`,
+    });
+  }
+
+  return embed;
+};
+
+const notesEmbed = (target, notes) => {
+  const embed = new EmbedBuilder().setAuthor({
+    name: `${target.username} (${target.id})`,
+    iconURL: target.avatarURL(),
+  });
+
+  if (notes.length > 5) {
+    embed.setFooter({
+      text: `Page ${page}/${Math.ceil(notes.length / 5)}`,
+    });
+  }
+
+  const startNoteIndex = (page - 1) * 5;
+  const endNoteIndex =
+    startNoteIndex + 5 > notes.length ? notes.length : startNoteIndex + 5;
+
+  for (const note of notes.slice(startNoteIndex, endNoteIndex)) {
+    const noteDate = new Intl.DateTimeFormat('en-US', dateOptions).format(
+      note.noteDate
+    );
+    const moderator = note.moderatorUserId;
+
+    embed.addFields({
+      name: `**Notes:** | Case #${note.noteNumber}`,
+      value:
+        `**Note:** ${note.note}\n` +
+        `**Moderator:** <@${moderator}> ${escapeMarkdown(`(${moderator})`, {
+          code: true,
+        })}\n` +
+        `**Date:** ${noteDate}`,
     });
   }
 
