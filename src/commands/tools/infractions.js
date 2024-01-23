@@ -295,7 +295,7 @@ const notesEmbed = (target, notesPage, notes) => {
     const moderator = note.moderatorUserId;
 
     embed.addFields({
-      name: `**Notes:** | Case #${note.noteNumber}`,
+      name: `**Notes** | Case #${note.noteNumber}`,
       value:
         `**Note:** ${note.note}\n` +
         `**Moderator:** <@${moderator}> ${escapeMarkdown(`(${moderator})`, {
