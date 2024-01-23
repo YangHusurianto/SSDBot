@@ -72,7 +72,8 @@ module.exports = {
                 iconURL: target.avatarURL(),
               })
               .addFields({
-                value: 'This user has no infractions or notes! 🎉',
+                name: 'No Infractions or Notes',
+                value: '🎉',
               }),
           ],
         });
