@@ -40,7 +40,7 @@ module.exports = {
         noteNumber: guildDoc.caseNumber,
         note: noteInfo,
         noteDate: date,
-        moderatorUserId: member.user.id,
+        moderatorUserId: member.user.id, 
       };
 
       let userDoc = guildDoc.users.find((user) => user.userId === target.id);
@@ -66,7 +66,7 @@ module.exports = {
           `${member.user.username} (${member.user.id}`,
           { code: true }
         )})\n` +
-        `**Note:** ${reason}\n`;
+        `**Note:** ${noteInfo}\n`;
 
       let noteConfirmation = `<:check:1196693134067896370> A note has been placed under ${target}.`;
 
