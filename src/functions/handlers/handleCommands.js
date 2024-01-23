@@ -63,16 +63,18 @@ module.exports = (client) => {
       }
     }
 
-    try {
-      await rest.put(
-        Routes.applicationGuildCommands(
-          process.env.CLIENT_ID,
-          process.env.DEV_GUILD_ID
-        ),
-        { body: client.commandArray }
-      );
-    } catch (error) {
-      return console.error(error);
+    if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
+      try {
+        await rest.put(
+          Routes.applicationGuildCommands(
+            process.env.CLIENT_ID,
+            process.env.DEV_GUILD_ID
+          ),
+          { body: client.commandArray }
+        );
+      } catch (error) {
+        return console.error(error);
+      }
     }
 
     console.log(
