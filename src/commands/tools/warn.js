@@ -65,7 +65,7 @@ module.exports = {
       
       // pull the tags list and convert to value
       let tags = guildDoc.autoTags;
-      reason = tags.get(reason) ?? reasong;
+      reason = tags.get(reason) ?? reason;
 
       // create the warning first so we can insert regardless of whether the user exists
       const warning = {
