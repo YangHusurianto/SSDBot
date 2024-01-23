@@ -16,7 +16,7 @@ module.exports = (client) => {
 
       const { commands, commandArray } = client;
       for (const file of commandFiles) {
-        const command = require(`../../commands/${folder}/${file}`);        
+        const command = require(`../../commands/${folder}/${file}`);
 
         commands.set(command.data.name, command);
         if (folder === 'dev') {
@@ -30,25 +30,31 @@ module.exports = (client) => {
 
     const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
-    // // delete all guild-based commands
-    // rest
-    //   .put(
-    //     Routes.applicationGuildCommands(
-    //       process.env.CLIENT_ID,
-    //       process.env.DEV_GUILD_ID
-    //     ),
-    //     { body: [] }
-    //   )
-    //   .then(() => console.log('Successfully deleted all guild commands.'))
-    //   .catch(console.error);
+    // delete all guild-based commands
+    if (false) {
+      rest
+        .put(
+          Routes.applicationGuildCommands(
+            process.env.CLIENT_ID,
+            process.env.DEV_GUILD_ID
+          ),
+          { body: [] }
+        )
+        .then(() => console.log('Successfully deleted all guild commands.'))
+        .catch(console.error);
+    }
 
-    // // delete all global commands
-    // rest
-    //   .put(Routes.applicationCommands(process.env.CLIENT_ID), { body: [] })
-    //   .then(() => console.log('Successfully deleted all application commands.'))
-    //   .catch(console.error);
+    // delete all global commands
+    if (false) {
+      rest
+        .put(Routes.applicationCommands(process.env.CLIENT_ID), { body: [] })
+        .then(() =>
+          console.log('Successfully deleted all application commands.')
+        )
+        .catch(console.error);
+    }
 
-    const REFRESH_COMMANDS = true;
+    const REFRESH_COMMANDS = false;
     if (!REFRESH_COMMANDS) return;
 
     console.log(
@@ -87,7 +93,6 @@ module.exports = (client) => {
       `Successfully reloaded ${client.guildCommandArray.length} guild application (/) commands.`
     );
 
-    
     return;
   };
 };

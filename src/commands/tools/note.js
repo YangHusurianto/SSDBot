@@ -26,15 +26,11 @@ module.exports = {
   async execute(interaction) {
     const { options, guild, member } = interaction;
     const target = options.getUser('user');
-    var note = options.getString('note');
+    var noteInfo = options.getString('note');
     const date = new Date();
 
     try {
       const guildDoc = await findGuild(guild);
-
-      // pull the tags list and convert to value
-      let tags = guildDoc.autoTags;
-      note = tags.get(note) ?? note;
 
       // create the note first so we can insert regardless of whether the user exists
       const note = {
@@ -42,7 +38,7 @@ module.exports = {
         guildId: guild.id,
         targetUserId: target.id,
         noteNumber: guildDoc.caseNumber,
-        note: reason,
+        note: noteInfo,
         noteDate: date,
         moderatorUserId: member.user.id,
       };
