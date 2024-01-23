@@ -20,29 +20,8 @@ module.exports = {
         .setName('note')
         .setDescription('The note')
         .setRequired(true)
-        .setAutocomplete(true)
     )
     .setDMPermission(false),
-
-  async autocomplete(interaction) {
-    const focusedValue = interaction.options.getFocused();
-    const guild = await findGuild(interaction.guild);
-    let tags = guild.autoTags;
-
-    const filtered = Array.from(tags).filter(([key, _value]) =>
-      key.startsWith(focusedValue)
-    );
-
-    if (!filtered.length) {
-      return await interaction.respond(
-        Array.from(tags).map(([key, _value]) => ({ name: key, value: key }))
-      );
-    }
-
-    return await interaction.respond(
-      filtered.map(([key, _value]) => ({ name: key, value: key }))
-    );
-  },
 
   async execute(interaction) {
     const { options, guild, member } = interaction;
