@@ -272,7 +272,7 @@ const logsEmbed = (target, page, warnings, recents, notes) => {
   return embed;
 };
 
-const notesEmbed = (target, notes) => {
+const notesEmbed = (target, notesPage, notes) => {
   const embed = new EmbedBuilder().setAuthor({
     name: `${target.username} (${target.id})`,
     iconURL: target.avatarURL(),
@@ -280,11 +280,11 @@ const notesEmbed = (target, notes) => {
 
   if (notes.length > 5) {
     embed.setFooter({
-      text: `Page ${page}/${Math.ceil(notes.length / 5)}`,
+      text: `Page ${notesPage}/${Math.ceil(notes.length / 5)}`,
     });
   }
 
-  const startNoteIndex = (page - 1) * 5;
+  const startNoteIndex = (notesPage - 1) * 5;
   const endNoteIndex =
     startNoteIndex + 5 > notes.length ? notes.length : startNoteIndex + 5;
 
