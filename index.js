@@ -13,8 +13,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 // register slash commands
 client.commands = new Collection();
 client.commandArray = [];
-client.testingCommands = new Collection();
-client.testingCommandArray = [];
+client.guildCommandArray = [];
 
 const functionFolders = fs.readdirSync('./src/functions');
 for (const folder of functionFolders) {

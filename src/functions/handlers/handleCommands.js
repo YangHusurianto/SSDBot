@@ -16,15 +16,14 @@ module.exports = (client) => {
 
       const { commands, commandArray } = client;
       for (const file of commandFiles) {
-        const command = require(`../../commands/${folder}/${file}`);
+        const command = require(`../../commands/${folder}/${file}`);        
 
+        commands.set(command.data.name, command);
         if (folder === 'dev') {
-          client.testingCommands.set(command.data.name, command);
-          client.testingCommandArray.push(command.data.toJSON());
+          client.guildCommandArray.push(command.data.toJSON());
           continue;
         }
 
-        commands.set(command.data.name, command);
         commandArray.push(command.data.toJSON());
       }
     }
