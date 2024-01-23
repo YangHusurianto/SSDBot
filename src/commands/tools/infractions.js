@@ -103,7 +103,7 @@ module.exports = {
 
       if (page == 1) previousButton.setDisabled(true);
       if (page == maxPages) nextButton.setDisabled(true);
-      if (!notes.length) notes.setDisabled(true);
+      if (!notes.length) notesButton.setDisabled(true);
 
       const pageControls = new ActionRowBuilder().addComponents(
         previousButton,
