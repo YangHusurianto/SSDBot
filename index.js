@@ -33,7 +33,10 @@ client.handleCommands();
 client.login(process.env.DISCORD_TOKEN);
 
 // Connect to database
-connect(process.env.MONGO_CONNECTION).catch(console.error);
+connect(process.env.MONGO_CONNECTIONm, {
+  reconnectTries: 60,
+  reconnectInterval: 60000,
+}).catch(console.error);
 // https://www.youtube.com/watch?v=Ina9qiiujCQ
 // https://github.com/LunarTaku/djs-warn-system
 // https://github.com/ryzyx/discordjs-button-pagination/blob/interaction/index.js
