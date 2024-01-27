@@ -33,10 +33,11 @@ client.handleCommands();
 client.login(process.env.DISCORD_TOKEN);
 
 // Connect to database
-connect(process.env.MONGO_CONNECTIONm, {
+connect(process.env.MONGO_CONNECTION, {
   reconnectTries: 60,
   reconnectInterval: 60000,
 }).catch(console.error);
 // https://www.youtube.com/watch?v=Ina9qiiujCQ
 // https://github.com/LunarTaku/djs-warn-system
 // https://github.com/ryzyx/discordjs-button-pagination/blob/interaction/index.js
+// https://stackoverflow.com/questions/39785036/reliably-reconnect-to-mongodb
