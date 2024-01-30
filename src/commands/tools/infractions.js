@@ -50,12 +50,23 @@ module.exports = {
     var warnPage = options.getInteger('page') ?? 1;
 
     try {
-      const targetDoc = await Guild.findOne(
+      const targetDoc = await Guild.findOneAndUpdate(
         { guildId: guild.id, 'users.userId': target.id },
-        { 'users.$': 1 }
+        { 'users.$': 1 },
+        {
+          $setOnInsert: {
+            _id: new mongoose.Types.ObjectId(),
+            guildId: guild.id,
+            guildName: guild.name,
+            guildIcon: guild.iconURL(),
+            caseNumber: 0,
+            loggingChannel: '',
+            users: [],
+            autoTags: new Map(),
+          },
+        },
+        { upsert: true, new: true }
       );
-
-      console.log(targetDoc.users[0]);
 
       const warnings = targetDoc.users[0].warns;
       const maxWarnPages = Math.ceil(warnings.length / INFRACTIONS_PER_PAGE);
@@ -66,7 +77,7 @@ module.exports = {
 
       if (warnPage > maxWarnPages) warnPage = maxWarnPages;
 
-      if (!targetDoc || !warnings?.length || !notes?.length) {
+      if (!targetDoc || (!warnings?.length && !notes?.length)) {
         return interaction.reply({
           embeds: [
             new EmbedBuilder()
