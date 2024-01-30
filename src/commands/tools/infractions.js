@@ -52,8 +52,10 @@ module.exports = {
     try {
       const targetDoc = await Guild.findOne(
         { guildId: guild.id, 'users.userId': target.id },
-        { 'users.$': 1 },
+        { 'users.$': 1 }
       );
+
+      console.log(targetDoc.users[0]);
 
       const warnings = targetDoc.users[0].warns;
       const maxWarnPages = Math.ceil(warnings.length / INFRACTIONS_PER_PAGE);
