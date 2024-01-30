@@ -1,5 +1,7 @@
 const Guild = require('../../schemas/guild');
 
+const mongoose = require('mongoose');
+
 const {
   SlashCommandBuilder,
   EmbedBuilder,
