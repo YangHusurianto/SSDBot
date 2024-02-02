@@ -117,7 +117,8 @@ module.exports = {
             'these warnings are to inform you that a rule ' +
             'may have been broken and for us to keep track ' +
             'of your history on the server. Warnings are not ' +
-            'serious, unless you keep repeating what we warned you for.\n\n' +
+            'serious, unless you keep repeating what we warned you for.\n' +
+            'If you believe this warn was made in error, please make a <#852694135927865406>.\n\n' +
             `Warning: ${reason}`
         )
         .catch(console.error);
