@@ -57,12 +57,11 @@ module.exports = {
         { 'users.$': 1 }
       );
 
-      const user = targetdoc.users[0];
-      if (!user) {
+      if (!targetDoc) {
         return interaction.reply({ content: 'User not found', ephemeral: true });
       }
 
-      const warnings = user.warns;
+      const warnings = targetDoc.users[0].warns;
       const maxWarnPages = Math.ceil(warnings.length / INFRACTIONS_PER_PAGE);
 
       const notes = targetDoc.users[0].notes;
