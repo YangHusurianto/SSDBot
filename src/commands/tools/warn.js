@@ -36,7 +36,7 @@ module.exports = {
       key.startsWith(focusedValue)
     );
 
-    if (!filtered.length && focusedValue.length !== 0) {
+    if (!filtered.length && focusedValue.length === 0) {
       return await interaction.respond(
         Array.from(tags).map(([key, _value]) => ({ name: key, value: key }))
       );
