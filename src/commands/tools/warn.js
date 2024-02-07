@@ -53,7 +53,14 @@ module.exports = {
     var reason = options.getString('reason') ?? 'No reason provided.';
     const date = new Date();
 
-    try {
+    if (target.id === client.user.id) { // unable to warn the bot
+      return await interaction.reply({
+        content: 'I cannot warn myself!',
+        ephemeral: true,
+      });
+    }
+
+      try {
       const guildDoc = await findGuild(guild);
 
       if (target.id == '145959145319694336')
@@ -109,7 +116,6 @@ module.exports = {
 
       await interaction.reply(warnConfirmation);
 
-      if (target.id === client.user.id) return; // don't send a message to the bot
       client.users
         .send(
           target.id,
