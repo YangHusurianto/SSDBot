@@ -22,6 +22,7 @@ module.exports = {
       option
         .setName('reason')
         .setDescription('The reason')
+        .setRequired(true)
         .setAutocomplete(true)
     )
     .setDMPermission(false),
