@@ -56,6 +56,8 @@ module.exports = {
           { code: true }
         )})`;
 
+      target.roles.add("926253317284323389");
+
       let verifyConfirmation = `<:check:1196693134067896370> ${target} has been verified!`;
 
       await guildDoc.save().catch(console.error);
