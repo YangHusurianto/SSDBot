@@ -54,7 +54,7 @@ module.exports = (client) => {
         .catch(console.error);
     }
 
-    const REFRESH_COMMANDS = false;
+    const REFRESH_COMMANDS = process.env.REFRESH_COMMANDS;
     if (!REFRESH_COMMANDS) return;
 
     console.log(
