@@ -25,6 +25,7 @@ module.exports = {
       const guildDoc = await findGuild(guild);
 
       let userDoc = guildDoc.users.find((user) => user.userId === target.id);
+
       if (!userDoc) {
         userDoc = {
           _id: new mongoose.Types.ObjectId(),
@@ -36,6 +37,10 @@ module.exports = {
         };
 
         guildDoc.users.push(userDoc);
+      } else if (userDoc.verified) {
+        return await interaction.reply(
+          `:x: ${target} is already verified!`
+        );
       } else {
         userDoc.verified = true;
         userDoc.verifiedBy = member.user.id;
