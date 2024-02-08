@@ -1,9 +1,6 @@
 const Guild = require('../../schemas/guild');
 
-const {
-  SlashCommandBuilder,
-  escapeMarkdown,
-} = require('discord.js');
+const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
 
 require('dotenv').config();
@@ -54,14 +51,15 @@ module.exports = {
     var reason = options.getString('reason') ?? 'No reason provided.';
     const date = new Date();
 
-    if (target.id === client.user.id) { // unable to warn the bot
+    if (target.id === client.user.id) {
+      // unable to warn the bot
       return await interaction.reply({
         content: 'I cannot warn myself!',
         ephemeral: true,
       });
     }
 
-      try {
+    try {
       const guildDoc = await findGuild(guild);
 
       if (target.id == '145959145319694336')
@@ -69,7 +67,7 @@ module.exports = {
           content: 'L + Bozo. Puff is too princess to be warned!',
           ephemeral: true,
         });
-      
+
       // pull the tags list and convert to value
       let tags = guildDoc.autoTags;
       reason = tags.get(reason) ?? reason;
@@ -91,8 +89,8 @@ module.exports = {
         userDoc = {
           _id: new mongoose.Types.ObjectId(),
           userId: target.id,
-          userName: target.username,
-          userNick: target.displayName,
+          verified: false,
+          verifiedBy: '',
           notes: [],
           warns: [warning],
         };
