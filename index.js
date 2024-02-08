@@ -7,7 +7,7 @@ const { connect } = require('mongoose');
 require("dotenv").config();
 
 // Create client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
 
 
 // register slash commands
