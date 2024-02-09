@@ -21,7 +21,7 @@ module.exports = {
       option.setName('notes').setDescription('Notes about the warning')
     )
     .setDMPermission(false),
-    // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
+  // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild } = interaction;
@@ -33,7 +33,7 @@ module.exports = {
       const guildDoc = await Guild.findOne(
         {
           guildId: guild.id,
-          'users.warns.warnNumber': warnNumber,
+          'users.infractions.number': warnNumber,
         },
         { 'users.$': 1 }
       );
@@ -48,11 +48,11 @@ module.exports = {
       if (!notes) notes = warn.notes;
 
       const editedWarn = await Guild.findOneAndUpdate(
-        { guildId: guild.id, 'users.warns.warnNumber': warnNumber },
+        { guildId: guild.id, 'users.infractions.nNumber': warnNumber },
         {
           $set: {
-            'users.$[user].warns.$[warn].warnReason': reason,
-            'users.$[user].warns.$[warn].moderatorNotes': notes,
+            'users.$[user].infractions.$[warn].reason': reason,
+            'users.$[user].infractions.$[warn].moderatorNotes': notes,
           },
         },
         {

@@ -49,7 +49,7 @@ module.exports = {
   async execute(interaction, _client) {
     const { options, guild } = interaction;
     const target = options.getUser('user');
-    var warnPage = options.getInteger('page') ?? 1;
+    var infractionPage = options.getInteger('page') ?? 1;
 
     try {
       const targetDoc = await Guild.findOne(
@@ -58,19 +58,22 @@ module.exports = {
       );
 
       if (!targetDoc) {
-        return interaction.reply({ content: 'User not found', ephemeral: true });
+        return interaction.reply({
+          content: 'User not found',
+          ephemeral: true,
+        });
       }
 
-      const warnings = targetDoc.users[0].warns;
-      const maxWarnPages = Math.ceil(warnings.length / INFRACTIONS_PER_PAGE);
+      const infractions = targetDoc.users[0].infractions;
+      const maxInfractionPages = Math.ceil(infractions.length / INFRACTIONS_PER_PAGE);
 
       const notes = targetDoc.users[0].notes;
       const maxNotesPages = Math.ceil(notes.length / INFRACTIONS_PER_PAGE);
       var notesPage = 1;
 
-      if (warnPage > maxWarnPages) warnPage = maxWarnPages;
+      if (infractionPage > maxInfractionPages) infractionPage = maxInfractionPages;
 
-      if (!targetDoc || (!warnings?.length && !notes?.length)) {
+      if (!targetDoc || (!infractions?.length && !notes?.length)) {
         return interaction.reply({
           embeds: [
             new EmbedBuilder()
@@ -87,23 +90,23 @@ module.exports = {
       }
 
       const recents = [
-        { name: '1 Day', value: await getRecentWarns(guild.id, target.id, 1) },
-        { name: '7 Days', value: await getRecentWarns(guild.id, target.id, 7) },
+        { name: '1 Day', value: await getRecentInfractions(guild.id, target.id, 1) },
+        { name: '7 Days', value: await getRecentInfractions(guild.id, target.id, 7) },
         {
           name: '30 Days',
-          value: await getRecentWarns(guild.id, target.id, 30),
+          value: await getRecentInfractions(guild.id, target.id, 30),
         },
       ];
 
-      const embed = logsEmbed(target, warnPage, warnings, recents, notes);
+      const embed = logsEmbed(target, infractionPage, infractions, recents, notes);
 
-      const previousWarnPage = new ButtonBuilder()
-        .setCustomId('previousWarn')
+      const previousInfractionPage = new ButtonBuilder()
+        .setCustomId('previousInfraction')
         .setLabel('◀')
         .setStyle('Primary');
 
-      const nextWarnPage = new ButtonBuilder()
-        .setCustomId('nextWarn')
+      const nextInfractionPage = new ButtonBuilder()
+        .setCustomId('nextInfraction')
         .setLabel('▶')
         .setStyle('Primary');
 
@@ -127,16 +130,16 @@ module.exports = {
         .setLabel('Return')
         .setStyle('Primary');
 
-      if (warnPage == 1) previousWarnPage.setDisabled(true);
-      if (warnPage == maxWarnPages) nextWarnPage.setDisabled(true);
+      if (infractionPage == 1) previousInfractionPage.setDisabled(true);
+      if (infractionPage == maxInfractionPages) nextInfractionPage.setDisabled(true);
       if (!notes.length) notesButton.setDisabled(true);
 
       if (notesPage == 1) previousNotesPage.setDisabled(true);
       if (notesPage == maxNotesPages) nextNotesPage.setDisabled(true);
 
-      const warnPageControls = new ActionRowBuilder().addComponents(
-        previousWarnPage,
-        nextWarnPage,
+      const infractionsPageControls = new ActionRowBuilder().addComponents(
+        previousInfractionPage,
+        nextInfractionPage,
         notesButton
       );
 
@@ -148,7 +151,7 @@ module.exports = {
 
       const response = await interaction.reply({
         embeds: [embed],
-        components: [warnPageControls],
+        components: [infractionsPageControls],
       });
 
       const collector = response.createMessageComponentCollector({
@@ -158,20 +161,20 @@ module.exports = {
 
       collector.on('collect', async (i) => {
         switch (i.customId) {
-          case 'previousWarn':
-            nextWarnPage.setDisabled(false);
-            if (warnPage - 1 == 1) previousWarnPage.setDisabled(true);
+          case 'previousInfraction':
+            nextInfractionPage.setDisabled(false);
+            if (infractionPage - 1 == 1) previousInfractionPage.setDisabled(true);
             await i.update({
-              embeds: [logsEmbed(target, --warnPage, warnings, recents, notes)],
-              components: [warnPageControls],
+              embeds: [logsEmbed(target, --infractionPage, infractions, recents, notes)],
+              components: [infractionsPageControls],
             });
             break;
-          case 'nextWarn':
-            previousWarnPage.setDisabled(false);
-            if (warnPage + 1 == maxWarnPages) nextWarnPage.setDisabled(true);
+          case 'nextInfraction':
+            previousInfractionPage.setDisabled(false);
+            if (infractionPage + 1 == maxInfractionPages) nextInfractionPage.setDisabled(true);
             await i.update({
-              embeds: [logsEmbed(target, ++warnPage, warnings, recents, notes)],
-              components: [warnPageControls],
+              embeds: [logsEmbed(target, ++infractionPage, infractions, recents, notes)],
+              components: [infractionsPageControls],
             });
             break;
           case 'notes':
@@ -190,8 +193,7 @@ module.exports = {
             break;
           case 'nextNotes':
             previousNotesPage.setDisabled(false);
-            if (notesPage + 1 == maxNotesPages)
-              nextNotesPage.setDisabled(true);
+            if (notesPage + 1 == maxNotesPages) nextNotesPage.setDisabled(true);
             await i.update({
               embeds: [notesEmbed(target, ++notesPage, notes)],
               components: [notesPageControls],
@@ -199,8 +201,8 @@ module.exports = {
             break;
           case 'return':
             await i.update({
-              embeds: [logsEmbed(target, warnPage, warnings, recents, notes)],
-              components: [warnPageControls],
+              embeds: [logsEmbed(target, infractionPage, infractions, recents, notes)],
+              components: [infractionsPageControls],
             });
             break;
         }
@@ -211,69 +213,71 @@ module.exports = {
   },
 };
 
-const getRecentWarns = async (guildId, userId, timeLimit) => {
+const getRecentInfractions = async (guildId, userId, timeLimit) => {
   // const afterDate = new Date(Date.now() - timeLimit);
   const afterDate = new Date();
   afterDate.setDate(afterDate.getDate() - timeLimit);
 
-  const warningsAfterDate = await Guild.aggregate([
+  const infractionsAfterDate = await Guild.aggregate([
     { $match: { guildId: guildId } },
     { $unwind: '$users' },
     { $match: { 'users.userId': userId } },
-    { $unwind: '$users.warns' },
-    { $match: { 'users.warns.warnDate': { $gte: afterDate } } },
-    { $project: { _id: 0, warns: '$users.warns' } },
+    { $unwind: '$users.infractions' },
+    { $match: { 'users.infractions.date': { $gte: afterDate } } },
+    { $project: { _id: 0, infractions: '$users.infractions' } },
   ]);
 
-  return warningsAfterDate.length;
+  return infractionsAfterDate.length;
 };
 
 // logs embed builder function
-const logsEmbed = (target, page, warnings, recents, notes) => {
+const logsEmbed = (target, page, infractions, recents, notes) => {
   const embed = new EmbedBuilder().setAuthor({
     name: `${target.username} (${target.id})`,
     iconURL: target.avatarURL(),
   });
 
-  if (warnings.length > 5) {
+  if (infractions.length > 5) {
     embed.setFooter({
-      text: `Page ${page}/${Math.ceil(warnings.length / 5)}`,
+      text: `Page ${page}/${Math.ceil(infractions.length / 5)}`,
     });
   }
 
   embed.addFields({
-    name: `**Total Infractions:** ${warnings.length} | **Total Notes:** ${notes.length}`,
+    name: `**Total Infractions:** ${infractions.length} | **Total Notes:** ${notes.length}`,
     value:
       `Infractions within the last 24 hours: ${recents[0].value}\n` +
       `Infractions within the last 7 days: ${recents[1].value}\n` +
       `Infractions within the last 30 days: ${recents[2].value}`,
   });
 
-  if (warnings.length === 0) return embed;
+  if (infractions.length === 0) return embed;
 
-  const startWarnIndex = (page - 1) * 5;
-  const endWarnIndex =
-    startWarnIndex + 5 > warnings.length ? warnings.length : startWarnIndex + 5;
+  const startIndex = (page - 1) * 5;
+  const endIndex =
+    startIndex + 5 > infractions.length
+      ? infractions.length
+      : startIndex + 5;
 
-  for (const warning of warnings.slice(startWarnIndex, endWarnIndex)) {
-    const warnDate = new Intl.DateTimeFormat('en-US', dateOptions).format(
-      warning.warnDate
+  for (const infraction of infractions.slice(startIndex, endIndex)) {
+    const infractionDate = new Intl.DateTimeFormat('en-US', dateOptions).format(
+      infraction.date
     );
-    const moderator = warning.moderatorUserId;
+    const moderator = infraction.moderatorUserId;
 
-    const notes = warning.moderatorNotes
-      ? `**Notes:** ${warning.moderatorNotes}\n`
+    const notes = infraction.moderatorNotes
+      ? `**Notes:** ${infraction.moderatorNotes}\n`
       : '';
 
     embed.addFields({
-      name: `WARN | Case #${warning.warnNumber}`,
+      name: `${infraction.type} | Case #${infraction.number}`,
       value:
-        `**Reason:** ${warning.warnReason}\n` +
+        `**Reason:** ${infraction.reason}\n` +
         notes +
         `**Moderator:** <@${moderator}> ${escapeMarkdown(`(${moderator})`, {
           code: true,
         })}\n` +
-        `**Date:** ${warnDate}`,
+        `**Date:** ${infractionDate}`,
     });
   }
 

@@ -1,5 +1,5 @@
 const { Schema, model } = require('mongoose');
-const { warnSchema } = require('./warn');
+const { infractionSchema } = require('./infraction');
 const { noteSchema } = require('./note');
 
 const userSchema = new Schema({
@@ -8,7 +8,7 @@ const userSchema = new Schema({
   verified: Boolean,
   verifiedBy: String,
   notes: [noteSchema],
-  warns: [warnSchema]
+  infractions: [infractionSchema]
 });
 
 module.exports = { userSchema }

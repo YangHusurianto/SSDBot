@@ -1,14 +1,15 @@
 const { Schema, model } = require("mongoose");
 
-const warnSchema = new Schema({
+const infractionSchema = new Schema({
   _id: Schema.Types.ObjectId,
   guildId: String,
   targetUserId: String,
-  warnNumber: Number,
-  warnReason: String,
-  warnDate: Date,
+  type: String,
+  number: Number,
+  reason: String,
+  date: Date,
   moderatorUserId: String,
   moderatorNotes: String
 });
 
-module.exports = { warnSchema }
+module.exports = { infractionSchema }

@@ -48,10 +48,10 @@ module.exports = {
         userDoc = {
           _id: new mongoose.Types.ObjectId(),
           userId: target.id,
-          userName: target.username,
-          userNick: target.displayName,
+          verified: false,
+          verifiedBy: '',
           notes: [note],
-          warns: [],
+          infractions: [],
         };
 
         guildDoc.users.push(userDoc);

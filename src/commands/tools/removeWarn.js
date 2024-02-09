@@ -20,7 +20,7 @@ module.exports = {
         .setDescription('The user to warn (used to verify the warning)')
     )
     .setDMPermission(false),
-    // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
+  // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild, member } = interaction;
@@ -39,44 +39,47 @@ module.exports = {
           (user) => user.userId === target.id
         );
         if (!userDoc) {
-          await interaction.reply(`This user has no warnings!`);
-          return;
+          return await interaction.reply(`This user has no warnings!`);
         }
       }
 
       const userDoc = await Guild.findOne(
-        { guildId: guild.id, 'users.warns.warnNumber': warnNumber },
+        { guildId: guild.id, 'users.infractions.number': warnNumber },
         { 'users.$': 1 }
       );
 
       if (!userDoc) {
-        await interaction.reply(`:x: No warning found with that case number.`);
-        return;
+        return await interaction.reply(
+          `:x: No warning found with that case number.`
+        );
       }
 
-      const warning = userDoc.users[0].warns.find(
-        (warn) => warn.warnNumber === warnNumber
+      const infraction = userDoc.users[0].infractions.find(
+        (infraction) => infraction.number === warnNumber
       );
 
-      if (target && warning.targetUserId !== target.id) {
-        await interaction.reply(
+      if (target && infraction.targetUserId !== target.id) {
+        return await interaction.reply(
           `:x: The user you provided is not the user who was warned.`
         );
-        return;
+      }
+
+      if (infraction.type !== 'WARN') {
+        return await interaction.reply(`:x: You cannot remove a ban.`);
       }
 
       const removedWarn = await Guild.findOneAndUpdate(
-        { guildId: guild.id, 'users.warns.warnNumber': warnNumber },
+        { guildId: guild.id, 'users.infractions.number': warnNumber },
         {
           $pull: {
-            'users.$.warns': { warnNumber: warnNumber },
+            'users.$.infractions': { number: warnNumber },
           },
         }
       );
 
       await removedWarn.save().catch(console.error);
 
-      await interaction.reply(
+      return await interaction.reply(
         `<:check:1196693134067896370> Warning #${warnNumber} removed.`
       );
     } catch (err) {

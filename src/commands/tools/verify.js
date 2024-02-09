@@ -33,7 +33,7 @@ module.exports = {
           verified: true,
           verifiedBy: member.user.id,
           notes: [],
-          warns: [],
+          infractions: [],
         };
 
         guildDoc.users.push(userDoc);
