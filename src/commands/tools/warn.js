@@ -96,7 +96,7 @@ module.exports = {
         };
 
         guildDoc.users.push(userDoc);
-      } else userDoc.warns.push(warning);
+      } else userDoc.infractions.push(warning);
 
       await guildDoc.save().catch(console.error);
 
