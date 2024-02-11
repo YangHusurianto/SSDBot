@@ -78,7 +78,7 @@ module.exports = {
           `You have been banned from ${guild.name}.\n` +
           `**Reason:** ${reason}\n\n` +
           `If you feel this ban was not fair or made in error,` +
-          `please create a ticket in the [unban server](https://discord.gg/Hwtt2V8CKp).`
+          `please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp.`
         )
         .catch(console.error);
 
