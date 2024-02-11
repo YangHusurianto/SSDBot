@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const util = require('node:util');
 const exec = util.promisify(require('node:child_process').exec);
+const path = require('path');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -37,7 +38,19 @@ module.exports = {
       );
     }
 
-    const commandPath = `../tools/${command.data.name}.js`;
+    const requireCache = require.cache;
+    console.log(requireCache);
+    var commandPath = '';
+    for (const key in requireCache) {
+      console.log(key);
+      const fileName = requireCache[key].basename;
+      console.log(fileName);
+      if (fileName === `${commandName}.js`) {
+        commandPath = key;
+      }
+    }
+
+    // const commandPath = `../tools/${command.data.name}.js`;
 
     delete require.cache[require.resolve(commandPath)];
 

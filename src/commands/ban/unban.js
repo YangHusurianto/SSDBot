@@ -31,6 +31,7 @@ module.exports = {
 
     try {
       const ban = await guild.bans.fetch(target.id);
+      console.log(ban);
       if (!ban) {
         return await interaction.reply(
           `:x: ${target} is not banned!`
