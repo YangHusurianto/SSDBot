@@ -30,6 +30,13 @@ module.exports = {
     const date = new Date();
 
     try {
+      const ban = await guild.bans.fetch(target.id);
+      if (!ban) {
+        return await interaction.reply(
+          `:x: ${target} is not banned!`
+        );
+      }
+
       const guildDoc = await findGuild(guild);
 
       // pull the tags list and convert to value
