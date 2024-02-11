@@ -19,7 +19,7 @@ module.exports = (client) => {
         const filePath = `../../commands/${folder}/${file}`;
 
         const command = require(filePath);
-        const fullPath = require.cache[require.resolve(filePath)]
+        const fullPath = require.cache[require.resolve(filePath)].filename;
         client.commandFilePaths.set(command.data.name, fullPath);
 
         commands.set(command.data.name, command);
