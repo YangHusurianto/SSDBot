@@ -19,8 +19,8 @@ module.exports = (client) => {
         const filePath = `../../commands/${folder}/${file}`;
         // const command = require(`../../commands/${folder}/${file}`);
         const command = require(filePath);
-        console.log(`Loaded command: ${require.cache[require.resolve(filePath)]}`)
-        console.log(`path: ${filePath.filename}`)
+        const test = require.cache[require.resolve(filePath)]
+        console.log(`path: ${test.filename}`)
 
         commands.set(command.data.name, command);
         if (folder === 'dev') {
