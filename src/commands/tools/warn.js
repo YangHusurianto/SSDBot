@@ -98,8 +98,8 @@ module.exports = {
         guildDoc.users.push(userDoc);
       } else userDoc.infractions.push(warning);
 
+      guildDoc.caseNumber++;
       await guildDoc.save().catch(console.error);
-
 
       let warnConfirmation = `<:check:1196693134067896370> ${target} has been warned.`;
       await interaction.reply(warnConfirmation);
@@ -119,7 +119,7 @@ module.exports = {
 
       //log to channel
       let warnData =
-        `**WARN** | Case #${guildDoc.caseNumber++}\n` +
+        `**WARN** | Case #${guildDoc.caseNumber}\n` +
         `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
           code: true,
         })})\n` +

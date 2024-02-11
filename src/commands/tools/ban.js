@@ -84,6 +84,7 @@ module.exports = {
 
       guild.members.ban(target.id, { reason: reason }).catch(console.error);
 
+      guildDoc.caseNumber++;
       await guildDoc.save().catch(console.error);
 
       let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
@@ -91,7 +92,7 @@ module.exports = {
 
       //log to channel
       let banData =
-        `**BAN** | Case #${guildDoc.caseNumber++}\n` +
+        `**BAN** | Case #${guildDoc.caseNumber}\n` +
         `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
           code: true,
         })})\n` +
