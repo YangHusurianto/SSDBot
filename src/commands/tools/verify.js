@@ -47,7 +47,7 @@ module.exports = {
       }
 
       let verifyData =
-        `**VERIFY**\n` +
+        `**VERIFY** | ${target}\n` +
         `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
           code: true,
         })})\n` +
