@@ -40,8 +40,10 @@ module.exports = {
 
     // const commandPath = `../tools/${command.data.name}.js`;
     const commandPath = client.commandFilePaths.get(commandName);
+    console.log(commandPath);
 
     delete require.cache[require.resolve(commandPath)];
+    console.log("test");
 
     if (interaction.options.getString('type', true) === 'git') {
       try {
