@@ -16,8 +16,11 @@ module.exports = (client) => {
 
       const { commands, commandArray } = client;
       for (const file of commandFiles) {
-        const command = require(`../../commands/${folder}/${file}`);
-        console.log(`Loaded command: ${command}`)
+        const filePath = `../../commands/${folder}/${file}`;
+        // const command = require(`../../commands/${folder}/${file}`);
+        const command = require(filePath);
+        console.log(`Loaded command: ${require.cache[require.resolve(filePath)]}`)
+        console.log(`path: ${filePath.filename}`)
 
         commands.set(command.data.name, command);
         if (folder === 'dev') {
