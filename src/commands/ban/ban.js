@@ -22,7 +22,6 @@ module.exports = {
         .setRequired(true)
     )
     .setDMPermission(false),
-  // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, client) {
     const { options, guild, member } = interaction;
@@ -80,7 +79,7 @@ module.exports = {
           `If you feel this ban was not fair or made in error,` +
           `please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp.`
         )
-        .catch(console.error);
+        .catch(console.log('Failed to dm user about ban.'));
 
       guild.members.ban(target.id, { reason: reason }).catch(console.error);
 
