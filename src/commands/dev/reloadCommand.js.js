@@ -24,7 +24,7 @@ module.exports = {
         )
     ),
 
-  async execute(interaction) {
+  async execute(interaction, client) {
     if (interaction.member.id !== '147869832275034112') return;
 
     const commandName = interaction.options
@@ -38,19 +38,8 @@ module.exports = {
       );
     }
 
-    const requireCache = require.cache;
-    console.log(requireCache);
-    var commandPath = '';
-    for (const key in requireCache) {
-      console.log(key);
-      const fileName = requireCache[key].basename;
-      console.log(fileName);
-      if (fileName === `${commandName}.js`) {
-        commandPath = key;
-      }
-    }
-
     // const commandPath = `../tools/${command.data.name}.js`;
+    const commandPath = client.commandFilePaths.get(commandName);
 
     delete require.cache[require.resolve(commandPath)];
 

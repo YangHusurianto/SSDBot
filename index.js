@@ -14,7 +14,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 client.commands = new Collection();
 client.commandArray = [];
 client.guildCommandArray = [];
-client.commandFilePaths = [];
+client.commandFilePaths = {};
 
 const functionFolders = fs.readdirSync('./src/functions');
 for (const folder of functionFolders) {
