@@ -36,7 +36,7 @@ module.exports = {
       let tags = guildDoc.autoTags;
       reason = tags.get(reason) ?? reason;
 
-      // create the ban first so we can insert regardless of whether the user exists
+      // create the unban first so we can insert regardless of whether the user exists
       const unban = {
         _id: new mongoose.Types.ObjectId(),
         guildId: guild.id,
@@ -61,7 +61,7 @@ module.exports = {
         };
 
         guildDoc.users.push(userDoc);
-      } else userDoc.infractions.push(ban);
+      } else userDoc.infractions.push(unban);
 
      
       guild.members.unban(target.id, reason).catch(console.error);
@@ -69,11 +69,11 @@ module.exports = {
       guildDoc.caseNumber++;
       await guildDoc.save().catch(console.error);
 
-      let banConfirmation = `<:check:1196693134067896370> ${target} has been unbanned.`;
-      await interaction.reply(banConfirmation);
+      let unbanConfirmation = `<:check:1196693134067896370> ${target} has been unbanned.`;
+      await interaction.reply(unbanConfirmation);
 
       //log to channel
-      let banData =
+      let unbanData =
         `**UNBAN** | Case #${guildDoc.caseNumber}\n` +
         `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
           code: true,
@@ -88,7 +88,7 @@ module.exports = {
         const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
         if (!logChannel) return;
 
-        await logChannel.send(banData);
+        await logChannel.send(unbanData);
       }
     } catch (err) {
       console.error(err);
