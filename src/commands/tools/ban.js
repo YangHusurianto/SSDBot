@@ -72,14 +72,7 @@ module.exports = {
         guildDoc.users.push(userDoc);
       } else userDoc.infractions.push(ban);
 
-      guild.members.ban(target.id, { reason: reason }).catch(console.error);
-
-      await guildDoc.save().catch(console.error);
-
-      let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
-      await interaction.reply(banConfirmation);
-
-      client.users
+      await client.users
         .send(
           target.id,
           `You have been banned from ${guild.name}.\n` +
@@ -88,6 +81,13 @@ module.exports = {
           `please create a ticket in the [unban server](https://discord.gg/Hwtt2V8CKp).`
         )
         .catch(console.error);
+
+      guild.members.ban(target.id, { reason: reason }).catch(console.error);
+
+      await guildDoc.save().catch(console.error);
+
+      let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
+      await interaction.reply(banConfirmation);
 
       //log to channel
       let banData =
