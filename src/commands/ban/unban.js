@@ -30,14 +30,6 @@ module.exports = {
     const date = new Date();
 
     try {
-      const ban = await guild.bans.fetch(target.id);
-      console.log(ban);
-      if (!ban) {
-        return await interaction.reply(
-          `:x: ${target} is not banned!`
-        );
-      }
-
       const guildDoc = await findGuild(guild);
 
       // pull the tags list and convert to value
@@ -71,9 +63,9 @@ module.exports = {
         guildDoc.users.push(userDoc);
       } else userDoc.infractions.push(unban);
 
-     
-      guild.members.unban(target.id, reason).catch(console.error);
-
+      await guild.members
+        .unban(target.id, reason)
+        .catch(await interaction.reply(`:x: ${target} is not banned.`));
       guildDoc.caseNumber++;
       await guildDoc.save().catch(console.error);
 
@@ -91,7 +83,7 @@ module.exports = {
           { code: true }
         )})\n` +
         `**Reason:** ${reason}\n`;
-    
+
       if (guildDoc.loggingChannel) {
         const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
         if (!logChannel) return;

@@ -10,10 +10,7 @@ module.exports = {
     .setName('ban')
     .setDescription('Ban a user by sending them a private message')
     .addUserOption((option) =>
-      option
-        .setName('user')
-        .setDescription('The user to ban')
-        .setRequired(true)
+      option.setName('user').setDescription('The user to ban').setRequired(true)
     )
     .addStringOption((option) =>
       option
@@ -75,13 +72,13 @@ module.exports = {
         .send(
           target.id,
           `You have been banned from ${guild.name}.\n` +
-          `**Reason:** ${reason}\n\n` +
-          `If you feel this ban was not fair or made in error,` +
-          `please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp.`
+            `**Reason:** ${reason}\n\n` +
+            `If you feel this ban was not fair or made in error,` +
+            `please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp.`
         )
         .catch(console.log('Failed to dm user about ban.'));
 
-      guild.members.ban(target.id, { reason: reason }).catch(console.error);
+      await guild.members.ban(target.id, { reason: reason }).catch(console.error);
 
       guildDoc.caseNumber++;
       await guildDoc.save().catch(console.error);
@@ -100,7 +97,7 @@ module.exports = {
           { code: true }
         )})\n` +
         `**Reason:** ${reason}\n`;
-    
+
       if (guildDoc.loggingChannel) {
         const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
         if (!logChannel) return;
