@@ -130,7 +130,9 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
         'If you believe this warn was made in error, please make a <#852694135927865406>.\n\n' +
         `Warning: ${reason}`
     )
-    .catch(console.log('Failed to dm user about warn.'));
+    .catch( (err) => {
+      console.log('Failed to dm user about warn.')
+    });
 
   //log to channel
   let warnData =
