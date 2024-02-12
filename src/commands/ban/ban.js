@@ -35,7 +35,7 @@ module.exports = {
     }
 
     try {
-      const banCheck = await guild.bans.fetch(target.id, { force: true });
+      const banCheck = await guild.bans.fetch({user: target.id, force: true });
       if (banCheck) {
         return await interaction.reply({
           content: `${target} is already banned!`,
