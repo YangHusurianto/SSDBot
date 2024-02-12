@@ -139,7 +139,7 @@ const findGuild = async (guild) => {
 const banCheck = async (interaction, target, guild) => {
   const banCheck = await guild.bans
     .fetch({ user: target.id, force: true })
-    .catch();
+    .catch(console.error);
   if (banCheck) {
     return await interaction.reply({
       content: `${target} is already banned!`,
