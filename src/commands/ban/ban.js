@@ -29,7 +29,7 @@ module.exports = {
     selfBanCheck(interaction, client, target);
 
     try {
-      banUser(interaction, client, target, reason);
+      banUser(interaction, client, guild, target, member, reason);
     } catch (err) {
       console.error(err);
     }
@@ -45,7 +45,7 @@ const selfBanCheck = async (interaction, client, target) => {
   }
 };
 
-const banUser = async (interaction, client, target, reason) => {
+const banUser = async (interaction, client, guild, target, member, reason) => {
   const guildDoc = await findGuild(guild);
   // pull the tags list and convert to value
   let tags = guildDoc.autoTags;

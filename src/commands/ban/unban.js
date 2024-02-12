@@ -23,20 +23,20 @@ module.exports = {
     )
     .setDMPermission(false),
 
-  async execute(interaction, client) {
+  async execute(interaction) {
     const { options, guild, member } = interaction;
     const target = options.getUser('user');
     var reason = options.getString('reason');
 
     try {
-      unbanUser(interaction, client, target, reason);
+      unbanUser(interaction, guild, target, member, reason);
     } catch (err) {
       console.error(err);
     }
   },
 };
 
-const unbanUser = async (interaction, client, target, reason) => {
+const unbanUser = async (interaction, guild, target, member, reason) => {
   const guildDoc = await findGuild(guild);
 
   // pull the tags list and convert to value
