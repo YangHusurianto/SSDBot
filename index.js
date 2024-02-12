@@ -4,11 +4,16 @@ const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { connect } = require('mongoose');
 
 // Access env variables
-require("dotenv").config();
+require('dotenv').config();
 
 // Create client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
-
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildModeration,
+  ],
+});
 
 // register slash commands
 client.commands = new Collection();
@@ -19,12 +24,14 @@ client.commandFilePaths = new Map();
 const functionFolders = fs.readdirSync('./src/functions');
 for (const folder of functionFolders) {
   const functionPath = path.join('./src/functions', folder);
-  const functionFiles = fs.readdirSync(functionPath).filter(file => file.endsWith('.js'));
+  const functionFiles = fs
+    .readdirSync(functionPath)
+    .filter((file) => file.endsWith('.js'));
 
   for (const file of functionFiles) {
     const filePath = path.join(__dirname, functionPath);
     require(path.join(filePath, file))(client);
-  } 
+  }
 }
 
 client.handleEvents();
