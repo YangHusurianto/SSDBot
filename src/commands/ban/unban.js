@@ -72,7 +72,6 @@ const unbanUser = async (interaction, client, target, reason) => {
 
   await guild.members.unban(target.id, reason).catch(async (err) => {
     await interaction.reply(`:x: ${target} is not banned.`);
-    console.error(err);
   });
   guildDoc.caseNumber++;
   await guildDoc.save().catch(console.error);
