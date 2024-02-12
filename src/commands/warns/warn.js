@@ -50,95 +50,106 @@ module.exports = {
     const target = options.getUser('user');
     var reason = options.getString('reason');
 
-    if (target.id === client.user.id) {
-      // unable to warn the bot
-      return await interaction.reply({
-        content: 'I cannot warn myself!',
-        ephemeral: true,
-      });
-    }
+    selfWarnCheck(interaction, target, client);
 
     try {
-      const guildDoc = await findGuild(guild);
-
-      if (target.id == '145959145319694336')
-        return await interaction.reply({
-          content: 'L + Bozo. Puff is too princess to be warned!',
-          ephemeral: true,
-        });
-
-      // pull the tags list and convert to value
-      let tags = guildDoc.autoTags;
-      reason = tags.get(reason) ?? reason;
-
-      // create the warning first so we can insert regardless of whether the user exists
-      const warning = {
-        _id: new mongoose.Types.ObjectId(),
-        guildId: guild.id,
-        targetUserId: target.id,
-        type: 'WARN',
-        number: guildDoc.caseNumber,
-        reason: reason,
-        date: new Date(),
-        moderatorUserId: member.user.id,
-        moderatorNotes: '',
-      };
-
-      let userDoc = guildDoc.users.find((user) => user.userId === target.id);
-      if (!userDoc) {
-        userDoc = {
-          _id: new mongoose.Types.ObjectId(),
-          userId: target.id,
-          verified: false,
-          verifiedBy: '',
-          notes: [],
-          infractions: [warning],
-        };
-
-        guildDoc.users.push(userDoc);
-      } else userDoc.infractions.push(warning);
-
-      guildDoc.caseNumber++;
-      await guildDoc.save().catch(console.error);
-
-      let warnConfirmation = `<:check:1196693134067896370> ${target} has been warned.`;
-      await interaction.reply(warnConfirmation);
-
-      client.users
-        .send(
-          target.id,
-          'You have been warned in Sweet Sugar Dreams, ' +
-            'these warnings are to inform you that a rule ' +
-            'may have been broken and for us to keep track ' +
-            'of your history on the server. Warnings are not ' +
-            'serious, unless you keep repeating what we warned you for.\n' +
-            'If you believe this warn was made in error, please make a <#852694135927865406>.\n\n' +
-            `Warning: ${reason}`
-        )
-        .catch(console.log('Failed to dm user about warn.'));
-
-      //log to channel
-      let warnData =
-        `**WARN** | Case #${guildDoc.caseNumber}\n` +
-        `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-          code: true,
-        })})\n` +
-        `**Moderator:** ${escapeMarkdown(
-          `${member.user.username} (${member.user.id}`,
-          { code: true }
-        )})\n` +
-        `**Reason:** ${reason}\n`;
-
-      if (guildDoc.loggingChannel) {
-        const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
-        if (!logChannel) return;
-
-        await logChannel.send(warnData);
-      }
+      warnUser(interaction, guild, target, member, reason);
     } catch (err) {
       console.error(err);
     }
   },
+};
+
+const selfWarnCheck = async (interaction, target, client) => {
+  if (target.id === client.user.id) {
+    return await interaction.reply({
+      content: 'I cannot warn myself!',
+      ephemeral: true,
+    });
+  }
+};
+
+const warnUser = async (interaction, guild, target, member, reason) => {
+  if (target.id == '145959145319694336') {
+    return await interaction.reply({
+      content: 'L + Bozo. Puff is too princess to be warned!',
+      ephemeral: true,
+    });
+  }
+
+  const guildDoc = await findGuild(guild);
+
+  // pull the tags list and convert to value
+  let tags = guildDoc.autoTags;
+  reason = tags.get(reason) ?? reason;
+
+  // create the warning first so we can insert regardless of whether the user exists
+  const warning = {
+    _id: new mongoose.Types.ObjectId(),
+    guildId: guild.id,
+    targetUserId: target.id,
+    type: 'WARN',
+    number: guildDoc.caseNumber,
+    reason: reason,
+    date: new Date(),
+    moderatorUserId: member.user.id,
+    moderatorNotes: '',
+  };
+
+  let userDoc = guildDoc.users.find((user) => user.userId === target.id);
+  if (!userDoc) {
+    userDoc = {
+      _id: new mongoose.Types.ObjectId(),
+      userId: target.id,
+      verified: false,
+      verifiedBy: '',
+      notes: [],
+      infractions: [warning],
+    };
+
+    guildDoc.users.push(userDoc);
+  } else userDoc.infractions.push(warning);
+
+  guildDoc.caseNumber++;
+  await guildDoc.save().catch( async (err) => {
+    await interaction.reply(`:x: Failed to save warn.`);
+    console.error(err);
+  });
+
+  let warnConfirmation = `<:check:1196693134067896370> ${target} has been warned.`;
+  await interaction.reply(warnConfirmation);
+
+  client.users
+    .send(
+      target.id,
+      'You have been warned in Sweet Sugar Dreams, ' +
+        'these warnings are to inform you that a rule ' +
+        'may have been broken and for us to keep track ' +
+        'of your history on the server. Warnings are not ' +
+        'serious, unless you keep repeating what we warned you for.\n' +
+        'If you believe this warn was made in error, please make a <#852694135927865406>.\n\n' +
+        `Warning: ${reason}`
+    )
+    .catch(console.log('Failed to dm user about warn.'));
+
+  //log to channel
+  let warnData =
+    `**WARN** | Case #${guildDoc.caseNumber - 1}\n` +
+    `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+      code: true,
+    })})\n` +
+    `**Moderator:** ${escapeMarkdown(
+      `${member.user.username} (${member.user.id}`,
+      { code: true }
+    )})\n` +
+    `**Reason:** ${reason}\n`;
+
+  if (guildDoc.loggingChannel) {
+    const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
+    if (!logChannel) return;
+
+    await logChannel.send(warnData);
+  }
 };
 
 const findGuild = async (guild) => {

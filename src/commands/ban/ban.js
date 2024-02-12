@@ -35,8 +35,6 @@ module.exports = {
     }
 
     try {
-      banCheck(interaction, target, guild);
-
       const guildDoc = await findGuild(guild);
 
       // pull the tags list and convert to value
@@ -134,16 +132,4 @@ const findGuild = async (guild) => {
     },
     { upsert: true, new: true }
   );
-};
-
-const banCheck = async (interaction, target, guild) => {
-  const banCheck = await guild.bans
-    .fetch({ user: target.id, force: true })
-    .catch(console.error);
-  if (banCheck) {
-    return await interaction.reply({
-      content: `${target} is already banned!`,
-      ephemeral: true,
-    });
-  }
 };
