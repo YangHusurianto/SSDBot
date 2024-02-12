@@ -69,7 +69,7 @@ const selfWarnCheck = async (interaction, target, client) => {
   }
 };
 
-const warnUser = async (interaction, guild, target, member, reason) => {
+const warnUser = async (interaction, client, guild, target, member, reason) => {
   if (target.id == '145959145319694336') {
     return await interaction.reply({
       content: 'L + Bozo. Puff is too princess to be warned!',
