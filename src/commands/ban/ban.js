@@ -35,7 +35,7 @@ module.exports = {
     }
 
     try {
-      banCheck();
+      banCheck(interaction, target, guild);
 
       const guildDoc = await findGuild(guild);
 
@@ -136,7 +136,7 @@ const findGuild = async (guild) => {
   );
 };
 
-const banCheck = async () => {
+const banCheck = async (interaction, target, guild) => {
   const banCheck = await guild.bans
     .fetch({ user: target.id, force: true })
     .catch();
