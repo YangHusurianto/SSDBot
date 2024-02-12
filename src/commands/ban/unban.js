@@ -65,7 +65,10 @@ module.exports = {
 
       await guild.members
         .unban(target.id, reason)
-        .catch(await interaction.reply(`:x: ${target} is not banned.`));
+        .catch(async (err) => {
+          await interaction.reply(`:x: ${target} is not banned.`);
+          console.error(err);
+        });
       guildDoc.caseNumber++;
       await guildDoc.save().catch(console.error);
 
