@@ -53,7 +53,7 @@ module.exports = {
     selfWarnCheck(interaction, target, client);
 
     try {
-      warnUser(interaction, guild, target, member, reason);
+      warnUser(interaction, client, guild, target, member, reason);
     } catch (err) {
       console.error(err);
     }
