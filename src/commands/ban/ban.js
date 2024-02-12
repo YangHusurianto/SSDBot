@@ -35,13 +35,7 @@ module.exports = {
     }
 
     try {
-      const banCheck = await guild.bans.fetch({user: target.id, force: true });
-      if (banCheck) {
-        return await interaction.reply({
-          content: `${target} is already banned!`,
-          ephemeral: true,
-        });
-      }
+      banCheck();
 
       const guildDoc = await findGuild(guild);
 
@@ -85,11 +79,13 @@ module.exports = {
             `please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp.`
         )
         .catch((err) => {
-          console.log('Failed to dm user about ban.')
+          console.log('Failed to dm user about ban.');
           console.log(err);
         });
 
-      await guild.members.ban(target.id, { reason: reason }).catch(console.error);
+      await guild.members
+        .ban(target.id, { reason: reason })
+        .catch(console.error);
 
       guildDoc.caseNumber++;
       await guildDoc.save().catch(console.error);
@@ -138,4 +134,16 @@ const findGuild = async (guild) => {
     },
     { upsert: true, new: true }
   );
+};
+
+const banCheck = async () => {
+  const banCheck = await guild.bans
+    .fetch({ user: target.id, force: true })
+    .catch();
+  if (banCheck) {
+    return await interaction.reply({
+      content: `${target} is already banned!`,
+      ephemeral: true,
+    });
+  }
 };
