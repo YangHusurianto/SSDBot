@@ -76,7 +76,10 @@ module.exports = {
             `If you feel this ban was not fair or made in error,` +
             `please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp.`
         )
-        .catch(console.log('Failed to dm user about ban.'));
+        .catch((err) => {
+          console.log('Failed to dm user about ban.')
+          console.log(err);
+        });
 
       await guild.members.ban(target.id, { reason: reason }).catch(console.error);
 
