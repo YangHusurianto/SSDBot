@@ -26,93 +26,97 @@ module.exports = {
     var reason = options.getString('reason');
     const date = new Date();
 
-    if (target.id === client.user.id) {
-      // unable to warn the bot
-      return await interaction.reply({
-        content: 'I cannot ban myself!',
-        ephemeral: true,
-      });
-    }
+    selfBanCheck(interaction, client, target);
 
     try {
-      const guildDoc = await findGuild(guild);
-
-      // pull the tags list and convert to value
-      let tags = guildDoc.autoTags;
-      reason = tags.get(reason) ?? reason;
-
-      // create the ban first so we can insert regardless of whether the user exists
-      const ban = {
-        _id: new mongoose.Types.ObjectId(),
-        guildId: guild.id,
-        targetUserId: target.id,
-        type: 'BAN',
-        number: guildDoc.caseNumber,
-        reason: reason,
-        date: date,
-        moderatorUserId: member.user.id,
-        moderatorNotes: '',
-      };
-
-      let userDoc = guildDoc.users.find((user) => user.userId === target.id);
-      if (!userDoc) {
-        userDoc = {
-          _id: new mongoose.Types.ObjectId(),
-          userId: target.id,
-          verified: false,
-          verifiedBy: '',
-          notes: [],
-          infractions: [ban],
-        };
-
-        guildDoc.users.push(userDoc);
-      } else userDoc.infractions.push(ban);
-
-      await client.users
-        .send(
-          target.id,
-          `You have been banned from ${guild.name}.\n` +
-            `**Reason:** ${reason}\n\n` +
-            `If you feel this ban was not fair or made in error,` +
-            `please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp.`
-        )
-        .catch((err) => {
-          console.log('Failed to dm user about ban.');
-          console.log(err);
-        });
-
-      await guild.members
-        .ban(target.id, { reason: reason })
-        .catch(console.error);
-
-      guildDoc.caseNumber++;
-      await guildDoc.save().catch(console.error);
-
-      let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
-      await interaction.reply(banConfirmation);
-
-      //log to channel
-      let banData =
-        `**BAN** | Case #${guildDoc.caseNumber}\n` +
-        `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-          code: true,
-        })})\n` +
-        `**Moderator:** ${escapeMarkdown(
-          `${member.user.username} (${member.user.id}`,
-          { code: true }
-        )})\n` +
-        `**Reason:** ${reason}\n`;
-
-      if (guildDoc.loggingChannel) {
-        const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
-        if (!logChannel) return;
-
-        await logChannel.send(banData);
-      }
+      banUser(interaction, client, target, reason);
     } catch (err) {
       console.error(err);
     }
   },
+};
+
+const selfBanCheck = async (interaction, client, target) => {
+  if (target.id === client.user.id) {
+    return await interaction.reply({
+      content: 'I cannot ban myself!',
+      ephemeral: true,
+    });
+  }
+};
+
+const banUser = async (interaction, client, target, reason) => {
+  const guildDoc = await findGuild(guild);
+  // pull the tags list and convert to value
+  let tags = guildDoc.autoTags;
+  reason = tags.get(reason) ?? reason;
+
+  // create the ban first so we can insert regardless of whether the user exists
+  const ban = {
+    _id: new mongoose.Types.ObjectId(),
+    guildId: guild.id,
+    targetUserId: target.id,
+    type: 'BAN',
+    number: guildDoc.caseNumber,
+    reason: reason,
+    date: new Date(),
+    moderatorUserId: member.user.id,
+    moderatorNotes: '',
+  };
+
+  let userDoc = guildDoc.users.find((user) => user.userId === target.id);
+  if (!userDoc) {
+    userDoc = {
+      _id: new mongoose.Types.ObjectId(),
+      userId: target.id,
+      verified: false,
+      verifiedBy: '',
+      notes: [],
+      infractions: [ban],
+    };
+
+    guildDoc.users.push(userDoc);
+  } else userDoc.infractions.push(ban);
+
+  await client.users
+    .send(
+      target.id,
+      `You have been banned from ${guild.name}.\n` +
+        `**Reason:** ${reason}\n\n` +
+        `If you feel this ban was not fair or made in error,` +
+        `please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp.`
+    )
+    .catch((err) => {
+      console.log('Failed to dm user about ban.');
+      console.log(err);
+    });
+
+  await guild.members.ban(target.id, { reason: reason }).catch(console.error);
+
+  guildDoc.caseNumber++;
+  await guildDoc.save().catch(console.error);
+
+  let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
+  await interaction.reply(banConfirmation);
+
+  //log to channel
+  let banData =
+    `**BAN** | Case #${guildDoc.caseNumber}\n` +
+    `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+      code: true,
+    })})\n` +
+    `**Moderator:** ${escapeMarkdown(
+      `${member.user.username} (${member.user.id}`,
+      { code: true }
+    )})\n` +
+    `**Reason:** ${reason}\n`;
+
+  if (guildDoc.loggingChannel) {
+    const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
+    if (!logChannel) return;
+
+    await logChannel.send(banData);
+  }
 };
 
 const findGuild = async (guild) => {

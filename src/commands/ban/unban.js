@@ -27,76 +27,77 @@ module.exports = {
     const { options, guild, member } = interaction;
     const target = options.getUser('user');
     var reason = options.getString('reason');
-    const date = new Date();
 
     try {
-      const guildDoc = await findGuild(guild);
-
-      // pull the tags list and convert to value
-      let tags = guildDoc.autoTags;
-      reason = tags.get(reason) ?? reason;
-
-      // create the unban first so we can insert regardless of whether the user exists
-      const unban = {
-        _id: new mongoose.Types.ObjectId(),
-        guildId: guild.id,
-        targetUserId: target.id,
-        type: 'UNBAN',
-        number: guildDoc.caseNumber,
-        reason: reason,
-        date: date,
-        moderatorUserId: member.user.id,
-        moderatorNotes: '',
-      };
-
-      let userDoc = guildDoc.users.find((user) => user.userId === target.id);
-      if (!userDoc) {
-        userDoc = {
-          _id: new mongoose.Types.ObjectId(),
-          userId: target.id,
-          verified: false,
-          verifiedBy: '',
-          notes: [],
-          infractions: [unban],
-        };
-
-        guildDoc.users.push(userDoc);
-      } else userDoc.infractions.push(unban);
-
-      await guild.members
-        .unban(target.id, reason)
-        .catch(async (err) => {
-          await interaction.reply(`:x: ${target} is not banned.`);
-          console.error(err);
-        });
-      guildDoc.caseNumber++;
-      await guildDoc.save().catch(console.error);
-
-      let unbanConfirmation = `<:check:1196693134067896370> ${target} has been unbanned.`;
-      await interaction.reply(unbanConfirmation);
-
-      //log to channel
-      let unbanData =
-        `**UNBAN** | Case #${guildDoc.caseNumber}\n` +
-        `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-          code: true,
-        })})\n` +
-        `**Moderator:** ${escapeMarkdown(
-          `${member.user.username} (${member.user.id}`,
-          { code: true }
-        )})\n` +
-        `**Reason:** ${reason}\n`;
-
-      if (guildDoc.loggingChannel) {
-        const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
-        if (!logChannel) return;
-
-        await logChannel.send(unbanData);
-      }
+      unbanUser(interaction, client, target, reason);
     } catch (err) {
       console.error(err);
     }
   },
+};
+
+const unbanUser = async (interaction, client, target, reason) => {
+  const guildDoc = await findGuild(guild);
+
+  // pull the tags list and convert to value
+  let tags = guildDoc.autoTags;
+  reason = tags.get(reason) ?? reason;
+
+  // create the unban first so we can insert regardless of whether the user exists
+  const unban = {
+    _id: new mongoose.Types.ObjectId(),
+    guildId: guild.id,
+    targetUserId: target.id,
+    type: 'UNBAN',
+    number: guildDoc.caseNumber,
+    reason: reason,
+    date: new Date(),
+    moderatorUserId: member.user.id,
+    moderatorNotes: '',
+  };
+
+  let userDoc = guildDoc.users.find((user) => user.userId === target.id);
+  if (!userDoc) {
+    userDoc = {
+      _id: new mongoose.Types.ObjectId(),
+      userId: target.id,
+      verified: false,
+      verifiedBy: '',
+      notes: [],
+      infractions: [unban],
+    };
+
+    guildDoc.users.push(userDoc);
+  } else userDoc.infractions.push(unban);
+
+  await guild.members.unban(target.id, reason).catch(async (err) => {
+    await interaction.reply(`:x: ${target} is not banned.`);
+    console.error(err);
+  });
+  guildDoc.caseNumber++;
+  await guildDoc.save().catch(console.error);
+
+  let unbanConfirmation = `<:check:1196693134067896370> ${target} has been unbanned.`;
+  await interaction.reply(unbanConfirmation);
+
+  //log to channel
+  let unbanData =
+    `**UNBAN** | Case #${guildDoc.caseNumber}\n` +
+    `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+      code: true,
+    })})\n` +
+    `**Moderator:** ${escapeMarkdown(
+      `${member.user.username} (${member.user.id}`,
+      { code: true }
+    )})\n` +
+    `**Reason:** ${reason}\n`;
+
+  if (guildDoc.loggingChannel) {
+    const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
+    if (!logChannel) return;
+
+    await logChannel.send(unbanData);
+  }
 };
 
 const findGuild = async (guild) => {
