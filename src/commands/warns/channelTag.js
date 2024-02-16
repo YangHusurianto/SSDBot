@@ -89,7 +89,7 @@ const createTag = async (guild, tag, reason) => {
     { upsert: true, new: true }
   );
 
-  guildDoc.channelTags.set(tag, id);
+  guildDoc.channelTags.set(`#${tag}`, id);
 
   await guildDoc.save().catch(console.error);
 
@@ -107,7 +107,7 @@ const removeTag = async (guild, tag) => {
     return(`This server has no channel tag with that name!`);
   }
 
-  guildDoc.channelTags.delete(tag);
+  guildDoc.channelTags.delete(`#${tag}`);
 
   await guildDoc.save().catch(console.error);
 
@@ -132,7 +132,7 @@ const tagsListEmbed = async (guild) => {
 
   tags.forEach((value, key) => {
     embed.addFields({
-      name: key,
+      name: key.slice(1),
       value: value,
     });
   });
