@@ -9,7 +9,8 @@ const guildSchema = new Schema({
   caseNumber: Number,
   loggingChannel: String,
   users: { type: [userSchema], default: [] },
-  autoTags: { type: Map, of: String }
+  autoTags: { type: Map, of: String },
+  channelTags: { type: Map, of: String },
 });
 
 module.exports = model('Guild', guildSchema, "guilds");

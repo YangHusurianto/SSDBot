@@ -81,7 +81,15 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
 
   // pull the tags list and convert to value
   let tags = guildDoc.autoTags;
-  reason = tags.get(reason) ?? reason;
+  finalReason = tags.get(reason);
+
+  if (!finalReason) {
+    // if no tag is found, then look for a channel tag
+    const channelTags = guildDoc.channelTags;
+    const tagPattern = new RegExp(Object.keys(channelTags).join('|'), 'g');
+
+    finalReason = reason.replace(tagPattern, (matched) => `<#${channelTags[matched]}>`);
+  }
 
   // create the warning first so we can insert regardless of whether the user exists
   const warning = {
@@ -90,7 +98,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     targetUserId: target.id,
     type: 'WARN',
     number: guildDoc.caseNumber,
-    reason: reason,
+    reason: finalReason,
     date: new Date(),
     moderatorUserId: member.user.id,
     moderatorNotes: '',
@@ -128,7 +136,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
         'of your history on the server. Warnings are not ' +
         'serious, unless you keep repeating what we warned you for.\n' +
         'If you believe this warn was made in error, please make a <#852694135927865406>.\n\n' +
-        `Warning: ${reason}`
+        `Warning: ${finalReason}`
     )
     .catch( (err) => {
       console.log('Failed to dm user about warn.')
@@ -144,7 +152,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
       `${member.user.username} (${member.user.id}`,
       { code: true }
     )})\n` +
-    `**Reason:** ${reason}\n`;
+    `**Reason:** ${finalReason}\n`;
 
   if (guildDoc.loggingChannel) {
     const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
@@ -167,6 +175,7 @@ const findGuild = async (guild) => {
         loggingChannel: '',
         users: [],
         autoTags: new Map(),
+        channelTags: new Map(),
       },
     },
     { upsert: true, new: true }

@@ -11,12 +11,12 @@ require('dotenv').config();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('autowarn')
-    .setDescription('Create an auto warn tag')
+    .setName('warnchannel')
+    .setDescription('Create a channel tag')
     .addSubcommand((subcommand) =>
       subcommand
         .setName('create')
-        .setDescription('Create an auto warn tag')
+        .setDescription('Create a channel tag')
         .addStringOption((option) =>
           option
             .setName('tag_name')
@@ -25,15 +25,15 @@ module.exports = {
         )
         .addStringOption((option) =>
           option
-            .setName('warn_reason')
-            .setDescription('The autofilled warning reason')
+            .setName('channel_id')
+            .setDescription('The id of the channel')
             .setRequired(true)
         )
     )
     .addSubcommand((subcommand) =>
       subcommand
         .setName('remove')
-        .setDescription('Remove an auto warn tag')
+        .setDescription('Remove a channel tag')
         .addStringOption((option) =>
           option
             .setName('tag_name')
@@ -42,10 +42,9 @@ module.exports = {
         )
     )
     .addSubcommand((subcommand) =>
-      subcommand.setName('list').setDescription('List all auto warn tags')
+      subcommand.setName('list').setDescription('List all channel tags')
     )
     .setDMPermission(false),
-    // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild, member } = interaction;
@@ -53,7 +52,7 @@ module.exports = {
 
     try {
       if (options.getSubcommand() === 'create') {
-        const createdTag = await createTag(guild, tag, options.getString('warn_reason'));
+        const createdTag = await createTag(guild, tag, options.getString('channel_id'));
         return await interaction.reply(createdTag);
       }
 
@@ -84,47 +83,48 @@ const createTag = async (guild, tag, reason) => {
         caseNumber: 0,
         users: [],
         autoTags: new Map(),
+        channelTags: new Map(),
       },
     },
     { upsert: true, new: true }
   );
 
-  guildDoc.autoTags.set(tag, reason);
+  guildDoc.channelTags.set(tag, id);
 
   await guildDoc.save().catch(console.error);
 
-  return(`AutoTag ${tag} created with reason: ${reason}.`);
+  return(`ChannelTag ${tag} created with id: ${id}.`);
 };
 
 const removeTag = async (guild, tag) => {
   let guildDoc = await Guild.findOne({ guildId: guild.id });
 
   if (!guildDoc) {
-    return(`This server has no auto tags!`);
+    return(`This server has no channel tags!`);
   }
 
-  if (!guildDoc.autoTags.has(tag)) {
-    return(`This server has no auto tag with that name!`);
+  if (!guildDoc.channelTags.has(tag)) {
+    return(`This server has no channel tag with that name!`);
   }
 
-  guildDoc.autoTags.delete(tag);
+  guildDoc.channelTags.delete(tag);
 
   await guildDoc.save().catch(console.error);
 
-  return(`AutoTag ${tag} removed.`);
+  return(`ChannelTag ${tag} removed.`);
 };
 
 const tagsListEmbed = async (guild) => {
   let guildDoc = await Guild.findOne({ guildId: guild.id });
 
-  if (!guildDoc || guildDoc.autoTags.size === 0) {
-    return('This server has no auto tags!');
+  if (!guildDoc || guildDoc.channelTags.size === 0) {
+    return('This server has no channel tags!');
   }
 
-  let tags = guildDoc.autoTags;
+  let tags = guildDoc.channelTags;
 
   const embed = new EmbedBuilder().setAuthor({
-    name: 'Auto Tags'
+    name: 'Channel Tags'
   });
 
   // sort by alphabetical key

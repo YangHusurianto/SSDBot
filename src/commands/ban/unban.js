@@ -112,6 +112,7 @@ const findGuild = async (guild) => {
         loggingChannel: '',
         users: [],
         autoTags: new Map(),
+        channelTags: new Map(),
       },
     },
     { upsert: true, new: true }
