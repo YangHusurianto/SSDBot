@@ -86,7 +86,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
   if (!finalReason) {
     // if no tag is found, then look for a channel tag
     const channelTags = guildDoc.channelTags;
-    const tagPattern = new RegExp(Object.keys(channelTags).join('|'), 'g');
+    const tagPattern = new RegExp(Object.keys(channelTags.toJSON()).join('|'), 'g');
 
     finalReason = reason.replace(tagPattern, (matched) => `<#${channelTags[matched]}>`);
   }
