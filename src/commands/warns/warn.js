@@ -88,7 +88,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     const channelTags = guildDoc.channelTags;
     const tagPattern = new RegExp(Object.keys(channelTags.toJSON()).join('|'), 'g');
 
-    finalReason = reason.replace(tagPattern, (matched) => `<#${channelTags[matched]}>`);
+    finalReason = reason.replace(tagPattern, (matched) => `<#${channelTags.get(matched)}>`);
   }
 
   // create the warning first so we can insert regardless of whether the user exists
