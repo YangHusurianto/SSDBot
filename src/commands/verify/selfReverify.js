@@ -31,7 +31,8 @@ module.exports = {
       }
 
       // give the verified role to the user and ephemeral reply
-      await member.roles.add(926253317284323389).then(() => {
+      let verifiedRole = guild.roles.cache.find(role => role.id == "926253317284323389")
+      await member.roles.add(verifiedRole).then(() => {
         return interaction.reply({
           content: `<:check:1196693134067896370> You have been reverified!`,
           ephemeral: true,
