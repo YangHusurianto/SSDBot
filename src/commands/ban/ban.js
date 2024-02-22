@@ -43,6 +43,13 @@ const selfBanCheck = async (interaction, client, target) => {
       ephemeral: true,
     });
   }
+
+  if (target.id === interaction.member.id) {
+    return await interaction.reply({
+      content: 'You cannot ban yourself!',
+      ephemeral: true,
+    });
+  }
 };
 
 const banUser = async (interaction, client, guild, target, member, reason) => {
