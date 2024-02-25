@@ -70,7 +70,12 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
   
       return false;
     }
-  }).catch();
+  }).catch( async (err) => {
+    await interaction.reply({
+      content: 'Failed to fetch member for ban check. Attempting to ban anyway.',
+      ephemeral: true,
+    });
+  });
 
   return true;
 }
