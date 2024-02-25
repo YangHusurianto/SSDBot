@@ -131,7 +131,9 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
   await guildDoc.save().catch(console.error);
 
   let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
-  await interaction.reply(banConfirmation);
+
+  if (interaction.replied) await interaction.editReply(banConfirmation);
+  else await interaction.reply(banConfirmation);
 
   //log to channel
   let banData =
