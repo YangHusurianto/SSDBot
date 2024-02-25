@@ -55,7 +55,7 @@ const selfBanCheck = async (interaction, client, target) => {
 
 const roleHeirarchyCheck = async (interaction, guild, target, member) => {
   // get the guild member for the target
-  const targetMember = guild.members.fetch(target.id);
+  const targetMember = await guild.members.fetch(target.id);
 
   if (member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1) {
     return await interaction.reply({
