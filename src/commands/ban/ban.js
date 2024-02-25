@@ -26,8 +26,8 @@ module.exports = {
     var reason = options.getString('reason');
     const date = new Date();
 
-    selfBanCheck(interaction, client, target);
-    roleHeirarchyCheck(interaction, guild, target, member);
+    if (!selfBanCheck(interaction, client, target)) return;
+    if (!roleHeirarchyCheck(interaction, guild, target, member)) return;
 
     try {
       banUser(interaction, client, guild, target, member, reason);
@@ -39,31 +39,40 @@ module.exports = {
 
 const selfBanCheck = async (interaction, client, target) => {
   if (target.id === client.user.id) {
-    return await interaction.reply({
+    await interaction.reply({
       content: 'I cannot ban myself!',
       ephemeral: true,
     });
+
+    return false;
   }
 
   if (target.id === interaction.member.id) {
-    return await interaction.reply({
+    await interaction.reply({
       content: 'You cannot ban yourself!',
       ephemeral: true,
     });
+
+    return false;
   }
+
+  return true;
 };
 
 const roleHeirarchyCheck = async (interaction, guild, target, member) => {
   // get the guild member for the target
-  const targetMember = await guild.members.fetch(target.id);
+  await guild.members.fetch(target.id).then(async (targetMember) => {
+    if (member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1) {
+      await interaction.reply({
+        content: 'You cannot ban a member with a higher or equal role than you!',
+        ephemeral: true,
+      });
+  
+      return false;
+    }
+  }).catch();
 
-  if (member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1) {
-    return await interaction.reply({
-      content: 'You cannot ban a member with a higher or equal role than you!',
-      ephemeral: true,
-    });
-  }
-
+  return true;
 }
 
 const banUser = async (interaction, client, guild, target, member, reason) => {
