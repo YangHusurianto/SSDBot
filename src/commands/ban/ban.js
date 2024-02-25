@@ -27,7 +27,7 @@ module.exports = {
     const date = new Date();
 
     selfBanCheck(interaction, client, target);
-    roleHeirarchyCheck(interaction, client, guild, target, member);
+    roleHeirarchyCheck(interaction, guild, target, member);
 
     try {
       banUser(interaction, client, guild, target, member, reason);
@@ -53,9 +53,9 @@ const selfBanCheck = async (interaction, client, target) => {
   }
 };
 
-const roleHeirarchyCheck = async (interaction, client, guild, target, member) => {
+const roleHeirarchyCheck = async (interaction, guild, target, member) => {
   // get the guild member for the target
-  const targetMember = guild.members.cache.get(target.id);
+  const targetMember = guild.members.fetch(target.id);
 
   if (member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1) {
     return await interaction.reply({
