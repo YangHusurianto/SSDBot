@@ -54,7 +54,10 @@ const selfBanCheck = async (interaction, client, target) => {
 };
 
 const roleHeirarchyCheck = async (interaction, client, guild, target, member) => {
-  if (member.roles.highest.comparePositionTo(target.roles.highest) < 1) {
+  // get the guild member for the target
+  const targetMember = guild.members.cache.get(target.id);
+
+  if (member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1) {
     return await interaction.reply({
       content: 'You cannot ban a member with a higher or equal role than you!',
       ephemeral: true,
