@@ -79,7 +79,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
   await guild.members.fetch(target.id).then(async (targetMember) => {
     if (member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1) {
       await interaction.reply({
-        content: 'You cannot ban a member with a higher or equal role than you!',
+        content: 'You cannot warn a member with a higher or equal role than you!',
         ephemeral: true,
       });
   
@@ -87,7 +87,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
     }
   }).catch( async (err) => {
     await interaction.reply({
-      content: 'Failed to fetch member for ban check. Attempting to ban anyway.',
+      content: 'Failed to fetch member for warn check. Attempting to warn anyway.',
       ephemeral: true,
     });
   });
