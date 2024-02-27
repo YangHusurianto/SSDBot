@@ -50,7 +50,8 @@ module.exports = {
     const target = options.getUser('user');
     var reason = options.getString('reason');
 
-    selfWarnCheck(interaction, target, client);
+    if (!selfWarnCheck(interaction, target, client)) return;
+    if (!roleHeirarchyCheck(interaction, guild, target, member)) return;
 
     try {
       warnUser(interaction, client, guild, target, member, reason);
@@ -62,12 +63,37 @@ module.exports = {
 
 const selfWarnCheck = async (interaction, target, client) => {
   if (target.id === client.user.id) {
-    return await interaction.reply({
+    await interaction.reply({
       content: 'I cannot warn myself!',
       ephemeral: true,
     });
+
+    return false;
   }
+
+  return true;
 };
+
+const roleHeirarchyCheck = async (interaction, guild, target, member) => {
+  // get the guild member for the target
+  await guild.members.fetch(target.id).then(async (targetMember) => {
+    if (member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1) {
+      await interaction.reply({
+        content: 'You cannot ban a member with a higher or equal role than you!',
+        ephemeral: true,
+      });
+  
+      return false;
+    }
+  }).catch( async (err) => {
+    await interaction.reply({
+      content: 'Failed to fetch member for ban check. Attempting to ban anyway.',
+      ephemeral: true,
+    });
+  });
+
+  return true;
+}
 
 const warnUser = async (interaction, client, guild, target, member, reason) => {
   if (target.id == '145959145319694336') {
