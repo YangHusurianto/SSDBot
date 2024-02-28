@@ -7,10 +7,10 @@ require('dotenv').config();
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('editwarn')
-    .setDescription('Edit a warning.')
+    .setDescription('Edit an infraction.')
     .addIntegerOption((option) =>
       option
-        .setName('warn_number')
+        .setName('infraction_number')
         .setDescription('The case number to edit')
         .setRequired(true)
     )
@@ -18,14 +18,14 @@ module.exports = {
       option.setName('reason').setDescription('The new reason')
     )
     .addStringOption((option) =>
-      option.setName('notes').setDescription('Notes about the warning')
+      option.setName('notes').setDescription('Notes about the infraction')
     )
     .setDMPermission(false),
   // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild } = interaction;
-    const warnNumber = options.getInteger('warn_number');
+    const infractionNumber = options.getInteger('infraction_number');
     let reason = options.getString('reason') ?? '';
     let notes = options.getString('notes') ?? '';
 
@@ -33,39 +33,39 @@ module.exports = {
       const guildDoc = await Guild.findOne(
         {
           guildId: guild.id,
-          'users.infractions.number': warnNumber,
+          'users.infractions.number': infractionNumber,
         },
         { 'users.$': 1 }
       );
 
       if (!guildDoc)
         return await interaction.reply(
-          `:x: Could not find warning #${warnNumber}, failed to edit.`
+          `:x: Could not find infraction #${infractionNumber}, failed to edit.`
         );
       const user = guildDoc.users[0];
-      const warn = user.warns.find((warn) => warn.warnNumber === warnNumber);
-      if (!reason) reason = warn.warnReason;
-      if (!notes) notes = warn.notes;
+      const infraction = user.infractions.find((infraction) => infraction.number === infractionNumber);
+      if (!reason) reason = infraction.reason;
+      if (!notes) notes = infraction.notes;
 
-      const editedWarn = await Guild.findOneAndUpdate(
-        { guildId: guild.id, 'users.infractions.nNumber': warnNumber },
+      const editedInfraction = await Guild.findOneAndUpdate(
+        { guildId: guild.id, 'users.infractions.nNumber': infractionNumber },
         {
           $set: {
-            'users.$[user].infractions.$[warn].reason': reason,
-            'users.$[user].infractions.$[warn].moderatorNotes': notes,
+            'users.$[user].infractions.$[infraction].reason': reason,
+            'users.$[user].infractions.$[infraction].moderatorNotes': notes,
           },
         },
         {
           arrayFilters: [
-            { 'user.warns.warnNumber': warnNumber },
-            { 'warn.warnNumber': warnNumber },
+            { 'user.infractions.infractionNumber': infractionNumber },
+            { 'infraction.infractionNumber': infractionNumber },
           ],
           new: true,
         }
       );
 
       await interaction.reply(
-        `<:check:1196693134067896370> Warning #${warnNumber} edited with new reason: ${reason}`
+        `<:check:1196693134067896370> Infraction #${infractionNumber} edited with new reason: ${reason}`
       );
     } catch (err) {
       console.error(err);
