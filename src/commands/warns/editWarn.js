@@ -57,8 +57,8 @@ module.exports = {
         },
         {
           arrayFilters: [
-            { 'user.infractions.infractionNumber': infractionNumber },
-            { 'infraction.infractionNumber': infractionNumber },
+            { 'user.infractions.number': infractionNumber },
+            { 'infraction.number': infractionNumber },
           ],
           new: true,
         }
