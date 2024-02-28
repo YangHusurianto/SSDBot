@@ -45,7 +45,7 @@ module.exports = {
       const user = guildDoc.users[0];
       const infraction = user.infractions.find((infraction) => infraction.number === infractionNumber);
       if (!reason) reason = infraction.reason;
-      if (!notes) notes = infraction.notes;
+      if (!notes) notes = infraction.moderatorNotes;
 
       const editedInfraction = await Guild.findOneAndUpdate(
         { guildId: guild.id, 'users.infractions.nNumber': infractionNumber },
