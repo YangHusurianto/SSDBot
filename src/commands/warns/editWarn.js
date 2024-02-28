@@ -48,7 +48,7 @@ module.exports = {
       if (!notes) notes = infraction.moderatorNotes;
 
       const editedInfraction = await Guild.findOneAndUpdate(
-        { guildId: guild.id, 'users.infractions.nNumber': infractionNumber },
+        { guildId: guild.id, 'users.infractions.number': infractionNumber },
         {
           $set: {
             'users.$[user].infractions.$[infraction].reason': reason,
