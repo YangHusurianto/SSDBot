@@ -30,6 +30,8 @@ module.exports = {
     const date = new Date();
 
     try {
+      await interaction.deferReply({ ephemeral: true });
+
       const guildDoc = await findGuild(guild);
 
       // create the note first so we can insert regardless of whether the user exists
@@ -72,7 +74,7 @@ module.exports = {
 
       await guildDoc.save().catch(console.error);
 
-      await interaction.reply({
+      await interaction.editReply({
         content: noteConfirmation,
         ephemeral: true,
       });
