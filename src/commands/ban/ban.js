@@ -39,7 +39,7 @@ module.exports = {
 
 const selfBanCheck = async (interaction, client, target) => {
   if (target.id === client.user.id) {
-    await interaction.reply({
+    await interaction.editReply({
       content: 'I cannot ban myself!',
       ephemeral: true,
     });
@@ -48,7 +48,7 @@ const selfBanCheck = async (interaction, client, target) => {
   }
 
   if (target.id === interaction.member.id) {
-    await interaction.reply({
+    await interaction.editReply({
       content: 'You cannot ban yourself!',
       ephemeral: true,
     });
@@ -63,7 +63,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
   // get the guild member for the target
   await guild.members.fetch(target.id).then(async (targetMember) => {
     if (member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'You cannot ban a member with a higher or equal role than you!',
         ephemeral: true,
       });
@@ -71,7 +71,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
       return false;
     }
   }).catch( async (err) => {
-    await interaction.reply({
+    await interaction.editReply({
       content: 'Failed to fetch member for ban check. Attempting to ban anyway.',
       ephemeral: true,
     });
@@ -81,6 +81,8 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
 }
 
 const banUser = async (interaction, client, guild, target, member, reason) => {
+  await interaction.deferReply();
+
   const guildDoc = await findGuild(guild);
   // pull the tags list and convert to value
   let tags = guildDoc.autoTags;
@@ -133,7 +135,7 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
   let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
 
   if (interaction.replied) await interaction.editReply(banConfirmation);
-  else await interaction.reply(banConfirmation);
+  else await interaction.editReply(banConfirmation);
 
   //log to channel
   let banData =
