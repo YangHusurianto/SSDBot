@@ -37,7 +37,12 @@ module.exports = {
 
       return await interaction.reply(
         `<:check:1196693134067896370> ${target} is verified!`
-      );
+      ).then(() => {
+        const targetMember = interaction.guild.members.cache.find(member => member.id === target.id);
+        targetMember.roles.add("926253317284323389");
+      }).catch((err) => {
+        console.error(err);
+      });
     } catch (err) {
       console.error(err);
     }
