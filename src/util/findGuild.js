@@ -2,7 +2,7 @@ const Guild = require('../schemas/guild');
 
 const mongoose = require('mongoose');
 
-module.exports.findGuild = async (guild) => {
+findGuild = async (guild) => {
   return await Guild.findOneAndUpdate(
     { guildId: guild.id },
     {
@@ -21,3 +21,5 @@ module.exports.findGuild = async (guild) => {
     { upsert: true, new: true }
   );
 };
+
+module.exports = findGuild;
