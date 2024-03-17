@@ -1,4 +1,4 @@
-const Guild = require('../../schemas/guild');
+const findGuild = require('../../util/findGuild');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -90,24 +90,4 @@ module.exports = {
       console.error(err);
     }
   },
-};
-
-const findGuild = async (guild) => {
-  return await Guild.findOneAndUpdate(
-    { guildId: guild.id },
-    {
-      $setOnInsert: {
-        _id: new mongoose.Types.ObjectId(),
-        guildId: guild.id,
-        guildName: guild.name,
-        guildIcon: guild.iconURL(),
-        caseNumber: 0,
-        loggingChannel: '',
-        users: [],
-        autoTags: new Map(),
-        channelTags: new Map(),
-      },
-    },
-    { upsert: true, new: true }
-  );
 };
