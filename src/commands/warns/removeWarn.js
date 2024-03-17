@@ -27,10 +27,12 @@ module.exports = {
     const warnNumber = options.getInteger('warn_number');
     const target = options.getUser('user');
 
+    await interaction.deferReply();
+
     try {
       const guildDoc = await Guild.findOne({ guildId: guild.id });
       if (!guildDoc) {
-        await interaction.reply(`This server has no users with warnings!`);
+        await interaction.editReply(`This server has no users with warnings!`);
         return;
       }
 
@@ -39,7 +41,7 @@ module.exports = {
           (user) => user.userId === target.id
         );
         if (!userDoc) {
-          return await interaction.reply(`This user has no warnings!`);
+          return await interaction.editReply(`This user has no warnings!`);
         }
       }
 
@@ -49,7 +51,7 @@ module.exports = {
       );
 
       if (!userDoc) {
-        return await interaction.reply(
+        return await interaction.editReply(
           `:x: No warning found with that case number.`
         );
       }
@@ -59,13 +61,13 @@ module.exports = {
       );
 
       if (target && infraction.targetUserId !== target.id) {
-        return await interaction.reply(
+        return await interaction.editReply(
           `:x: The user you provided is not the user who was warned.`
         );
       }
 
       if (infraction.type !== 'WARN') {
-        return await interaction.reply(`:x: You cannot remove a ban.`);
+        return await interaction.editReply(`:x: You cannot remove a ban.`);
       }
 
       const removedWarn = await Guild.findOneAndUpdate(
@@ -79,7 +81,7 @@ module.exports = {
 
       await removedWarn.save().catch(console.error);
 
-      return await interaction.reply(
+      return await interaction.editReply(
         `<:check:1196693134067896370> Warning #${warnNumber} removed.`
       );
     } catch (err) {

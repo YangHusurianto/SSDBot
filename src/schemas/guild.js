@@ -11,6 +11,7 @@ const guildSchema = new Schema({
   users: { type: [userSchema], default: [] },
   autoTags: { type: Map, of: String },
   channelTags: { type: Map, of: String },
+  settings: { type: Map, of: String },
 });
 
 module.exports = model('Guild', guildSchema, "guilds");
