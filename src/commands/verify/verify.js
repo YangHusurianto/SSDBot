@@ -1,4 +1,4 @@
-const Guild = require('../../schemas/guild');
+const findGuild = require('../../utils/findGuild');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -38,62 +38,47 @@ module.exports = {
 
         guildDoc.users.push(userDoc);
       } else if (userDoc.verified) {
-        return await interaction.reply(
-          `:x: ${target} is already verified!`
-        );
+        return await interaction.reply(`:x: ${target} is already verified!`);
       } else {
         userDoc.verified = true;
         userDoc.verifiedBy = member.user.id;
       }
 
-      let verifyData =
-        `**VERIFY** | ${target}\n` +
-        `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-          code: true,
-        })})\n` +
-        `**Moderator:** ${escapeMarkdown(
-          `${member.user.username} (${member.user.id}`,
-          { code: true }
-        )})`;
+      await guildDoc
+        .save()
+        .then(async () => {
+          let verifyData =
+            `**VERIFY** | ${target}\n` +
+            `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+              code: true,
+            })})\n` +
+            `**Moderator:** ${escapeMarkdown(
+              `${member.user.username} (${member.user.id}`,
+              { code: true }
+            )})`;
 
-      const targetMember = interaction.guild.members.cache.find(member => member.id === target.id);
-      targetMember.roles.add("926253317284323389");
+          const targetMember = interaction.guild.members.cache.find(
+            (member) => member.id === target.id
+          );
+          targetMember.roles.add('926253317284323389');
 
-      let verifyConfirmation = `<:check:1196693134067896370> ${target} has been verified!`;
+          let verifyConfirmation = `<:check:1196693134067896370> ${target} has been verified!`;
 
-      await guildDoc.save().catch(console.error);
+          await interaction.reply(verifyConfirmation);
 
-      await interaction.reply(verifyConfirmation);
+          //log to channel
+          if (guildDoc.loggingChannel) {
+            const logChannel = guild.channels.cache.get(
+              guildDoc.loggingChannel
+            );
+            if (!logChannel) return;
 
-      //log to channel
-      if (guildDoc.loggingChannel) {
-        const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
-        if (!logChannel) return;
-
-        await logChannel.send(verifyData);
-      }
+            await logChannel.send(verifyData);
+          }
+        })
+        .catch(console.error);
     } catch (err) {
       console.error(err);
     }
   },
-};
-
-const findGuild = async (guild) => {
-  return await Guild.findOneAndUpdate(
-    { guildId: guild.id },
-    {
-      $setOnInsert: {
-        _id: new mongoose.Types.ObjectId(),
-        guildId: guild.id,
-        guildName: guild.name,
-        guildIcon: guild.iconURL(),
-        caseNumber: 0,
-        loggingChannel: '',
-        users: [],
-        autoTags: new Map(),
-        channelTags: new Map(),
-      },
-    },
-    { upsert: true, new: true }
-  );
 };
