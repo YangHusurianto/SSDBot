@@ -28,25 +28,38 @@ module.exports = {
 
       let userDoc = guildDoc.users.find((user) => user.userId === target.id);
 
+      const targetMember = interaction.guild.members.cache.find(
+        (member) => member.id === target.id
+      );
+
       if (!userDoc) {
         userDoc = {
           _id: new mongoose.Types.ObjectId(),
           userId: target.id,
-          verified: true,
-          verifiedBy: member.user.id,
+          verified: false,
+          verifiedBy: "",
           notes: [],
           infractions: [],
         };
 
         guildDoc.users.push(userDoc);
-      } else if (userDoc.verified) {
-        return await interaction.editReply(`:x: ${target} is already verified!`);
-      } else {
-        userDoc.verified = true;
-        userDoc.verifiedBy = member.user.id;
+      } 
+      
+      if (userDoc.verified) {
+        if (targetMember.roles.cache.has('926253317284323389')) {
+          return await interaction.editReply(`${target} is already verified!`);
+        }
+
+        targetMember.roles.add('926253317284323389');
+        return await interaction.editReply(
+          `<:check:1196693134067896370> ${target} is verified, but missing the verified role.\nGiving the role now.`
+        );
       }
 
-      await guildDoc
+      userDoc.verified = true;
+      userDoc.verifiedBy = member.user.id;
+
+      return await guildDoc
         .save()
         .then(async () => {
           let verifyData =
