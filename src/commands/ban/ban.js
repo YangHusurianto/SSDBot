@@ -27,6 +27,8 @@ module.exports = {
     var reason = options.getString('reason');
     const date = new Date();
 
+    await interaction.deferReply();
+
     if (!selfBanCheck(interaction, client, target)) return;
     if (!roleHeirarchyCheck(interaction, guild, target, member)) return;
     if (!antiSpamBanCheck(interaction, guild, member)) return;
@@ -63,30 +65,38 @@ const selfBanCheck = async (interaction, client, target) => {
 
 const roleHeirarchyCheck = async (interaction, guild, target, member) => {
   // get the guild member for the target
-  await guild.members.fetch(target.id).then(async (targetMember) => {
-    if (member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1) {
+  await guild.members
+    .fetch(target.id)
+    .then(async (targetMember) => {
+      if (
+        member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1
+      ) {
+        await interaction.editReply({
+          content:
+            'You cannot ban a member with a higher or equal role than you!',
+          ephemeral: true,
+        });
+
+        return false;
+      }
+    })
+    .catch(async (err) => {
       await interaction.editReply({
-        content: 'You cannot ban a member with a higher or equal role than you!',
+        content:
+          'Failed to fetch member for ban check. Attempting to ban anyway.',
         ephemeral: true,
       });
-  
-      return false;
-    }
-  }).catch( async (err) => {
-    await interaction.editReply({
-      content: 'Failed to fetch member for ban check. Attempting to ban anyway.',
-      ephemeral: true,
     });
-  });
 
   return true;
-}
+};
 
 const antiSpamBanCheck = async (interaction, guild, member) => {
   const recentBans = await getRecentBans(guild.id, member.user.id);
   if (recentBans >= 1) {
     await interaction.editReply({
-      content: 'You have banned too many users recently. Please try again later.',
+      content:
+        'You have banned too many users recently. Please try again later.',
       ephemeral: true,
     });
 
@@ -94,11 +104,9 @@ const antiSpamBanCheck = async (interaction, guild, member) => {
   }
 
   return true;
-}
+};
 
 const banUser = async (interaction, client, guild, target, member, reason) => {
-  await interaction.deferReply();
-
   const guildDoc = await findGuild(guild);
   // pull the tags list and convert to value
   let tags = guildDoc.autoTags;
