@@ -158,6 +158,7 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
     )
     .catch((err) => {
       console.log('Failed to dm user about ban.');
+      console.error(err);
     });
 
   await guild.members.ban(target.id, { reason: reason }).catch(console.error);
