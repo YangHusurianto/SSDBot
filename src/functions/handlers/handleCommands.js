@@ -58,6 +58,14 @@ module.exports = (client) => {
         .catch(console.error);
     }
 
+    // delete specific global command
+    if (true) {
+      rest
+        .delete(Routes.applicationCommand(process.env.CLIENT_ID, '1205196509524533341'))
+        .then(() => console.log('Successfully deleted application command'))
+        .catch(console.error);
+    }
+
     const REFRESH_COMMANDS = process.env.REFRESH_COMMANDS === 'true';
     if (!REFRESH_COMMANDS) return;
 
