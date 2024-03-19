@@ -29,9 +29,9 @@ module.exports = {
 
     await interaction.deferReply();
 
-    if (!selfBanCheck(interaction, client, target)) return;
-    if (!roleHeirarchyCheck(interaction, guild, target, member)) return;
-    if (!antiSpamBanCheck(interaction, guild, member)) return;
+    if (await selfBanCheck(interaction, client, target)) return;
+    if (await roleHeirarchyCheck(interaction, guild, target, member)) return;
+    if (await antiSpamBanCheck(interaction, guild, member)) return;
 
     try {
       banUser(interaction, client, guild, target, member, reason);
@@ -48,7 +48,7 @@ const selfBanCheck = async (interaction, client, target) => {
       ephemeral: true,
     });
 
-    return false;
+    return true;
   }
 
   if (target.id === interaction.member.id) {
@@ -57,10 +57,10 @@ const selfBanCheck = async (interaction, client, target) => {
       ephemeral: true,
     });
 
-    return false;
+    return true;
   }
 
-  return true;
+  return false;
 };
 
 const roleHeirarchyCheck = async (interaction, guild, target, member) => {
@@ -77,7 +77,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
           ephemeral: true,
         });
 
-        return false;
+        return true;
       }
     })
     .catch(async (err) => {
@@ -88,7 +88,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
       });
     });
 
-  return true;
+  return false;
 };
 
 const antiSpamBanCheck = async (interaction, guild, member) => {
@@ -100,10 +100,10 @@ const antiSpamBanCheck = async (interaction, guild, member) => {
       ephemeral: true,
     });
 
-    return false;
+    return true;
   }
 
-  return true;
+  return false;
 };
 
 const banUser = async (interaction, client, guild, target, member, reason) => {
