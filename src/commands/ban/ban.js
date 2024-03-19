@@ -31,7 +31,14 @@ module.exports = {
 
     if (await selfBanCheck(interaction, client, target)) return;
     if (await roleHeirarchyCheck(interaction, guild, target, member)) return;
-    if (await antiSpamBanCheck(interaction, guild, member)) return;
+
+    const modMember = interaction.guild.members.cache.find(
+      (member) => member.id === target.id
+    );
+
+    if (modMember.roles.cache.has('942541250647695371')) {
+      if (await antiSpamBanCheck(interaction, guild, member)) return;
+    }
 
     try {
       banUser(interaction, client, guild, target, member, reason);
