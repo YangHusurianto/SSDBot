@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 
 require('dotenv').config();
 
+const DAILY_BAN_LIMIT = 5;
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('ban')
@@ -100,7 +102,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
 
 const antiSpamBanCheck = async (interaction, guild, member) => {
   const recentBans = await getRecentBans(guild.id, member.user.id);
-  if (recentBans >= 1) {
+  if (recentBans >= DAILY_BAN_LIMIT) {
     await interaction.editReply({
       content:
         'You have banned too many users recently. Please try again later.',
