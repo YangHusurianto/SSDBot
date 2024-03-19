@@ -21,6 +21,8 @@ module.exports = {
     const { options, guild, member } = interaction;
     const target = options.getUser('user');
 
+    interaction.deferReply();
+
     try {
       const guildDoc = await findGuild(guild);
 
@@ -38,7 +40,7 @@ module.exports = {
 
         guildDoc.users.push(userDoc);
       } else if (userDoc.verified) {
-        return await interaction.reply(`:x: ${target} is already verified!`);
+        return await interaction.editReply(`:x: ${target} is already verified!`);
       } else {
         userDoc.verified = true;
         userDoc.verifiedBy = member.user.id;
@@ -64,7 +66,7 @@ module.exports = {
 
           let verifyConfirmation = `<:check:1196693134067896370> ${target} has been verified!`;
 
-          await interaction.reply(verifyConfirmation);
+          await interaction.editReply(verifyConfirmation);
 
           //log to channel
           if (guildDoc.loggingChannel) {
