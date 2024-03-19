@@ -59,9 +59,9 @@ module.exports = (client) => {
     }
 
     // delete specific global command
-    if (true) {
+    if (false) {
       rest
-        .delete(Routes.applicationCommand(process.env.CLIENT_ID, '1205196509524533341'))
+        .delete(Routes.applicationCommand(process.env.CLIENT_ID, ''))
         .then(() => console.log('Successfully deleted application command'))
         .catch(console.error);
     }
