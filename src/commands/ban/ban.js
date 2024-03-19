@@ -199,6 +199,7 @@ const getRecentBans = async (guildId, userId) => {
     { $unwind: '$users' },
     { $unwind: '$users.infractions' },
     { $match: { 'users.infractions.date': { $gte: afterDate } } },
+    { $match: { 'users.infractions.type': 'BAN'} }, 
     { $match: { 'users.infractions.moderatorUserId': userId } },
     { $project: { _id: 0, infractions: '$users.infractions' } },
   ]);
