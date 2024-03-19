@@ -58,7 +58,7 @@ module.exports = {
           const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
           if (!logChannel) return;
 
-          await logChannel.send(verifyData);
+          await logChannel.send(unverifyData);
         }
 
         return await interaction.reply({
