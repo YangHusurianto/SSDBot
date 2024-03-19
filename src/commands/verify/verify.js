@@ -32,7 +32,9 @@ module.exports = {
         (member) => member.id === target.id
       );
 
+      let newUser = false;
       if (!userDoc) {
+        newUser = true;
         userDoc = {
           _id: new mongoose.Types.ObjectId(),
           userId: target.id,
@@ -41,10 +43,8 @@ module.exports = {
           notes: [],
           infractions: [],
         };
-
-        guildDoc.users.push(userDoc);
       } 
-      
+
       if (userDoc.verified) {
         if (targetMember.roles.cache.has('926253317284323389')) {
           return await interaction.editReply(`${target} is already verified!`);
@@ -58,6 +58,7 @@ module.exports = {
 
       userDoc.verified = true;
       userDoc.verifiedBy = member.user.id;
+      if (newUser) guildDoc.users.push(userDoc);
 
       return await guildDoc
         .save()
