@@ -29,6 +29,8 @@ module.exports = {
     let reason = options.getString('reason') ?? '';
     let notes = options.getString('notes') ?? '';
 
+    interaction.deferReply();
+
     try {
       const guildDoc = await Guild.findOne(
         {
@@ -39,7 +41,7 @@ module.exports = {
       );
 
       if (!guildDoc)
-        return await interaction.reply(
+        return await interaction.editReply(
           `:x: Could not find infraction #${infractionNumber}, failed to edit.`
         );
       const user = guildDoc.users[0];
@@ -64,7 +66,7 @@ module.exports = {
         }
       );
 
-      await interaction.reply(
+      await interaction.editReply(
         `<:check:1196693134067896370> Infraction #${infractionNumber} edited with new reason: ${reason}`
       );
     } catch (err) {
