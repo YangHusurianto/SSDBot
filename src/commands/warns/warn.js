@@ -50,6 +50,8 @@ module.exports = {
     const target = options.getUser('user');
     var reason = options.getString('reason');
 
+    interaction.deferReply();
+
     if (!selfWarnCheck(interaction, target, client)) return;
     if (!roleHeirarchyCheck(interaction, guild, target, member)) return;
 
@@ -63,7 +65,7 @@ module.exports = {
 
 const selfWarnCheck = async (interaction, target, client) => {
   if (target.id === client.user.id) {
-    await interaction.reply({
+    await interaction.editReply({
       content: 'I cannot warn myself!',
       ephemeral: true,
     });
@@ -78,7 +80,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
   // get the guild member for the target
   await guild.members.fetch(target.id).then(async (targetMember) => {
     if (member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'You cannot warn a member with a higher or equal role than you!',
         ephemeral: true,
       });
@@ -86,7 +88,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
       return false;
     }
   }).catch( async (err) => {
-    await interaction.reply({
+    await interaction.editReply({
       content: 'Failed to fetch member for warn check. Attempting to warn anyway.',
       ephemeral: true,
     });
@@ -97,7 +99,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
 
 const warnUser = async (interaction, client, guild, target, member, reason) => {
   if (target.id == '145959145319694336') {
-    return await interaction.reply({
+    return await interaction.editReply({
       content: 'L + Bozo. Puff is too princess to be warned!',
       ephemeral: true,
     });
@@ -146,12 +148,12 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
 
   guildDoc.caseNumber++;
   await guildDoc.save().catch( async (err) => {
-    await interaction.reply(`:x: Failed to save warn.`);
+    await interaction.editReply(`:x: Failed to save warn.`);
     console.error(err);
   });
 
   let warnConfirmation = `<:check:1196693134067896370> ${target} has been warned.`;
-  await interaction.reply(warnConfirmation);
+  await interaction.editReply(warnConfirmation);
 
   client.users
     .send(
