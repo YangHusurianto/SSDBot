@@ -1,4 +1,5 @@
-const Guild = require('../../schemas/guild');
+const findGuild = require('../../util/findGuild');
+const findUser = require('../../util/findUser');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -23,7 +24,6 @@ module.exports = {
         .setAutocomplete(true)
     )
     .setDMPermission(false),
-  // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async autocomplete(interaction) {
     const focusedValue = interaction.options.getFocused();
@@ -78,24 +78,31 @@ const selfWarnCheck = async (interaction, target, client) => {
 
 const roleHeirarchyCheck = async (interaction, guild, target, member) => {
   // get the guild member for the target
-  await guild.members.fetch(target.id).then(async (targetMember) => {
-    if (member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1) {
+  await guild.members
+    .fetch(target.id)
+    .then(async (targetMember) => {
+      if (
+        member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1
+      ) {
+        await interaction.editReply({
+          content:
+            'You cannot warn a member with a higher or equal role than you!',
+          ephemeral: true,
+        });
+
+        return false;
+      }
+    })
+    .catch(async (err) => {
       await interaction.editReply({
-        content: 'You cannot warn a member with a higher or equal role than you!',
+        content:
+          'Failed to fetch member for warn check. Attempting to warn anyway.',
         ephemeral: true,
       });
-  
-      return false;
-    }
-  }).catch( async (err) => {
-    await interaction.editReply({
-      content: 'Failed to fetch member for warn check. Attempting to warn anyway.',
-      ephemeral: true,
     });
-  });
 
   return true;
-}
+};
 
 const warnUser = async (interaction, client, guild, target, member, reason) => {
   if (target.id == '145959145319694336') {
@@ -114,9 +121,15 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
   if (!finalReason) {
     // if no tag is found, then look for a channel tag
     const channelTags = guildDoc.channelTags;
-    const tagPattern = new RegExp(Object.keys(channelTags.toJSON()).join('|'), 'g');
+    const tagPattern = new RegExp(
+      Object.keys(channelTags.toJSON()).join('|'),
+      'g'
+    );
 
-    finalReason = reason.replace(tagPattern, (matched) => `<#${channelTags.get(matched)}>`);
+    finalReason = reason.replace(
+      tagPattern,
+      (matched) => `<#${channelTags.get(matched)}>`
+    );
   }
 
   // create the warning first so we can insert regardless of whether the user exists
@@ -132,28 +145,23 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     moderatorNotes: '',
   };
 
-  let userDoc = guildDoc.users.find((user) => user.userId === target.id);
-  if (!userDoc) {
-    userDoc = {
-      _id: new mongoose.Types.ObjectId(),
-      userId: target.id,
-      verified: false,
-      verifiedBy: '',
-      notes: [],
-      infractions: [warning],
-    };
-
-    guildDoc.users.push(userDoc);
-  } else userDoc.infractions.push(warning);
+  let userDoc = findUser(guild.id, target.id);
+  userDoc.infractions.push(warning);
 
   guildDoc.caseNumber++;
-  await guildDoc.save().catch( async (err) => {
-    await interaction.editReply(`:x: Failed to save warn.`);
+  await guildDoc.save().catch(async (err) => {
+    await interaction.editReply(`:x: Failed to update case number.`);
     console.error(err);
   });
 
-  let warnConfirmation = `<:check:1196693134067896370> ${target} has been warned.`;
-  await interaction.editReply(warnConfirmation);
+  await userDoc.save().catch(async (err) => {
+    await interaction.editReply(`:x: Failed to save warning.`);
+    console.error(err);
+  });
+
+  await interaction.editReply(
+    `<:check:1196693134067896370> ${target} has been warned.`
+  );
 
   client.users
     .send(
@@ -166,46 +174,26 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
         'If you believe this warn was made in error, please make a <#852694135927865406>.\n\n' +
         `Warning: ${finalReason}`
     )
-    .catch( (err) => {
-      console.log('Failed to dm user about warn.')
+    .catch((err) => {
+      console.log('Failed to dm user about warn.');
+      console.err('Failed to dm user about warn.');
     });
 
   //log to channel
-  let warnData =
-    `**WARN** | Case #${guildDoc.caseNumber - 1}\n` +
-    `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-      code: true,
-    })})\n` +
-    `**Moderator:** ${escapeMarkdown(
-      `${member.user.username} (${member.user.id}`,
-      { code: true }
-    )})\n` +
-    `**Reason:** ${finalReason}\n`;
-
   if (guildDoc.loggingChannel) {
     const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
     if (!logChannel) return;
 
-    await logChannel.send(warnData);
+    await logChannel.send(
+      `**WARN** | Case #${guildDoc.caseNumber - 1}\n` +
+        `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+          code: true,
+        })})\n` +
+        `**Moderator:** ${escapeMarkdown(
+          `${member.user.username} (${member.user.id}`,
+          { code: true }
+        )})\n` +
+        `**Reason:** ${finalReason}\n`
+    );
   }
-};
-
-const findGuild = async (guild) => {
-  return await Guild.findOneAndUpdate(
-    { guildId: guild.id },
-    {
-      $setOnInsert: {
-        _id: new mongoose.Types.ObjectId(),
-        guildId: guild.id,
-        guildName: guild.name,
-        guildIcon: guild.iconURL(),
-        caseNumber: 0,
-        loggingChannel: '',
-        users: [],
-        autoTags: new Map(),
-        channelTags: new Map(),
-      },
-    },
-    { upsert: true, new: true }
-  );
 };
