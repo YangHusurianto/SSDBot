@@ -168,20 +168,3 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
   )})\n` +
   `**Reason:** ${reason}\n`)
 };
-
-const getRecentBans = async (guildId, userId) => {
-  const afterDate = new Date();
-  afterDate.setDate(afterDate.getDate() - 1);
-
-  const infractionsAfterDate = await Guild.aggregate([
-    { $match: { guildId: guildId } },
-    { $unwind: '$users' },
-    { $unwind: '$users.infractions' },
-    { $match: { 'users.infractions.date': { $gte: afterDate } } },
-    { $match: { 'users.infractions.type': 'BAN'} }, 
-    { $match: { 'users.infractions.moderatorUserId': userId } },
-    { $project: { _id: 0, infractions: '$users.infractions' } },
-  ]);
-
-  return infractionsAfterDate.length;
-};
