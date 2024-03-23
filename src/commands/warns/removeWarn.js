@@ -1,6 +1,6 @@
 const User = require('../../schemas/user_test');
 
-const findInfraction = require('../../util/findInfraction');
+const findInfraction = require('../../queries/findInfraction');
 
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
