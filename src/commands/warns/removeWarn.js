@@ -2,7 +2,7 @@ const {
   findInfraction,
   removeInfraction,
 } = require('../../queries/infractionQueries');
-const { logMessage } = require('../../util/logMessage');
+const { logMessage } = require('../../utils/logMessage');
 
 const { SlashCommandBuilder, PermissionFlagsBits, escapeMarkdown } = require('discord.js');
 

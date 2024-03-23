@@ -1,5 +1,5 @@
 const Guild = require('../../schemas/guild');
-const { findUser } = require('../../queries/userQueries');
+const { findUser, getRecentByUser } = require('../../queries/userQueries');
 
 const {
   SlashCommandBuilder,
@@ -86,11 +86,11 @@ module.exports = {
       }
 
       const recents = [
-        { name: '1 Day', value: await getRecentInfractions(guild.id, user.id, 1) },
-        { name: '7 Days', value: await getRecentInfractions(guild.id, user.id, 7) },
+        { name: '1 Day', value: await getRecentByUser(guild.id, user.id, 1) },
+        { name: '7 Days', value: await getRecentByUser(guild.id, user.id, 7) },
         {
           name: '30 Days',
-          value: await getRecentInfractions(guild.id, user.id, 30),
+          value: await getRecentByUser(guild.id, user.id, 30),
         },
       ];
 

@@ -20,19 +20,14 @@ getRecentByModerator = async (guildId, userId, timeLimit, type) => {
   ]);
 };
 
-getRecentByUser = async (guildId, userId, timeLimit, type) => {
+getRecentByUser = async (guildId, userId, timeLimit) => {
   const afterDate = new Date();
   afterDate.setDate(afterDate.getDate() - timeLimit);
 
   return await User.aggregate([
     { $match: { guildId: guildId, userId: userId } },
     { $unwind: '$infractions' },
-    {
-      $match: {
-        'infractions.date': { $gte: afterDate },
-        'infractions.type': type,
-      },
-    },
+    { $match: { 'infractions.date': { $gte: afterDate } } },
     { $project: { _id: 0, infractions: '$infractions' } },
   ]);
 };
@@ -59,4 +54,9 @@ findAndCreateUser = async (guildId, userId) => {
   );
 };
 
-module.exports = { getRecentByModerator, getRecentByUser, findUser, findAndCreateUser };
+module.exports = {
+  getRecentByModerator,
+  getRecentByUser,
+  findUser,
+  findAndCreateUser,
+};

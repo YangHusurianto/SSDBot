@@ -2,7 +2,7 @@ const findGuild = require('../../queries/guildQueries');
 const { findUser } = require('../../queries/userQueries');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
-const { logMessage } = require('../../util/logMessage');
+const { logMessage } = require('../../utils/logMessage');
 
 module.exports = {
   data: new SlashCommandBuilder()

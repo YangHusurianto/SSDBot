@@ -1,5 +1,5 @@
 const { findAndCreateUser } = require('../../queries/userQueries');
-const { logMessage } = require('../../util/logMessage');
+const { logMessage } = require('../../utils/logMessage');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 
