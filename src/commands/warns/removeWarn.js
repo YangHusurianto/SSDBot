@@ -1,5 +1,7 @@
-const findInfraction = require('../../queries/infractionQueries');
-const removeInfraction = require('../../queries/infractionQueries');
+const {
+  findInfraction,
+  removeInfraction,
+} = require('../../queries/infractionQueries');
 
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
@@ -20,14 +22,11 @@ module.exports = {
   async execute(interaction, _client) {
     const { options, guild, member } = interaction;
     const warnNumber = options.getInteger('warn_number');
-    const target = options.getUser('user');
 
     try {
       const userDoc = await findInfraction(guild.id, warnNumber);
       if (!userDoc) {
-        return await interaction.reply(
-          `:x: Warning #${warnNumber} not found.`
-        );
+        return await interaction.reply(`:x: Warning #${warnNumber} not found.`);
       }
 
       const infraction = userDoc.infractions.find(
@@ -38,19 +37,22 @@ module.exports = {
         return await interaction.reply(`:x: You cannot remove a ban.`);
       }
 
-      return await removeInfraction(target.id, guild.id, warnNumber)
-      .then(async () => {
-        return await interaction.reply(
-          `<:check:1196693134067896370> Warning #${warnNumber} removed.`
-        );
-        }).catch(async (err) => {
-        console.error(err);
-        return await interaction.reply(
-          `:x: Failed to remove warning #${warnNumber}.`
-        );
-      })
-
-  
+      return await removeInfraction(
+        infraction.targetUserId,
+        guild.id,
+        warnNumber
+      )
+        .then(async () => {
+          return await interaction.reply(
+            `<:check:1196693134067896370> Warning #${warnNumber} removed.`
+          );
+        })
+        .catch(async (err) => {
+          console.error(err);
+          return await interaction.reply(
+            `:x: Failed to remove warning #${warnNumber}.`
+          );
+        });
     } catch (err) {
       console.error(err);
     }
