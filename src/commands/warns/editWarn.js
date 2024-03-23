@@ -61,7 +61,7 @@ module.exports = {
               `<:check:1196693134067896370> Infraction #${infractionNumber} edited.`
             );
 
-            return logMessage(guild, loggedMessage);
+            return await logMessage(guild, loggedMessage);
           }
 
           return await interaction.reply(

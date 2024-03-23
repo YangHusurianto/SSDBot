@@ -2,7 +2,7 @@ const findGuild = require('../../queries/guildQueries');
 const { findUser } = require('../../queries/userQueries');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
-
+const { logMessage } = require('../../util/logMessage');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -21,8 +21,6 @@ module.exports = {
     const target = options.getUser('user');
 
     try {
-      const guildDoc = await findGuild(guild);
-
       let userDoc = await findUser(guild.id, target.id);
 
       if (!userDoc || !userDoc.verified) {
@@ -30,42 +28,31 @@ module.exports = {
           content: `:x: ${target} is not verified!`,
           ephemeral: true,
         });
-      } else {
-        userDoc.verified = false;
-        userDoc.verifiedBy = '';
-        guildDoc
-          .save()
-          .then(() => {
-            const targetMember = interaction.guild.members.cache.find(
-              (member) => member.id === target.id
-            );
-            targetMember.roles.remove('926253317284323389');
-          })
-          .catch(console.error);
+      }
 
-        let unverifyData =
-          `**UNVERIFY** | ${target}\n` +
+      userDoc.verified = false;
+      userDoc.verifiedBy = '';
+      userDoc
+        .save()
+        .then(async () => {
+          const targetMember = await guild.members.fetch(target.id);
+          targetMember.roles.remove('926253317284323389');
+
+          await interaction.reply({
+            content: `<:check:1196693134067896370> ${target} has been unverified!`,
+            ephemeral: true,
+          });
+
+          return await logMessage(guild, `**UNVERIFY** | ${target}\n` +
           `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
             code: true,
           })})\n` +
           `**Moderator:** ${escapeMarkdown(
             `${member.user.username} (${member.user.id}`,
             { code: true }
-          )})`;
-
-        //log to channel
-        if (guildDoc.loggingChannel) {
-          const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
-          if (!logChannel) return;
-
-          await logChannel.send(unverifyData);
-        }
-
-        return await interaction.reply({
-          content: `<:check:1196693134067896370> ${target} has been unverified!`,
-          ephemeral: true,
-        });
-      }
+          )})`)
+        })
+        .catch(console.error);
     } catch (err) {
       console.error(err);
     }

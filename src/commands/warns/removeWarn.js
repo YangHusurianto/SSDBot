@@ -49,7 +49,7 @@ module.exports = {
 
           const target = await guild.members.fetch(infraction.targetUserId);
 
-          logMessage(
+          return await logMessage(
             guild,
             `**REMOVE WARN** | Case #${warnNumber}\n` +
               `**Target:** ${escapeMarkdown(

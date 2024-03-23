@@ -59,7 +59,7 @@ module.exports = {
       });
 
       //log to channel
-      logMessage(
+      return await logMessage(
         guild,
         `**NOTE** | Case #${guildDoc.caseNumber++}\n` +
           `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {

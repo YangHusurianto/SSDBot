@@ -178,7 +178,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     });
 
   //log to channel
-  logMessage(
+  return await logMessage(
     guild,
     `**WARN** | Case #${guildDoc.caseNumber - 1}\n` +
       `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {

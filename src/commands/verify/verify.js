@@ -1,4 +1,3 @@
-const { findGuild } = require('../../queries/guildQueries');
 const { findAndCreateUser } = require('../../queries/userQueries');
 const { logMessage } = require('../../util/logMessage');
 
@@ -23,6 +22,7 @@ module.exports = {
 
     try {
       let userDoc = await findAndCreateUser(guild.id, target.id);
+      const targetMember = await guild.members.fetch(target.id);
 
       if (userDoc.verified) {
         if (targetMember.roles.cache.has('926253317284323389')) {
@@ -41,9 +41,6 @@ module.exports = {
       return await userDoc
         .save()
         .then(async () => {
-          const targetMember = interaction.guild.members.cache.find(
-            (member) => member.id === target.id
-          );
           targetMember.roles.add('926253317284323389');
 
           await interaction.reply(
@@ -51,7 +48,7 @@ module.exports = {
           );
 
           //log to channel
-          logMessage(
+          return await logMessage(
             guild,
             `**VERIFY** | ${target}\n` +
               `**Target:** ${escapeMarkdown(

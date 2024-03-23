@@ -1,7 +1,7 @@
 const Guild = require('../../schemas/guild');
+const { findUser } = require('../../queries/userQueries');
 
-const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
-const mongoose = require('mongoose');
+const { SlashCommandBuilder } = require('discord.js');
 
 
 module.exports = {
@@ -11,20 +11,13 @@ module.exports = {
     .setDMPermission(false),
 
   async execute(interaction, client) {
-    const { options, guild, member } = interaction;
+    const { guild, member } = interaction;
 
     try {
-      const guildDoc = await Guild.findOne(
-        {
-          guildId: guild.id,
-          'users.userId': member.id,
-        },
-        { 'users.$': 1 }
-      );
-
-      if (!guildDoc || !guildDoc.users[0].verified) {
+      const userDoc = await findUser(guild.id, member.id);
+      if (!userDoc || !userDoc.verified) {
         return await interaction.reply({
-          content: `:x: You are not verified in this server.`,
+          content: `:x: You are not verified!`,
           ephemeral: true,
         });
       }
