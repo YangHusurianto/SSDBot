@@ -1,6 +1,6 @@
 const { user_testSchema } = require('../schemas/user_test');
 
-const mongoose = require('mongoose');
+const { mongoose, model } = require('mongoose');
 
 findUser = async (guildId, userId) => {
   const userDoc = model('User', user_testSchema, `users-${guildId}`);

@@ -145,7 +145,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     moderatorNotes: '',
   };
 
-  let userDoc = findUser(guild.id, target.id);
+  let userDoc = await findUser(guild.id, target.id);
   userDoc.infractions.push(warning);
 
   guildDoc.caseNumber++;
