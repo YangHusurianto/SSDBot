@@ -2,7 +2,6 @@ const { Schema, model } = require("mongoose");
 
 const infractionSchema = new Schema({
   _id: Schema.Types.ObjectId,
-  guildId: String,
   targetUserId: String,
   type: String,
   number: Number,
