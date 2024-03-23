@@ -11,7 +11,6 @@ const {
 } = require('discord.js');
 const { find } = require('../../schemas/user_test');
 
-
 const dateOptions = {
   year: 'numeric',
   month: 'long',
@@ -61,13 +60,16 @@ module.exports = {
       }
 
       const infractions = userDoc.infractions;
-      const maxInfractionPages = Math.ceil(infractions.length / INFRACTIONS_PER_PAGE);
+      const maxInfractionPages = Math.ceil(
+        infractions.length / INFRACTIONS_PER_PAGE
+      );
 
       const notes = userDoc.notes;
       const maxNotesPages = Math.ceil(notes.length / INFRACTIONS_PER_PAGE);
       var notesPage = 1;
 
-      if (infractionPage > maxInfractionPages) infractionPage = maxInfractionPages;
+      if (infractionPage > maxInfractionPages)
+        infractionPage = maxInfractionPages;
 
       if (!userDoc || (!infractions?.length && !notes?.length)) {
         return interaction.reply({
@@ -86,15 +88,27 @@ module.exports = {
       }
 
       const recents = [
-        { name: '1 Day', value: await getRecentByUser(guild.id, user.id, 1) },
-        { name: '7 Days', value: await getRecentByUser(guild.id, user.id, 7) },
+        {
+          name: '1 Day',
+          value: (await getRecentByUser(guild.id, user.id, 1)).length,
+        },
+        {
+          name: '7 Days',
+          value: (await getRecentByUser(guild.id, user.id, 7)).length,
+        },
         {
           name: '30 Days',
-          value: await getRecentByUser(guild.id, user.id, 30),
+          value: (await getRecentByUser(guild.id, user.id, 30)).length,
         },
       ];
 
-      const embed = logsEmbed(user, infractionPage, infractions, recents, notes);
+      const embed = logsEmbed(
+        user,
+        infractionPage,
+        infractions,
+        recents,
+        notes
+      );
 
       const previousInfractionPage = new ButtonBuilder()
         .setCustomId('previousInfraction')
@@ -127,7 +141,8 @@ module.exports = {
         .setStyle('Primary');
 
       if (infractionPage == 1) previousInfractionPage.setDisabled(true);
-      if (infractionPage == maxInfractionPages) nextInfractionPage.setDisabled(true);
+      if (infractionPage == maxInfractionPages)
+        nextInfractionPage.setDisabled(true);
       if (!notes.length) notesButton.setDisabled(true);
 
       if (notesPage == 1) previousNotesPage.setDisabled(true);
@@ -159,17 +174,23 @@ module.exports = {
         switch (i.customId) {
           case 'previousInfraction':
             nextInfractionPage.setDisabled(false);
-            if (infractionPage - 1 == 1) previousInfractionPage.setDisabled(true);
+            if (infractionPage - 1 == 1)
+              previousInfractionPage.setDisabled(true);
             await i.update({
-              embeds: [logsEmbed(user, --infractionPage, infractions, recents, notes)],
+              embeds: [
+                logsEmbed(user, --infractionPage, infractions, recents, notes),
+              ],
               components: [infractionsPageControls],
             });
             break;
           case 'nextInfraction':
             previousInfractionPage.setDisabled(false);
-            if (infractionPage + 1 == maxInfractionPages) nextInfractionPage.setDisabled(true);
+            if (infractionPage + 1 == maxInfractionPages)
+              nextInfractionPage.setDisabled(true);
             await i.update({
-              embeds: [logsEmbed(user, ++infractionPage, infractions, recents, notes)],
+              embeds: [
+                logsEmbed(user, ++infractionPage, infractions, recents, notes),
+              ],
               components: [infractionsPageControls],
             });
             break;
@@ -197,7 +218,9 @@ module.exports = {
             break;
           case 'return':
             await i.update({
-              embeds: [logsEmbed(user, infractionPage, infractions, recents, notes)],
+              embeds: [
+                logsEmbed(user, infractionPage, infractions, recents, notes),
+              ],
               components: [infractionsPageControls],
             });
             break;
@@ -207,22 +230,6 @@ module.exports = {
       console.error(err);
     }
   },
-};
-
-const getRecentInfractions = async (guildId, userId, timeLimit) => {
-  const afterDate = new Date();
-  afterDate.setDate(afterDate.getDate() - timeLimit);
-
-  const infractionsAfterDate = await Guild.aggregate([
-    { $match: { guildId: guildId } },
-    { $unwind: '$users' },
-    { $match: { 'users.userId': userId } },
-    { $unwind: '$users.infractions' },
-    { $match: { 'users.infractions.date': { $gte: afterDate } } },
-    { $project: { _id: 0, infractions: '$users.infractions' } },
-  ]);
-
-  return infractionsAfterDate.length;
 };
 
 // logs embed builder function
@@ -250,9 +257,7 @@ const logsEmbed = (target, page, infractions, recents, notes) => {
 
   const startIndex = (page - 1) * 5;
   const endIndex =
-    startIndex + 5 > infractions.length
-      ? infractions.length
-      : startIndex + 5;
+    startIndex + 5 > infractions.length ? infractions.length : startIndex + 5;
 
   for (const infraction of infractions.slice(startIndex, endIndex)) {
     const infractionDate = new Intl.DateTimeFormat('en-US', dateOptions).format(
