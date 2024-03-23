@@ -1,5 +1,5 @@
-const findGuild = require('../../queries/guildQueries');
-const findAndCreateUser = require('../../queries/userQueries');
+const { findGuild } = require('../../queries/guildQueries');
+const { findAndCreateUser } = require('../../queries/userQueries');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');

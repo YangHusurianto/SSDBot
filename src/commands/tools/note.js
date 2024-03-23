@@ -1,4 +1,5 @@
-const findGuild = require('../../queries/guildQueries');
+const { findGuild } = require('../../queries/guildQueries');
+const { findAndCreateUser } = require('../../queries/userQueries');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -16,10 +17,7 @@ module.exports = {
         .setRequired(true)
     )
     .addStringOption((option) =>
-      option
-        .setName('note')
-        .setDescription('The note')
-        .setRequired(true)
+      option.setName('note').setDescription('The note').setRequired(true)
     )
     .setDMPermission(false),
 
@@ -30,10 +28,7 @@ module.exports = {
     const date = new Date();
 
     try {
-      await interaction.deferReply({ ephemeral: true });
-
       const guildDoc = await findGuild(guild);
-
       // create the note first so we can insert regardless of whether the user exists
       const note = {
         _id: new mongoose.Types.ObjectId(),
@@ -42,40 +37,24 @@ module.exports = {
         noteNumber: guildDoc.caseNumber,
         note: noteInfo,
         noteDate: date,
-        moderatorUserId: member.user.id, 
+        moderatorUserId: member.user.id,
       };
 
-      let userDoc = guildDoc.users.find((user) => user.userId === target.id);
-      if (!userDoc) {
-        userDoc = {
-          _id: new mongoose.Types.ObjectId(),
-          userId: target.id,
-          verified: false,
-          verifiedBy: '',
-          notes: [note],
-          infractions: [],
-        };
+      let userDoc = await findAndCreateUser(guild.id, target.id);
+      userDoc.notes.push(note);
 
-        guildDoc.users.push(userDoc);
-      } else userDoc.notes.push(note);
+      await guildDoc.save().catch(async (err) => {
+        await interaction.reply(`:x: Failed to update case number.`);
+        console.error(err);
+      });
 
-      let noteData =
-        `**NOTE** | Case #${guildDoc.caseNumber++}\n` +
-        `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-          code: true,
-        })})\n` +
-        `**Moderator:** ${escapeMarkdown(
-          `${member.user.username} (${member.user.id}`,
-          { code: true }
-        )})\n` +
-        `**Note:** ${noteInfo}\n`;
+      await userDoc.save().catch(async (err) => {
+        await interaction.reply(`:x: Failed to save note.`);
+        console.error(err);
+      });
 
-      let noteConfirmation = `<:check:1196693134067896370> A note has been placed under ${target}.`;
-
-      await guildDoc.save().catch(console.error);
-
-      await interaction.editReply({
-        content: noteConfirmation,
+      await interaction.reply({
+        content: `<:check:1196693134067896370> A note has been placed under ${target}.`,
         ephemeral: true,
       });
 
@@ -84,7 +63,17 @@ module.exports = {
         const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
         if (!logChannel) return;
 
-        await logChannel.send(noteData);
+        await logChannel.send(
+          `**NOTE** | Case #${guildDoc.caseNumber++}\n` +
+            `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+              code: true,
+            })})\n` +
+            `**Moderator:** ${escapeMarkdown(
+              `${member.user.username} (${member.user.id}`,
+              { code: true }
+            )})\n` +
+            `**Note:** ${noteInfo}\n`
+        );
       }
     } catch (err) {
       console.error(err);
