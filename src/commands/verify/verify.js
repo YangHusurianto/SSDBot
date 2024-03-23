@@ -1,4 +1,5 @@
 const findGuild = require('../../queries/guildQueries');
+const { findAndCreateUser } = require('../../queries/userQueries');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -26,24 +27,7 @@ module.exports = {
     try {
       const guildDoc = await findGuild(guild);
 
-      let userDoc = guildDoc.users.find((user) => user.userId === target.id);
-
-      const targetMember = interaction.guild.members.cache.find(
-        (member) => member.id === target.id
-      );
-
-      let newUser = false;
-      if (!userDoc) {
-        newUser = true;
-        userDoc = {
-          _id: new mongoose.Types.ObjectId(),
-          userId: target.id,
-          verified: false,
-          verifiedBy: "",
-          notes: [],
-          infractions: [],
-        };
-      } 
+      let userDoc = await findAndCreateUser(guild.id, target.id);
 
       if (userDoc.verified) {
         if (targetMember.roles.cache.has('926253317284323389')) {
@@ -58,9 +42,8 @@ module.exports = {
 
       userDoc.verified = true;
       userDoc.verifiedBy = member.user.id;
-      if (newUser) guildDoc.users.push(userDoc);
 
-      return await guildDoc
+      return await userDoc
         .save()
         .then(async () => {
           let verifyData =
