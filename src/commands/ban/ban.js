@@ -1,4 +1,4 @@
-const findGuild = require('../../util/findGuild');
+const findGuild = require('../../queries/guildQueries');
 const Guild = require('../../schemas/guild');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');

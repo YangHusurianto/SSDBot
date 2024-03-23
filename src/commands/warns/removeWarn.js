@@ -1,6 +1,6 @@
 const User = require('../../schemas/user_test');
 
-const findInfraction = require('../../queries/findInfraction');
+const findInfraction = require('../../queries/infractionQueries');
 
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
@@ -23,12 +23,10 @@ module.exports = {
     const warnNumber = options.getInteger('warn_number');
     const target = options.getUser('user');
 
-    await interaction.deferReply();
-
     try {
       const userDoc = await findInfraction(guild.id, warnNumber);
       if (!userDoc) {
-        return await interaction.editReply(
+        return await interaction.reply(
           `:x: Warning #${warnNumber} not found.`
         );
       }
@@ -38,7 +36,7 @@ module.exports = {
       );
 
       if (infraction.type !== 'WARN') {
-        return await interaction.editReply(`:x: You cannot remove a ban.`);
+        return await interaction.reply(`:x: You cannot remove a ban.`);
       }
 
       return await User.findOneAndUpdate(
@@ -50,12 +48,12 @@ module.exports = {
         },
         { new: true }
       ).then(async () => {
-        return await interaction.editReply(
+        return await interaction.reply(
           `<:check:1196693134067896370> Warning #${warnNumber} removed.`
         );
         }).catch(async (err) => {
         console.error(err);
-        return await interaction.editReply(
+        return await interaction.reply(
           `:x: Failed to remove warning #${warnNumber}.`
         );
       })

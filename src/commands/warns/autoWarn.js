@@ -1,4 +1,4 @@
-const Guild = require('../../schemas/guild');
+const findGuild = require('../../queries/guildQueries');
 
 const {
   SlashCommandBuilder,
@@ -73,21 +73,7 @@ module.exports = {
 };
 
 const createTag = async (guild, tag, reason) => {
-  let guildDoc = await Guild.findOneAndUpdate(
-    { guildId: guild.id },
-    {
-      $setOnInsert: {
-        _id: new mongoose.Types.ObjectId(),
-        guildId: guild.id,
-        guildName: guild.name,
-        guildIcon: guild.iconURL(),
-        caseNumber: 0,
-        users: [],
-        autoTags: new Map(),
-      },
-    },
-    { upsert: true, new: true }
-  );
+  let guildDoc = await findGuild(guild);
 
   guildDoc.autoTags.set(tag, reason);
 

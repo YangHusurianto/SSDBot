@@ -1,4 +1,5 @@
 const Guild = require('../../schemas/guild');
+const { updateInfraction } = require('../../queries/infractionQueries');
 
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
@@ -21,54 +22,43 @@ module.exports = {
       option.setName('notes').setDescription('Notes about the infraction')
     )
     .setDMPermission(false),
-  // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild } = interaction;
     const infractionNumber = options.getInteger('infraction_number');
-    let reason = options.getString('reason') ?? '';
-    let notes = options.getString('notes') ?? '';
+    let reason = options.getString('reason') ?? null;
+    let notes = options.getString('notes') ?? null;
 
-    interaction.deferReply();
+    if (!reason && !notes) {
+      return await interaction.reply(
+        `:x: You must provide a reason or notes to edit an infraction.`
+      );
+    }
 
     try {
-      const guildDoc = await Guild.findOne(
-        {
-          guildId: guild.id,
-          'users.infractions.number': infractionNumber,
-        },
-        { 'users.$': 1 }
-      );
+      return await updateInfraction(
+        guild.id,
+        infractionNumber,
+        reason,
+        notes
+      )
+        .then(async (value) => {
+          if (value) {
+            return await await interaction.reply(
+              `<:check:1196693134067896370> Infraction #${infractionNumber} edited.`
+            );
+          }
 
-      if (!guildDoc)
-        return await interaction.editReply(
-          `:x: Could not find infraction #${infractionNumber}, failed to edit.`
-        );
-      const user = guildDoc.users[0];
-      const infraction = user.infractions.find((infraction) => infraction.number === infractionNumber);
-      if (!reason) reason = infraction.reason;
-      if (!notes) notes = infraction.moderatorNotes;
-
-      const editedInfraction = await Guild.findOneAndUpdate(
-        { guildId: guild.id, 'users.infractions.number': infractionNumber },
-        {
-          $set: {
-            'users.$[user].infractions.$[infraction].reason': reason,
-            'users.$[user].infractions.$[infraction].moderatorNotes': notes,
-          },
-        },
-        {
-          arrayFilters: [
-            { 'user.infractions.number': infractionNumber },
-            { 'infraction.number': infractionNumber },
-          ],
-          new: true,
-        }
-      );
-
-      await interaction.editReply(
-        `<:check:1196693134067896370> Infraction #${infractionNumber} edited with new reason: ${reason}`
-      );
+          return await interaction.reply(
+            `:x: Infraction #${infractionNumber} not found.`
+          );
+        })
+        .catch(async (err) => {
+          console.error(err);
+          return await interaction.reply(
+            `:x: Failed to edit infraction #${infractionNumber}.`
+          );
+        });
     } catch (err) {
       console.error(err);
     }

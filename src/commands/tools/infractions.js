@@ -1,6 +1,5 @@
 const Guild = require('../../schemas/guild');
-
-const mongoose = require('mongoose');
+const findUser = require('../../queries/userQueries');
 
 const {
   SlashCommandBuilder,
@@ -10,6 +9,7 @@ const {
   ButtonBuilder,
   ComponentType,
 } = require('discord.js');
+const { find } = require('../../schemas/user_test');
 
 require('dotenv').config();
 
@@ -54,10 +54,7 @@ module.exports = {
     interaction.deferReply();
 
     try {
-      const targetDoc = await Guild.findOne(
-        { guildId: guild.id, 'users.userId': target.id },
-        { 'users.$': 1 }
-      );
+      const targetDoc = await findUser(guild.id, target.id, false);
 
       if (!targetDoc) {
         return interaction.editReply({

@@ -1,5 +1,5 @@
-const findGuild = require('../../queries/findGuild');
-const findUser = require('../../queries/findUser');
+const findGuild = require('../../queries/guildQueries');
+const findUser = require('../../queries/userQueries');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -50,8 +50,6 @@ module.exports = {
     const target = options.getUser('user');
     var reason = options.getString('reason');
 
-    interaction.deferReply();
-
     if (!selfWarnCheck(interaction, target, client)) return;
     if (!roleHeirarchyCheck(interaction, guild, target, member)) return;
 
@@ -65,7 +63,7 @@ module.exports = {
 
 const selfWarnCheck = async (interaction, target, client) => {
   if (target.id === client.user.id) {
-    await interaction.editReply({
+    await interaction.reply({
       content: 'I cannot warn myself!',
       ephemeral: true,
     });
@@ -84,7 +82,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
       if (
         member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1
       ) {
-        await interaction.editReply({
+        await interaction.reply({
           content:
             'You cannot warn a member with a higher or equal role than you!',
           ephemeral: true,
@@ -94,7 +92,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
       }
     })
     .catch(async (err) => {
-      await interaction.editReply({
+      await interaction.reply({
         content:
           'Failed to fetch member for warn check. Attempting to warn anyway.',
         ephemeral: true,
@@ -106,7 +104,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
 
 const warnUser = async (interaction, client, guild, target, member, reason) => {
   if (target.id == '145959145319694336') {
-    return await interaction.editReply({
+    return await interaction.reply({
       content: 'L + Bozo. Puff is too princess to be warned!',
       ephemeral: true,
     });
@@ -145,7 +143,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     moderatorNotes: '',
   };
 
-  let userDoc = await findUser(guild.id, target.id);
+  let userDoc = await findUser(guild.id, target.id, true);
   userDoc.infractions.push(warning);
 
   guildDoc.caseNumber++;
@@ -159,7 +157,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     console.error(err);
   });
 
-  await interaction.editReply(
+  await interaction.reply(
     `<:check:1196693134067896370> ${target} has been warned.`
   );
 
