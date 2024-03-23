@@ -1,8 +1,8 @@
-const findGuild = require('../../queries/guildQueries');
+const { findGuild } = require('../../queries/guildQueries');
 const { findAndCreateUser } = require('../../queries/userQueries');
+const { logMessage } = require('../../util/logMessage');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
-const mongoose = require('mongoose');
 
 require('dotenv').config();
 
@@ -22,20 +22,16 @@ module.exports = {
     const { options, guild, member } = interaction;
     const target = options.getUser('user');
 
-    interaction.deferReply();
-
     try {
-      const guildDoc = await findGuild(guild);
-
       let userDoc = await findAndCreateUser(guild.id, target.id);
 
       if (userDoc.verified) {
         if (targetMember.roles.cache.has('926253317284323389')) {
-          return await interaction.editReply(`${target} is already verified!`);
+          return await interaction.reply(`${target} is already verified!`);
         }
 
         targetMember.roles.add('926253317284323389');
-        return await interaction.editReply(
+        return await interaction.reply(
           `<:check:1196693134067896370> ${target} is verified, but missing the verified role.\nGiving the role now.`
         );
       }
@@ -61,19 +57,10 @@ module.exports = {
           );
           targetMember.roles.add('926253317284323389');
 
-          let verifyConfirmation = `<:check:1196693134067896370> ${target} has been verified!`;
-
-          await interaction.editReply(verifyConfirmation);
+          await interaction.reply(`<:check:1196693134067896370> ${target} has been verified!`);
 
           //log to channel
-          if (guildDoc.loggingChannel) {
-            const logChannel = guild.channels.cache.get(
-              guildDoc.loggingChannel
-            );
-            if (!logChannel) return;
-
-            await logChannel.send(verifyData);
-          }
+          logMessage(guild, verifyData);
         })
         .catch(console.error);
     } catch (err) {
