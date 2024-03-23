@@ -1,5 +1,7 @@
-const findGuild = require('../../queries/guildQueries');
+const { findGuild } = require('../../queries/guildQueries');
+const { findAndCreateUser } = require('../../queries/userQueries');
 const Guild = require('../../schemas/guild');
+const { logMessage } = require('../../utils/logMessage');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -132,19 +134,8 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
     moderatorNotes: '',
   };
 
-  let userDoc = guildDoc.users.find((user) => user.userId === target.id);
-  if (!userDoc) {
-    userDoc = {
-      _id: new mongoose.Types.ObjectId(),
-      userId: target.id,
-      verified: false,
-      verifiedBy: '',
-      notes: [],
-      infractions: [ban],
-    };
-
-    guildDoc.users.push(userDoc);
-  } else userDoc.infractions.push(ban);
+  let userDoc = await findAndCreateUser(guild.id, target.id);
+  userDoc.infractions.push(ban);
 
   await client.users
     .send(
@@ -163,30 +154,23 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
 
   guildDoc.caseNumber++;
   await guildDoc.save().catch(console.error);
+  await userDoc.save().catch(console.error);
 
   let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
 
   if (interaction.replied) await interaction.editReply(banConfirmation);
-  else await interaction.editReply(banConfirmation);
+  else await interaction.reply(banConfirmation);
 
   //log to channel
-  let banData =
-    `**BAN** | Case #${guildDoc.caseNumber}\n` +
-    `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-      code: true,
-    })})\n` +
-    `**Moderator:** ${escapeMarkdown(
-      `${member.user.username} (${member.user.id}`,
-      { code: true }
-    )})\n` +
-    `**Reason:** ${reason}\n`;
-
-  if (guildDoc.loggingChannel) {
-    const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
-    if (!logChannel) return;
-
-    await logChannel.send(banData);
-  }
+  logMessage(guild, `**BAN** | Case #${guildDoc.caseNumber}\n` +
+  `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+    code: true,
+  })})\n` +
+  `**Moderator:** ${escapeMarkdown(
+    `${member.user.username} (${member.user.id}`,
+    { code: true }
+  )})\n` +
+  `**Reason:** ${reason}\n`)
 };
 
 const getRecentBans = async (guildId, userId) => {

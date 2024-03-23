@@ -2,6 +2,41 @@ const User = require('../schemas/user_test');
 
 const mongoose = require('mongoose');
 
+getRecentByModerator = async (guildId, userId, timeLimit, type) => {
+  const afterDate = new Date();
+  afterDate.setDate(afterDate.getDate() - timeLimit);
+
+  return await User.aggregate([
+    { $match: { guildId: guildId } },
+    { $unwind: '$infractions' },
+    {
+      $match: {
+        'infractions.date': { $gte: afterDate },
+        'infractions.type': type,
+        'infractions.moderatorUserId': userId,
+      },
+    },
+    { $project: { _id: 0, infractions: '$infractions' } },
+  ]);
+};
+
+getRecentByUser = async (guildId, userId, timeLimit, type) => {
+  const afterDate = new Date();
+  afterDate.setDate(afterDate.getDate() - timeLimit);
+
+  return await User.aggregate([
+    { $match: { guildId: guildId, userId: userId } },
+    { $unwind: '$infractions' },
+    {
+      $match: {
+        'infractions.date': { $gte: afterDate },
+        'infractions.type': type,
+      },
+    },
+    { $project: { _id: 0, infractions: '$infractions' } },
+  ]);
+};
+
 findUser = async (guildId, userId) => {
   return await User.findOne({ guildId: guildId, userId: userId });
 };
@@ -24,4 +59,4 @@ findAndCreateUser = async (guildId, userId) => {
   );
 };
 
-module.exports = { findUser, findAndCreateUser };
+module.exports = { getRecentByModerator, getRecentByUser, findUser, findAndCreateUser };
