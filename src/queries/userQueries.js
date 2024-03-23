@@ -1,4 +1,4 @@
-const User = require('../schemas/user_test');
+const User = require('../schemas/user');
 
 const mongoose = require('mongoose');
 

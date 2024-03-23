@@ -50,8 +50,8 @@ module.exports = {
     const target = options.getUser('user');
     var reason = options.getString('reason');
 
-    if (!selfWarnCheck(interaction, target, client)) return;
-    if (!roleHeirarchyCheck(interaction, guild, target, member)) return;
+    if (await selfWarnCheck(interaction, target, client)) return;
+    if (await roleHeirarchyCheck(interaction, guild, target, member)) return;
 
     try {
       warnUser(interaction, client, guild, target, member, reason);
@@ -68,10 +68,10 @@ const selfWarnCheck = async (interaction, target, client) => {
       ephemeral: true,
     });
 
-    return false;
+    return true;
   }
 
-  return true;
+  return false;
 };
 
 const roleHeirarchyCheck = async (interaction, guild, target, member) => {
@@ -88,18 +88,21 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
           ephemeral: true,
         });
 
-        return false;
+        return true;
       }
     })
     .catch(async (err) => {
+      console.error(err);
       await interaction.reply({
         content:
-          'Failed to fetch member for warn check. Attempting to warn anyway.',
+          'Failed to fetch member for warn check.',
         ephemeral: true,
       });
+
+      return true;
     });
 
-  return true;
+  return false;
 };
 
 const warnUser = async (interaction, client, guild, target, member, reason) => {

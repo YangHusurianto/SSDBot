@@ -1,5 +1,4 @@
 const { Schema, model } = require('mongoose');
-const { userSchema } = require('./user');
 
 const guildSchema = new Schema({
   _id: Schema.Types.ObjectId,
@@ -8,7 +7,6 @@ const guildSchema = new Schema({
   guildIcon: String,
   caseNumber: Number,
   loggingChannel: String,
-  users: { type: [userSchema], default: [] },
   autoTags: { type: Map, of: String },
   channelTags: { type: Map, of: String },
   settings: { type: Map, of: String },

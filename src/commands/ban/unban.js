@@ -53,7 +53,6 @@ const unbanUser = async (interaction, guild, target, member, reason) => {
   };
 
   let userDoc = await findUser(guild.id, target.id);
-  console.log(userDoc)
   if (!userDoc) {
     return await interaction.reply(`:x: ${target} is not banned.`);
   }

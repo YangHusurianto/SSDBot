@@ -9,7 +9,7 @@ const {
   ButtonBuilder,
   ComponentType,
 } = require('discord.js');
-const { find } = require('../../schemas/user_test');
+const { find } = require('../../schemas/user');
 
 const dateOptions = {
   year: 'numeric',
