@@ -1,5 +1,6 @@
 const { findGuild } = require('../../queries/guildQueries');
 const { findAndCreateUser } = require('../../queries/userQueries');
+const { logMessage } = require('../../util/logMessage');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -59,22 +60,18 @@ module.exports = {
       });
 
       //log to channel
-      if (guildDoc.loggingChannel) {
-        const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
-        if (!logChannel) return;
-
-        await logChannel.send(
-          `**NOTE** | Case #${guildDoc.caseNumber++}\n` +
-            `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-              code: true,
-            })})\n` +
-            `**Moderator:** ${escapeMarkdown(
-              `${member.user.username} (${member.user.id}`,
-              { code: true }
-            )})\n` +
-            `**Note:** ${noteInfo}\n`
-        );
-      }
+      logMessage(
+        guild,
+        `**NOTE** | Case #${guildDoc.caseNumber++}\n` +
+          `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+            code: true,
+          })})\n` +
+          `**Moderator:** ${escapeMarkdown(
+            `${member.user.username} (${member.user.id}`,
+            { code: true }
+          )})\n` +
+          `**Note:** ${noteInfo}\n`
+      );
     } catch (err) {
       console.error(err);
     }

@@ -1,7 +1,13 @@
-const Guild = require('../../schemas/guild');
-const { updateInfraction } = require('../../queries/infractionQueries');
+const {
+  findInfraction,
+  updateInfraction,
+} = require('../../queries/infractionQueries');
 
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  escapeMarkdown,
+} = require('discord.js');
 
 require('dotenv').config();
 
@@ -24,7 +30,7 @@ module.exports = {
     .setDMPermission(false),
 
   async execute(interaction, _client) {
-    const { options, guild } = interaction;
+    const { options, guild, member } = interaction;
     const infractionNumber = options.getInteger('infraction_number');
     let reason = options.getString('reason') ?? null;
     let notes = options.getString('notes') ?? null;
@@ -36,17 +42,27 @@ module.exports = {
     }
 
     try {
-      return await updateInfraction(
-        guild.id,
+      let loggedMessage = await logUpdates(
+        guild,
+        member,
         infractionNumber,
         reason,
         notes
-      )
+      );
+      if (!loggedMessage) {
+        return await interaction.reply(
+          `:x: Infraction #${infractionNumber} not found.`
+        );
+      }
+
+      return await updateInfraction(guild.id, infractionNumber, reason, notes)
         .then(async (value) => {
           if (value) {
-            return await await interaction.reply(
+            await await interaction.reply(
               `<:check:1196693134067896370> Infraction #${infractionNumber} edited.`
             );
+
+            return logMessage(guild, loggedMessage);
           }
 
           return await interaction.reply(
@@ -63,4 +79,39 @@ module.exports = {
       console.error(err);
     }
   },
+};
+
+const logUpdates = async (guild, member, infractionNumber, reason, notes) => {
+  const userDoc = await findInfraction(guild.id, infractionNumber);
+  if (!userDoc) {
+    return null;
+  }
+
+  const infraction = userDoc.infractions.find(
+    (infraction) => infraction.number === infractionNumber
+  );
+
+  const target = await guild.members.fetch(infraction.targetUserId);
+
+  let updates =
+    `**EDIT WARN** | Case #${infractionNumber}\n` +
+    `**Target:** ${escapeMarkdown(`${target.user.username} (${target.id}`, {
+      code: true,
+    })})\n` +
+    `**Moderator:** ${escapeMarkdown(
+      `${member.user.username} (${member.user.id}`,
+      { code: true }
+    )})\n`;
+
+  if (reason) {
+    updates += `**Old Reason**: ${infraction.reason}\n`;
+    updates += `**New Reason**: ${reason}\n`;
+  }
+
+  if (notes) {
+    updates += `**Old Notes**: ${infraction.moderatorNotes}\n`;
+    updates += `**New Notes**: ${notes}\n`;
+  }
+
+  return updates;
 };

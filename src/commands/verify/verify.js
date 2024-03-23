@@ -42,25 +42,30 @@ module.exports = {
       return await userDoc
         .save()
         .then(async () => {
-          let verifyData =
-            `**VERIFY** | ${target}\n` +
-            `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-              code: true,
-            })})\n` +
-            `**Moderator:** ${escapeMarkdown(
-              `${member.user.username} (${member.user.id}`,
-              { code: true }
-            )})`;
-
           const targetMember = interaction.guild.members.cache.find(
             (member) => member.id === target.id
           );
           targetMember.roles.add('926253317284323389');
 
-          await interaction.reply(`<:check:1196693134067896370> ${target} has been verified!`);
+          await interaction.reply(
+            `<:check:1196693134067896370> ${target} has been verified!`
+          );
 
           //log to channel
-          logMessage(guild, verifyData);
+          logMessage(
+            guild,
+            `**VERIFY** | ${target}\n` +
+              `**Target:** ${escapeMarkdown(
+                `${target.username} (${target.id}`,
+                {
+                  code: true,
+                }
+              )})\n` +
+              `**Moderator:** ${escapeMarkdown(
+                `${member.user.username} (${member.user.id}`,
+                { code: true }
+              )})`
+          );
         })
         .catch(console.error);
     } catch (err) {

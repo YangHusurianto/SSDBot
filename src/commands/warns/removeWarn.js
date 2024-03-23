@@ -2,8 +2,9 @@ const {
   findInfraction,
   removeInfraction,
 } = require('../../queries/infractionQueries');
+const { logMessage } = require('../../util/logMessage');
 
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, escapeMarkdown } = require('discord.js');
 
 require('dotenv').config();
 
@@ -43,8 +44,26 @@ module.exports = {
         warnNumber
       )
         .then(async () => {
-          return await interaction.reply(
+          await interaction.reply(
             `<:check:1196693134067896370> Warning #${warnNumber} removed.`
+          );
+
+          const target = await guild.members.fetch(infraction.targetUserId);
+
+          logMessage(
+            guild,
+            `**REMOVE WARN** | Case #${warnNumber}\n` +
+              `**Target:** ${escapeMarkdown(
+                `${target.user.username} (${target.id}`,
+                {
+                  code: true,
+                }
+              )})\n` +
+              `**Moderator:** ${escapeMarkdown(
+                `${member.user.username} (${member.user.id}`,
+                { code: true }
+              )})\n` +
+              `**Warn:** ${infraction.reason}\n`
           );
         })
         .catch(async (err) => {

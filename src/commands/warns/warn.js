@@ -1,5 +1,6 @@
 const { findGuild } = require('../../queries/guildQueries');
 const { findAndCreateUser } = require('../../queries/userQueries');
+const { logMessage } = require('../../util/logMessage');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -178,20 +179,16 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     });
 
   //log to channel
-  if (guildDoc.loggingChannel) {
-    const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
-    if (!logChannel) return;
-
-    await logChannel.send(
-      `**WARN** | Case #${guildDoc.caseNumber - 1}\n` +
-        `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-          code: true,
-        })})\n` +
-        `**Moderator:** ${escapeMarkdown(
-          `${member.user.username} (${member.user.id}`,
-          { code: true }
-        )})\n` +
-        `**Reason:** ${finalReason}\n`
-    );
-  }
+  logMessage(
+    guild,
+    `**WARN** | Case #${guildDoc.caseNumber - 1}\n` +
+      `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+        code: true,
+      })})\n` +
+      `**Moderator:** ${escapeMarkdown(
+        `${member.user.username} (${member.user.id}`,
+        { code: true }
+      )})\n` +
+      `**Reason:** ${finalReason}\n`
+  );
 };
