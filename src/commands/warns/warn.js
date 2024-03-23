@@ -5,7 +5,6 @@ const { logMessage } = require('../../util/logMessage');
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
 
-require('dotenv').config();
 
 module.exports = {
   data: new SlashCommandBuilder()

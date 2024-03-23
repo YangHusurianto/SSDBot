@@ -2,7 +2,6 @@ const Guild = require('../../schemas/guild');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 
-require('dotenv').config();
 
 module.exports = {
   data: new SlashCommandBuilder()

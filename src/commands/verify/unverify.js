@@ -1,8 +1,8 @@
 const findGuild = require('../../queries/guildQueries');
+const { findUser } = require('../../queries/userQueries');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 
-require('dotenv').config();
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -23,7 +23,7 @@ module.exports = {
     try {
       const guildDoc = await findGuild(guild);
 
-      let userDoc = guildDoc.users.find((user) => user.userId === target.id);
+      let userDoc = await findUser(guild.id, target.id);
 
       if (!userDoc || !userDoc.verified) {
         return await interaction.reply({

@@ -4,8 +4,6 @@ const Guild = require('../../schemas/guild');
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
 
-require('dotenv').config();
-
 const DAILY_BAN_LIMIT = 5;
 
 module.exports = {

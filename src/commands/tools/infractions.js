@@ -11,7 +11,6 @@ const {
 } = require('discord.js');
 const { find } = require('../../schemas/user_test');
 
-require('dotenv').config();
 
 const dateOptions = {
   year: 'numeric',
