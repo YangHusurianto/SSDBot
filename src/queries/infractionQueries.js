@@ -32,6 +32,21 @@ const updateInfraction = async (guildId, infractionNumber, reason, notes) => {
   }
 };
 
+const removeInfraction = async (userId, guildId, infractionNumber) => {
+  try {
+    return await User.findOneAndUpdate(
+      { userId: userId, guildId: guildId},
+      {
+        $pull: {
+          infractions: { number: infractionNumber },
+        },
+      }
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const findInfraction = async (guildId, infractionNumber) => {
   try {
     return await User.findOne({
@@ -43,4 +58,4 @@ const findInfraction = async (guildId, infractionNumber) => {
   }
 };
 
-module.exports = { updateInfraction, findInfraction };
+module.exports = { updateInfraction, removeInfraction, findInfraction };

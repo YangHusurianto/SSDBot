@@ -51,13 +51,11 @@ module.exports = {
     const target = options.getUser('user');
     var infractionPage = options.getInteger('page') ?? 1;
 
-    interaction.deferReply();
-
     try {
-      const targetDoc = await findUser(guild.id, target.id, false);
+      const targetDoc = await findUser(guild.id, target.id);
 
       if (!targetDoc) {
-        return interaction.editReply({
+        return interaction.reply({
           content: 'User not found',
           ephemeral: true,
         });

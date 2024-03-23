@@ -1,5 +1,5 @@
 const findGuild = require('../../queries/guildQueries');
-const findUser = require('../../queries/userQueries');
+const findAndCreateUser = require('../../queries/userQueries');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -143,7 +143,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     moderatorNotes: '',
   };
 
-  let userDoc = await findUser(guild.id, target.id, true);
+  let userDoc = await findAndCreateUser(guild.id, target.id, true);
   userDoc.infractions.push(warning);
 
   guildDoc.caseNumber++;

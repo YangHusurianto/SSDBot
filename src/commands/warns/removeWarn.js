@@ -1,6 +1,5 @@
-const User = require('../../schemas/user_test');
-
 const findInfraction = require('../../queries/infractionQueries');
+const removeInfraction = require('../../queries/infractionQueries');
 
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
@@ -39,15 +38,8 @@ module.exports = {
         return await interaction.reply(`:x: You cannot remove a ban.`);
       }
 
-      return await User.findOneAndUpdate(
-        { userId: infraction.targetUserId, guildId: guild.id},
-        {
-          $pull: {
-            infractions: { number: warnNumber },
-          },
-        },
-        { new: true }
-      ).then(async () => {
+      return await removeInfraction(target.id, guild.id, warnNumber)
+      .then(async () => {
         return await interaction.reply(
           `<:check:1196693134067896370> Warning #${warnNumber} removed.`
         );

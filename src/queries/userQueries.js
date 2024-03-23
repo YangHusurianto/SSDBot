@@ -2,7 +2,11 @@ const User = require('../schemas/user_test');
 
 const mongoose = require('mongoose');
 
-findUser = async (guildId, userId, upsert) => {
+findUser = async (guildId, userId) => {
+  return await User.findOne({ guildId: guildId, userId: userId });
+};
+
+findAndCreateUser = async (guildId, userId) => {
   return await User.findOneAndUpdate(
     { userId: userId, guildId: guildId },
     {
@@ -16,8 +20,8 @@ findUser = async (guildId, userId, upsert) => {
         infractions: [],
       },
     },
-    { upsert: upsert, new: true }
+    { upsert: true, new: true }
   );
 };
 
-module.exports = findUser;
+module.exports = { findUser, findAndCreateUser };
