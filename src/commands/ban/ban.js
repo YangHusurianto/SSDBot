@@ -1,6 +1,5 @@
 const { findGuild } = require('../../queries/guildQueries');
-const { findAndCreateUser } = require('../../queries/userQueries');
-const Guild = require('../../schemas/guild');
+const { findAndCreateUser, getRecentByModerator } = require('../../queries/userQueries');
 const { logMessage } = require('../../utils/logMessage');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
@@ -27,9 +26,6 @@ module.exports = {
     const { options, guild, member } = interaction;
     const target = options.getUser('user');
     var reason = options.getString('reason');
-    const date = new Date();
-
-    await interaction.deferReply();
 
     if (await selfBanCheck(interaction, client, target)) return;
     if (await roleHeirarchyCheck(interaction, guild, target, member)) return;
@@ -52,7 +48,7 @@ module.exports = {
 
 const selfBanCheck = async (interaction, client, target) => {
   if (target.id === client.user.id) {
-    await interaction.editReply({
+    await interaction.reply({
       content: 'I cannot ban myself!',
       ephemeral: true,
     });
@@ -61,7 +57,7 @@ const selfBanCheck = async (interaction, client, target) => {
   }
 
   if (target.id === interaction.member.id) {
-    await interaction.editReply({
+    await interaction.reply({
       content: 'You cannot ban yourself!',
       ephemeral: true,
     });
@@ -80,7 +76,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
       if (
         member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1
       ) {
-        await interaction.editReply({
+        await interaction.reply({
           content:
             'You cannot ban a member with a higher or equal role than you!',
           ephemeral: true,
@@ -90,7 +86,7 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
       }
     })
     .catch(async (err) => {
-      await interaction.editReply({
+      await interaction.reply({
         content:
           'Failed to fetch member for ban check. Attempting to ban anyway.',
         ephemeral: true,
@@ -101,9 +97,9 @@ const roleHeirarchyCheck = async (interaction, guild, target, member) => {
 };
 
 const antiSpamBanCheck = async (interaction, guild, member) => {
-  const recentBans = await getRecentBans(guild.id, member.user.id);
+  const recentBans = await getRecentByModerator(guild.id, member.user.id, 'BAN', 1);
   if (recentBans >= DAILY_BAN_LIMIT) {
-    await interaction.editReply({
+    await interaction.reply({
       content:
         'You have banned too many users recently. Please try again later.',
       ephemeral: true,
@@ -158,7 +154,7 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
 
   let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
 
-  if (interaction.replied) await interaction.editReply(banConfirmation);
+  if (interaction.replied) await interaction.reply(banConfirmation);
   else await interaction.reply(banConfirmation);
 
   //log to channel
