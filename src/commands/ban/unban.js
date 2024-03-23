@@ -1,8 +1,8 @@
-const Guild = require('../../schemas/guild');
+const { findUser } = require('../../queries/userQueries');
+const { logMessage } = require('../../utils/logMessage');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
-
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -36,12 +36,6 @@ module.exports = {
 };
 
 const unbanUser = async (interaction, guild, target, member, reason) => {
-  const guildDoc = await findGuild(guild);
-
-  // pull the tags list and convert to value
-  let tags = guildDoc.autoTags;
-  reason = tags.get(reason) ?? reason;
-
   // create the unban first so we can insert regardless of whether the user exists
   const unban = {
     _id: new mongoose.Types.ObjectId(),
@@ -55,65 +49,35 @@ const unbanUser = async (interaction, guild, target, member, reason) => {
     moderatorNotes: '',
   };
 
-  let userDoc = guildDoc.users.find((user) => user.userId === target.id);
+  let userDoc = await findUser(guild, target.id);
   if (!userDoc) {
-    userDoc = {
-      _id: new mongoose.Types.ObjectId(),
-      userId: target.id,
-      verified: false,
-      verifiedBy: '',
-      notes: [],
-      infractions: [unban],
-    };
+    return await interaction.reply(`:x: ${target} is not banned.`);
+  }
 
-    guildDoc.users.push(userDoc);
-  } else userDoc.infractions.push(unban);
+  userDoc.infractions.push(unban);
 
   await guild.members.unban(target.id, reason).catch(async (err) => {
     await interaction.reply(`:x: ${target} is not banned.`);
   });
   guildDoc.caseNumber++;
   await guildDoc.save().catch(console.error);
+  await userDoc.save().catch(console.error);
 
-  let unbanConfirmation = `<:check:1196693134067896370> ${target} has been unbanned.`;
-  await interaction.reply(unbanConfirmation);
+  await interaction.reply(
+    `<:check:1196693134067896370> ${target} has been unbanned.`
+  );
 
   //log to channel
-  let unbanData =
+  logMessage(
+    guild,
     `**UNBAN** | Case #${guildDoc.caseNumber}\n` +
-    `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-      code: true,
-    })})\n` +
-    `**Moderator:** ${escapeMarkdown(
-      `${member.user.username} (${member.user.id}`,
-      { code: true }
-    )})\n` +
-    `**Reason:** ${reason}\n`;
-
-  if (guildDoc.loggingChannel) {
-    const logChannel = guild.channels.cache.get(guildDoc.loggingChannel);
-    if (!logChannel) return;
-
-    await logChannel.send(unbanData);
-  }
-};
-
-const findGuild = async (guild) => {
-  return await Guild.findOneAndUpdate(
-    { guildId: guild.id },
-    {
-      $setOnInsert: {
-        _id: new mongoose.Types.ObjectId(),
-        guildId: guild.id,
-        guildName: guild.name,
-        guildIcon: guild.iconURL(),
-        caseNumber: 0,
-        loggingChannel: '',
-        users: [],
-        autoTags: new Map(),
-        channelTags: new Map(),
-      },
-    },
-    { upsert: true, new: true }
+      `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+        code: true,
+      })})\n` +
+      `**Moderator:** ${escapeMarkdown(
+        `${member.user.username} (${member.user.id}`,
+        { code: true }
+      )})\n` +
+      `**Reason:** ${reason}\n`
   );
 };

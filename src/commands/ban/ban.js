@@ -139,7 +139,7 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
       `You have been banned from ${guild.name}.\n` +
         `**Reason:** ${reason}\n\n` +
         `If you feel this ban was not fair or made in error,` +
-        `please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp.`
+        `please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp`
     )
     .catch((err) => {
       console.log('Failed to dm user about ban.');
