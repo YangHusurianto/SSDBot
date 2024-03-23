@@ -51,6 +51,8 @@ module.exports = {
     const target = options.getUser('user');
     var infractionPage = options.getInteger('page') ?? 1;
 
+    interaction.deferReply();
+
     try {
       const targetDoc = await Guild.findOne(
         { guildId: guild.id, 'users.userId': target.id },
@@ -58,7 +60,7 @@ module.exports = {
       );
 
       if (!targetDoc) {
-        return interaction.reply({
+        return interaction.editReply({
           content: 'User not found',
           ephemeral: true,
         });
@@ -74,7 +76,7 @@ module.exports = {
       if (infractionPage > maxInfractionPages) infractionPage = maxInfractionPages;
 
       if (!targetDoc || (!infractions?.length && !notes?.length)) {
-        return interaction.reply({
+        return interaction.editReply({
           embeds: [
             new EmbedBuilder()
               .setAuthor({
@@ -149,7 +151,7 @@ module.exports = {
         returnButton
       );
 
-      const response = await interaction.reply({
+      const response = await interaction.editReply({
         embeds: [embed],
         components: [infractionsPageControls],
       });
