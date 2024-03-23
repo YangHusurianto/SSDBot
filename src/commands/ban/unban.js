@@ -1,3 +1,4 @@
+const { findGuild } = require('../../queries/guildQueries');
 const { findUser } = require('../../queries/userQueries');
 const { logMessage } = require('../../utils/logMessage');
 
@@ -36,6 +37,8 @@ module.exports = {
 };
 
 const unbanUser = async (interaction, guild, target, member, reason) => {
+  const guildDoc = await findGuild(guild);
+
   // create the unban first so we can insert regardless of whether the user exists
   const unban = {
     _id: new mongoose.Types.ObjectId(),
