@@ -32,9 +32,9 @@ getChannelTags = async (guild) => {
   return guildDoc.channelTags;
 }
 
-getReplacedMessage = async (guild, message) => {
+getReplacedReason = async (guild, reason) => {
   const guildDoc = await findGuild(guild);
-  let finalReason = guildDoc.autoTags.get(message);
+  let finalReason = guildDoc.autoTags.get(reason);
 
   if (!finalReason) {
     const channelTags = guildDoc.channelTags;
@@ -43,7 +43,7 @@ getReplacedMessage = async (guild, message) => {
       'g'
     );
 
-    finalReason = message.replace(
+    finalReason = reason.replace(
       tagPattern,
       (matched) => `<#${channelTags.get(matched)}>`
     );
@@ -52,4 +52,4 @@ getReplacedMessage = async (guild, message) => {
   return finalReason;
 }
 
-module.exports = { findGuild, getAutoTags, getChannelTags};
+module.exports = { findGuild, getAutoTags, getChannelTags, getReplacedMessage };
