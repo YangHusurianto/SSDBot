@@ -1,4 +1,4 @@
-const findGuild = require('../../queries/guildQueries');
+const { findGuild } = require('../../queries/guildQueries');
 
 const {
   SlashCommandBuilder,
