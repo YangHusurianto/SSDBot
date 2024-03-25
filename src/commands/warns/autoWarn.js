@@ -82,7 +82,7 @@ const createTag = async (guild, tag, reason) => {
 };
 
 const removeTag = async (guild, tag) => {
-  let guildDoc = await Guild.findOne({ guildId: guild.id });
+  let guildDoc = await findGuild(guild);
 
   if (!guildDoc) {
     return(`This server has no auto tags!`);
