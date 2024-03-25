@@ -92,12 +92,12 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
 
   guildDoc.caseNumber++;
   await guildDoc.save().catch(async (err) => {
-    await interaction.editReply(`:x: Failed to update case number.`);
+    await interaction.reply(`:x: Failed to update case number.`);
     console.error(err);
   });
 
   await userDoc.save().catch(async (err) => {
-    await interaction.editReply(`:x: Failed to save warning.`);
+    await interaction.reply(`:x: Failed to save warning.`);
     console.error(err);
   });
 

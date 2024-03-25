@@ -2,7 +2,16 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const { connect } = require('mongoose');
-require( 'console-stamp' )( console );
+
+// setup timestamp logging
+const errorOutput = fs.createWriteStream('./stderr.log');
+const logger = new console.Console(console, errorOutput);
+
+require('console-stamp')(logger, {
+    stdout: console,
+    stderr: errorOutput
+});
+
 
 // Access env variables
 require('dotenv').config();
