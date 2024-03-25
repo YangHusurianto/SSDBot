@@ -1,22 +1,26 @@
 botSelfCheck = async (interaction, target, client) => {
+  let check = false;
+  
   if (target.id === client.user.id) {
-    return await interaction.reply({
+    check = await interaction.reply({
       content: 'I cannot warn myself!',
       ephemeral: true,
     });
   }
 
-  return false;
+  return check;
 };
 
 roleHeirarchyCheck = async (interaction, guild, target, member) => {
+  let check = false;
+  
   await guild.members
     .fetch(target.id)
     .then(async (targetMember) => {
       if (
         member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1
       ) {
-        return await interaction.reply({
+        check = await interaction.reply({
           content:
             'You cannot warn a member with a higher or equal role than you!',
           ephemeral: true,
@@ -25,13 +29,13 @@ roleHeirarchyCheck = async (interaction, guild, target, member) => {
     })
     .catch(async (err) => {
       console.error(err);
-      return await interaction.reply({
+      check = await interaction.reply({
         content: 'Failed to fetch member for warn check.',
         ephemeral: true,
       });
     });
 
-  return false;
+  return check;
 };
 
 module.exports = { botSelfCheck, roleHeirarchyCheck };
