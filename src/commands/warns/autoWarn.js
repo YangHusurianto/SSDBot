@@ -100,7 +100,7 @@ const removeTag = async (guild, tag) => {
 };
 
 const tagsListEmbed = async (guild) => {
-  let guildDoc = await Guild.findOne({ guildId: guild.id });
+  let guildDoc = await findGuild(guild);
 
   if (!guildDoc || guildDoc.autoTags.size === 0) {
     return('This server has no auto tags!');
