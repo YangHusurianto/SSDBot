@@ -5,19 +5,13 @@ const { connect } = require('mongoose');
 
 // setup timestamp logging
 require('console-stamp')(console, {
-  pattern: 'yyyy-mm-dd HH:MM:ss',
-  colors: {
-      stamp: 'yellow',
-      label: 'green',
-      metadata: 'white'
-  }
+  format: ':date(yyyy/mm/dd HH:MM:ss.l)',
 });
 
 const stderrLogFile = path.join(__dirname, 'error.log');
 const stderrStream = fs.createWriteStream(stderrLogFile, { flags: 'a' });
 
 process.stderr.write = stderrStream.write.bind(stderrStream);
-
 
 // Access env variables
 require('dotenv').config();
