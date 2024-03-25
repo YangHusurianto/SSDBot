@@ -1,4 +1,4 @@
-const { findGuild, getReplacedMessage } = require('../../queries/guildQueries');
+const { findGuild, getReplacedReason } = require('../../queries/guildQueries');
 const { findAndCreateUser } = require('../../queries/userQueries');
 const { logMessage } = require('../../utils/logMessage');
 const { botSelfCheck, roleHeirarchyCheck } = require('../../utils/checks');
@@ -72,7 +72,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
 
   const guildDoc = await findGuild(guild);
 
-  reason = getReplacedMessage(guild, reason);
+  reason = getReplacedReason(guild, reason);
 
   // create the warning first so we can insert regardless of whether the user exists
   const warning = {

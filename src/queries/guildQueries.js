@@ -52,4 +52,4 @@ getReplacedReason = async (guild, reason) => {
   return finalReason;
 }
 
-module.exports = { findGuild, getAutoTags, getChannelTags, getReplacedMessage };
+module.exports = { findGuild, getAutoTags, getChannelTags, getReplacedReason };
