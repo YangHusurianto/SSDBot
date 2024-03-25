@@ -72,7 +72,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
 
   const guildDoc = await findGuild(guild);
 
-  reason = getReplacedReason(guild, reason);
+  reason = await getReplacedReason(guild, reason);
 
   // create the warning first so we can insert regardless of whether the user exists
   const warning = {
