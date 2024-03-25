@@ -1,13 +1,14 @@
 {
-  "name": "RepAnon",
+  "name": "SSDBot",
   "version": "1.0.0",
   "main": "index.js",
   "author": "Yang Husurianto <yang.husurianto@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",
-    "mongoose": "^8.0.4",
+    "console-stamp": "^3.1.2",
     "discord.js": "14.14.1",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "mongoose": "^8.0.4"
   }
 }
