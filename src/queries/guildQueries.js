@@ -22,4 +22,34 @@ findGuild = async (guild) => {
   );
 };
 
-module.exports = { findGuild };
+getAutoTags = async (guild) => {
+  const guildDoc = await findGuild(guild);
+  return guildDoc.autoTags;
+}
+
+getChannelTags = async (guild) => {
+  const guildDoc = await findGuild(guild);
+  return guildDoc.channelTags;
+}
+
+getReplacedMessage = async (guild, message) => {
+  const guildDoc = await findGuild(guild);
+  let finalReason = guildDoc.autoTags.get(message);
+
+  if (!finalReason) {
+    const channelTags = guildDoc.channelTags;
+    const tagPattern = new RegExp(
+      Object.keys(channelTags.toJSON()).join('|'),
+      'g'
+    );
+
+    finalReason = message.replace(
+      tagPattern,
+      (matched) => `<#${channelTags.get(matched)}>`
+    );
+  }
+
+  return finalReason;
+}
+
+module.exports = { findGuild, getAutoTags, getChannelTags};

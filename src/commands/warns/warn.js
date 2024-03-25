@@ -1,6 +1,7 @@
-const { findGuild } = require('../../queries/guildQueries');
+const { findGuild, getReplacedMessage } = require('../../queries/guildQueries');
 const { findAndCreateUser } = require('../../queries/userQueries');
 const { logMessage } = require('../../utils/logMessage');
+const { botSelfCheck, roleHeirarchyCheck } = require('../../utils/checks');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -50,7 +51,7 @@ module.exports = {
     const target = options.getUser('user');
     var reason = options.getString('reason');
 
-    if (await selfWarnCheck(interaction, target, client)) return;
+    if (await botSelfCheck(interaction, target, client)) return;
     if (await roleHeirarchyCheck(interaction, guild, target, member)) return;
 
     try {
@@ -59,50 +60,6 @@ module.exports = {
       console.error(err);
     }
   },
-};
-
-const selfWarnCheck = async (interaction, target, client) => {
-  if (target.id === client.user.id) {
-    await interaction.reply({
-      content: 'I cannot warn myself!',
-      ephemeral: true,
-    });
-
-    return true;
-  }
-
-  return false;
-};
-
-const roleHeirarchyCheck = async (interaction, guild, target, member) => {
-  // get the guild member for the target
-  await guild.members
-    .fetch(target.id)
-    .then(async (targetMember) => {
-      if (
-        member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1
-      ) {
-        await interaction.reply({
-          content:
-            'You cannot warn a member with a higher or equal role than you!',
-          ephemeral: true,
-        });
-
-        return true;
-      }
-    })
-    .catch(async (err) => {
-      console.error(err);
-      await interaction.reply({
-        content:
-          'Failed to fetch member for warn check.',
-        ephemeral: true,
-      });
-
-      return true;
-    });
-
-  return false;
 };
 
 const warnUser = async (interaction, client, guild, target, member, reason) => {
@@ -115,23 +72,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
 
   const guildDoc = await findGuild(guild);
 
-  // pull the tags list and convert to value
-  let tags = guildDoc.autoTags;
-  finalReason = tags.get(reason);
-
-  if (!finalReason) {
-    // if no tag is found, then look for a channel tag
-    const channelTags = guildDoc.channelTags;
-    const tagPattern = new RegExp(
-      Object.keys(channelTags.toJSON()).join('|'),
-      'g'
-    );
-
-    finalReason = reason.replace(
-      tagPattern,
-      (matched) => `<#${channelTags.get(matched)}>`
-    );
-  }
+  reason = getReplacedMessage(guild, reason);
 
   // create the warning first so we can insert regardless of whether the user exists
   const warning = {
@@ -140,7 +81,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     targetUserId: target.id,
     type: 'WARN',
     number: guildDoc.caseNumber,
-    reason: finalReason,
+    reason: reason,
     date: new Date(),
     moderatorUserId: member.user.id,
     moderatorNotes: '',
@@ -173,7 +114,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
         'of your history on the server. Warnings are not ' +
         'serious, unless you keep repeating what we warned you for.\n' +
         'If you believe this warn was made in error, please make a <#852694135927865406>.\n\n' +
-        `Warning: ${finalReason}`
+        `Warning: ${reason}`
     )
     .catch((err) => {
       console.log('Failed to dm user about warn.');
@@ -191,6 +132,6 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
         `${member.user.username} (${member.user.id}`,
         { code: true }
       )})\n` +
-      `**Reason:** ${finalReason}\n`
+      `**Reason:** ${reason}\n`
   );
 };
