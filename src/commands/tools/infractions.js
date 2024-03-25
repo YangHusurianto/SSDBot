@@ -54,7 +54,7 @@ module.exports = {
 
       if (!userDoc) {
         return interaction.reply({
-          content: 'User not found',
+          content: 'User not found in database.',
           ephemeral: true,
         });
       }
