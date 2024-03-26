@@ -1,6 +1,7 @@
 const { findGuild } = require('../../queries/guildQueries');
 const { findAndCreateUser, getRecentByModerator } = require('../../queries/userQueries');
 const { logMessage } = require('../../utils/logMessage');
+const { botSelfCheck, roleHeirarchyCheck } = require('../../utils/checks');
 
 const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
 const mongoose = require('mongoose');
@@ -27,8 +28,8 @@ module.exports = {
     const target = options.getUser('user');
     var reason = options.getString('reason');
 
-    if (await selfBanCheck(interaction, client, target)) return;
-    if (await roleHeirarchyCheck(interaction, guild, target, member)) return;
+    if (await botSelfCheck(interaction, target, client, 'ban')) return;
+    if (await roleHeirarchyCheck(interaction, guild, target, member, 'ban')) return;
 
     const modMember = interaction.guild.members.cache.find(
       (member) => member.id === target.id
@@ -44,56 +45,6 @@ module.exports = {
       console.error(err);
     }
   },
-};
-
-const selfBanCheck = async (interaction, client, target) => {
-  if (target.id === client.user.id) {
-    await interaction.reply({
-      content: 'I cannot ban myself!',
-      ephemeral: true,
-    });
-
-    return true;
-  }
-
-  if (target.id === interaction.member.id) {
-    await interaction.reply({
-      content: 'You cannot ban yourself!',
-      ephemeral: true,
-    });
-
-    return true;
-  }
-
-  return false;
-};
-
-const roleHeirarchyCheck = async (interaction, guild, target, member) => {
-  // get the guild member for the target
-  await guild.members
-    .fetch(target.id)
-    .then(async (targetMember) => {
-      if (
-        member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1
-      ) {
-        await interaction.reply({
-          content:
-            'You cannot ban a member with a higher or equal role than you!',
-          ephemeral: true,
-        });
-
-        return true;
-      }
-    })
-    .catch(async (err) => {
-      await interaction.reply({
-        content:
-          'Failed to fetch member for ban check. Attempting to ban anyway.',
-        ephemeral: true,
-      });
-    });
-
-  return false;
 };
 
 const antiSpamBanCheck = async (interaction, guild, member) => {

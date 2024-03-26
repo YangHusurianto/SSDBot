@@ -1,7 +1,14 @@
-botSelfCheck = async (interaction, target, client) => {
+botSelfCheck = async (interaction, target, client, type) => {
   if (target.id === client.user.id) {
     return await interaction.reply({
-      content: 'I cannot warn myself!',
+      content: `I cannot ${type} myself!`,
+      ephemeral: true,
+    });
+  }
+
+  if (target.id === interaction.member.id) {
+    return await interaction.reply({
+      content: `You cannot ${type} yourself!`,
       ephemeral: true,
     });
   }
@@ -9,7 +16,7 @@ botSelfCheck = async (interaction, target, client) => {
   return false;
 };
 
-roleHeirarchyCheck = async (interaction, guild, target, member) => {
+roleHeirarchyCheck = async (interaction, guild, target, member, type) => {
   await guild.members
     .fetch(target.id)
     .then(async (targetMember) => {
@@ -18,7 +25,7 @@ roleHeirarchyCheck = async (interaction, guild, target, member) => {
       ) {
         return await interaction.reply({
           content:
-            'You cannot warn a member with a higher or equal role than you!',
+            `You cannot ${type} a member with a higher or equal role than you!`,
           ephemeral: true,
         });
       }
@@ -26,7 +33,7 @@ roleHeirarchyCheck = async (interaction, guild, target, member) => {
     .catch(async (err) => {
       console.error(err);
       return await interaction.reply({
-        content: 'Failed to fetch member for warn check.',
+        content: 'Failed to fetch member for permissions check.',
         ephemeral: true,
       });
     });

@@ -51,8 +51,8 @@ module.exports = {
     const target = options.getUser('user');
     var reason = options.getString('reason');
 
-    if (await botSelfCheck(interaction, target, client)) return;
-    if (await roleHeirarchyCheck(interaction, guild, target, member)) return;
+    if (await botSelfCheck(interaction, target, client, 'warn')) return;
+    if (await roleHeirarchyCheck(interaction, guild, target, member, 'warn')) return;
 
     try {
       warnUser(interaction, client, guild, target, member, reason);
