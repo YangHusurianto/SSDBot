@@ -33,7 +33,7 @@ module.exports = {
             (member) => member.id === target.id
           );
           targetMember.roles.add('926253317284323389');
-          return await interaction.reply(
+          return await interaction.editReply(
             `<:check:1196693134067896370> ${target} is verified, but missing the verified role.\nGiving the role now.`
           );
         })
