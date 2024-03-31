@@ -47,6 +47,11 @@ for (const folder of functionFolders) {
 client.handleEvents();
 client.handleCommands();
 
+// setup verbosity?
+client
+    .on("debug", console.log)
+    .on("warn", console.log)
+
 // Log in with token
 client.login(process.env.DISCORD_TOKEN);
 
