@@ -53,18 +53,15 @@ client.handleEvents();
 client.handleCommands();
 
 // setup verbosity?
-if (process.env.VERBOSE) {
+if (process.env.VERBOSE === 'true') {
   client.on('debug', console.log).on('warn', console.log);
 }
 
-console.log("TEST")
 // Log in with token
 client.login(process.env.DISCORD_TOKEN);
-console.log("TEST2")
 
 // Connect to database
 connect(process.env.MONGO_CONNECTION).catch(console.error);
-console.log("TEST3")
 // https://www.youtube.com/watch?v=Ina9qiiujCQ
 // https://github.com/LunarTaku/djs-warn-system
 // https://github.com/ryzyx/discordjs-button-pagination/blob/interaction/index.js
