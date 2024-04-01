@@ -1,6 +1,6 @@
-botSelfCheck = async (interaction, target, client, type) => {
+export async function botSelfCheck(interaction, target, client, type) {
   let check = false;
-  
+
   if (target.id === client.user.id) {
     check = await interaction.reply({
       content: `I cannot ${type} myself!`,
@@ -16,11 +16,17 @@ botSelfCheck = async (interaction, target, client, type) => {
   }
 
   return check;
-};
+}
 
-roleHeirarchyCheck = async (interaction, guild, target, member, type) => {
+export async function roleHeirarchyCheck(
+  interaction,
+  guild,
+  target,
+  member,
+  type
+) {
   let check = false;
-  
+
   await guild.members
     .fetch(target.id)
     .then(async (targetMember) => {
@@ -28,8 +34,7 @@ roleHeirarchyCheck = async (interaction, guild, target, member, type) => {
         member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1
       ) {
         check = await interaction.reply({
-          content:
-            `You cannot ${type} a member with a higher or equal role than you!`,
+          content: `You cannot ${type} a member with a higher or equal role than you!`,
           ephemeral: true,
         });
       }
@@ -43,6 +48,4 @@ roleHeirarchyCheck = async (interaction, guild, target, member, type) => {
     });
 
   return check;
-};
-
-module.exports = { botSelfCheck, roleHeirarchyCheck };
+}

@@ -1,13 +1,12 @@
-const { findGuild, getReplacedReason } = require('../../queries/guildQueries');
-const { findAndCreateUser } = require('../../queries/userQueries');
-const { logMessage } = require('../../utils/logMessage');
-const { botSelfCheck, roleHeirarchyCheck } = require('../../utils/checks');
+import { findGuild, getReplacedReason } from '../../queries/guildQueries.js';
+import { findAndCreateUser } from '../../queries/userQueries.js';
+import { logMessage } from '../../utils/logMessage.js';
+import { botSelfCheck, roleHeirarchyCheck } from '../../utils/checks.js';
 
-const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
-const mongoose = require('mongoose');
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
+import mongoose from 'mongoose';
 
-
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('warn')
     .setDescription('Warn a user by sending them a private message')
@@ -52,7 +51,8 @@ module.exports = {
     var reason = options.getString('reason');
 
     if (await botSelfCheck(interaction, target, client, 'warn')) return;
-    if (await roleHeirarchyCheck(interaction, guild, target, member, 'warn')) return;
+    if (await roleHeirarchyCheck(interaction, guild, target, member, 'warn'))
+      return;
 
     try {
       warnUser(interaction, client, guild, target, member, reason);

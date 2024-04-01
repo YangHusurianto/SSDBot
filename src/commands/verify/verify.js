@@ -1,10 +1,9 @@
-const { findAndCreateUser } = require('../../queries/userQueries');
-const { logMessage } = require('../../utils/logMessage');
+import { findAndCreateUser } from '../../queries/userQueries.js';
+import { logMessage } from '../../utils/logMessage.js';
 
-const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 
-
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('verify')
     .setDescription('Verify a user')

@@ -1,14 +1,9 @@
-const Guild = require('../../schemas/guild');
+import Guild from '../../schemas/guild.js';
 
-const {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  EmbedBuilder,
-} = require('discord.js');
-const mongoose = require('mongoose');
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import mongoose from 'mongoose';
 
-
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('warnchannel')
     .setDescription('Create a channel tag')
@@ -51,7 +46,11 @@ module.exports = {
 
     try {
       if (options.getSubcommand() === 'create') {
-        const createdTag = await createTag(guild, tag, options.getString('channel_id'));
+        const createdTag = await createTag(
+          guild,
+          tag,
+          options.getString('channel_id')
+        );
         return await interaction.reply(createdTag);
       }
 
@@ -92,38 +91,38 @@ const createTag = async (guild, tag, reason) => {
 
   await guildDoc.save().catch(console.error);
 
-  return(`ChannelTag ${tag} created with id: ${id}.`);
+  return `ChannelTag ${tag} created with id: ${id}.`;
 };
 
 const removeTag = async (guild, tag) => {
   let guildDoc = await Guild.findOne({ guildId: guild.id });
 
   if (!guildDoc) {
-    return(`This server has no channel tags!`);
+    return `This server has no channel tags!`;
   }
 
   if (!guildDoc.channelTags.has(tag)) {
-    return(`This server has no channel tag with that name!`);
+    return `This server has no channel tag with that name!`;
   }
 
   guildDoc.channelTags.delete(`#${tag}`);
 
   await guildDoc.save().catch(console.error);
 
-  return(`ChannelTag ${tag} removed.`);
+  return `ChannelTag ${tag} removed.`;
 };
 
 const tagsListEmbed = async (guild) => {
   let guildDoc = await Guild.findOne({ guildId: guild.id });
 
   if (!guildDoc || guildDoc.channelTags.size === 0) {
-    return('This server has no channel tags!');
+    return 'This server has no channel tags!';
   }
 
   let tags = guildDoc.channelTags;
 
   const embed = new EmbedBuilder().setAuthor({
-    name: 'Channel Tags'
+    name: 'Channel Tags',
   });
 
   // sort by alphabetical key

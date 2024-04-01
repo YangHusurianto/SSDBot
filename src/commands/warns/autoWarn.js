@@ -1,14 +1,8 @@
-const { findGuild } = require('../../queries/guildQueries');
+import { findGuild } from '../../queries/guildQueries.js';
 
-const {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  EmbedBuilder,
-} = require('discord.js');
-const mongoose = require('mongoose');
+import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 
-
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('autowarn')
     .setDescription('Create an auto warn tag')
@@ -44,7 +38,7 @@ module.exports = {
       subcommand.setName('list').setDescription('List all auto warn tags')
     )
     .setDMPermission(false),
-    // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
+  // .setDefaultMemberPermissions(PermissionFlagsBits.DeafenMembers),
 
   async execute(interaction, _client) {
     const { options, guild, member } = interaction;
@@ -52,7 +46,11 @@ module.exports = {
 
     try {
       if (options.getSubcommand() === 'create') {
-        const createdTag = await createTag(guild, tag, options.getString('warn_reason'));
+        const createdTag = await createTag(
+          guild,
+          tag,
+          options.getString('warn_reason')
+        );
         return await interaction.reply(createdTag);
       }
 
@@ -78,38 +76,38 @@ const createTag = async (guild, tag, reason) => {
 
   await guildDoc.save().catch(console.error);
 
-  return(`AutoTag ${tag} created with reason: ${reason}.`);
+  return `AutoTag ${tag} created with reason: ${reason}.`;
 };
 
 const removeTag = async (guild, tag) => {
   let guildDoc = await findGuild(guild);
 
   if (!guildDoc) {
-    return(`This server has no auto tags!`);
+    return `This server has no auto tags!`;
   }
 
   if (!guildDoc.autoTags.has(tag)) {
-    return(`This server has no auto tag with that name!`);
+    return `This server has no auto tag with that name!`;
   }
 
   guildDoc.autoTags.delete(tag);
 
   await guildDoc.save().catch(console.error);
 
-  return(`AutoTag ${tag} removed.`);
+  return `AutoTag ${tag} removed.`;
 };
 
 const tagsListEmbed = async (guild) => {
   let guildDoc = await findGuild(guild);
 
   if (!guildDoc || guildDoc.autoTags.size === 0) {
-    return('This server has no auto tags!');
+    return 'This server has no auto tags!';
   }
 
   let tags = guildDoc.autoTags;
 
   const embed = new EmbedBuilder().setAuthor({
-    name: 'Auto Tags'
+    name: 'Auto Tags',
   });
 
   // sort by alphabetical key

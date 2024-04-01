@@ -1,19 +1,18 @@
-const { findGuild, getReplacedReason } = require('../../queries/guildQueries');
-const { findAndCreateUser } = require('../../queries/userQueries');
-const { logMessage } = require('../../utils/logMessage');
-const { botSelfCheck, roleHeirarchyCheck } = require('../../utils/checks');
+import { findGuild, getReplacedReason } from '../../queries/guildQueries.js';
+import { findAndCreateUser } from '../../queries/userQueries.js';
+import { logMessage } from '../../utils/logMessage.js';
+import { botSelfCheck, roleHeirarchyCheck } from '../../utils/checks.js';
 
-const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
-const mongoose = require('mongoose');
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
+import mongoose from 'mongoose';
 
-const ms = require('ms');
+import ms from 'ms';
 import prettyMilliseconds from 'pretty-ms';
 
-
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('mute')
-    .setDescription('Mute a user for a specified amount of time and reason') 
+    .setDescription('Mute a user for a specified amount of time and reason')
     .addUserOption((option) =>
       option
         .setName('user')
@@ -62,7 +61,8 @@ module.exports = {
     var reason = options.getString('reason');
 
     if (await botSelfCheck(interaction, target, client, 'warn')) return;
-    if (await roleHeirarchyCheck(interaction, guild, target, member, 'warn')) return;
+    if (await roleHeirarchyCheck(interaction, guild, target, member, 'warn'))
+      return;
     time = ms(time);
     if (!time) {
       return await interaction.reply({
@@ -79,7 +79,15 @@ module.exports = {
   },
 };
 
-const muteUser = async (interaction, client, guild, target, member, time, reason) => {
+const muteUser = async (
+  interaction,
+  client,
+  guild,
+  target,
+  member,
+  time,
+  reason
+) => {
   const guildDoc = await findGuild(guild);
 
   reason = await getReplacedReason(guild, reason);
@@ -139,5 +147,5 @@ const muteUser = async (interaction, client, guild, target, member, time, reason
 
   setTimeout(() => {
     target.roles.set(savedRoles);
-  }, time) 
+  }, time);
 };

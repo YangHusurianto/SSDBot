@@ -1,16 +1,11 @@
-const {
+import {
   findInfraction,
   updateInfraction,
-} = require('../../queries/infractionQueries');
+} from '../../queries/infractionQueries.js';
 
-const {
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  escapeMarkdown,
-} = require('discord.js');
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 
-
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('editwarn')
     .setDescription('Edit an infraction.')

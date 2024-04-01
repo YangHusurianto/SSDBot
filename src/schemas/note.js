@@ -1,6 +1,6 @@
-const { Schema, model } = require("mongoose");
+import { Schema } from 'mongoose';
 
-const noteSchema = new Schema({
+export const noteSchema = new Schema({
   _id: Schema.Types.ObjectId,
   guildId: String,
   targetUserId: String,
@@ -9,5 +9,3 @@ const noteSchema = new Schema({
   noteDate: Date,
   moderatorUserId: String,
 });
-
-module.exports = { noteSchema }

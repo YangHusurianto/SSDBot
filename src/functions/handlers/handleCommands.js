@@ -1,14 +1,16 @@
-const fs = require('node:fs');
-const path = require('node:path');
+import fs from 'fs';
+import path from 'path';
 
-const { REST, Routes } = require('discord.js');
+import { REST, Routes } from 'discord.js';
 
-module.exports = (client) => {
+export default async function handleCommands(client) {
   client.handleCommands = async () => {
     const commandFolderPath = path.join('./src', 'commands');
     const commandFolders = fs.readdirSync(commandFolderPath);
 
     for (const folder of commandFolders) {
+      if (folder === 'dev') continue; // skip dev commands while i figure out how to remake the reload command
+
       const commandPath = path.join(commandFolderPath, folder);
       const commandFiles = fs
         .readdirSync(commandPath)
@@ -18,9 +20,7 @@ module.exports = (client) => {
       for (const file of commandFiles) {
         const filePath = `../../commands/${folder}/${file}`;
 
-        const command = require(filePath);
-        const fullPath = require.cache[require.resolve(filePath)].filename;
-        client.commandFilePaths.set(command.data.name, fullPath);
+        const command = (await import(filePath)).default;
 
         commands.set(command.data.name, command);
         if (folder === 'dev') {
@@ -107,4 +107,4 @@ module.exports = (client) => {
 
     return;
   };
-};
+}

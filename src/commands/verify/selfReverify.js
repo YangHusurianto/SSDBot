@@ -1,10 +1,8 @@
-const Guild = require('../../schemas/guild');
-const { findUser } = require('../../queries/userQueries');
+import { findUser } from '../../queries/userQueries.js';
 
-const { SlashCommandBuilder } = require('discord.js');
+import { SlashCommandBuilder } from 'discord.js';
 
-
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('selfreverify')
     .setDescription('Check if you have been verified')
@@ -23,19 +21,24 @@ module.exports = {
       }
 
       // give the verified role to the user and ephemeral reply
-      let verifiedRole = guild.roles.cache.find(role => role.id == "926253317284323389")
-      await member.roles.add(verifiedRole).then(() => {
-        return interaction.reply({
-          content: `<:check:1196693134067896370> You have been reverified!`,
-          ephemeral: true,
+      let verifiedRole = guild.roles.cache.find(
+        (role) => role.id == '926253317284323389'
+      );
+      await member.roles
+        .add(verifiedRole)
+        .then(() => {
+          return interaction.reply({
+            content: `<:check:1196693134067896370> You have been reverified!`,
+            ephemeral: true,
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+          return interaction.reply({
+            content: `:x: There was an error re-verifying you.`,
+            ephemeral: true,
+          });
         });
-      }).catch((err) => {
-        console.error(err);
-        return interaction.reply({
-          content: `:x: There was an error re-verifying you.`,
-          ephemeral: true,
-        });
-      });
     } catch (err) {
       console.error(err);
     }

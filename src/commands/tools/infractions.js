@@ -1,15 +1,13 @@
-const Guild = require('../../schemas/guild');
-const { findUser, getRecentByUser } = require('../../queries/userQueries');
+import { findUser, getRecentByUser } from '../../queries/userQueries.js';
 
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   escapeMarkdown,
   ActionRowBuilder,
   ButtonBuilder,
   ComponentType,
-} = require('discord.js');
-const { find } = require('../../schemas/user');
+} from 'discord.js';
 
 const dateOptions = {
   year: 'numeric',
@@ -25,7 +23,7 @@ const dateOptions = {
 
 const INFRACTIONS_PER_PAGE = 5;
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('infractions')
     .setDescription('List   all infractions of a user')

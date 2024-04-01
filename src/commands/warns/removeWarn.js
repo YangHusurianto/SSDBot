@@ -1,13 +1,12 @@
-const {
+import {
   findInfraction,
   removeInfraction,
-} = require('../../queries/infractionQueries');
-const { logMessage } = require('../../utils/logMessage');
+} from '../../queries/infractionQueries.js';
+import { logMessage } from '../../utils/logMessage.js';
 
-const { SlashCommandBuilder, PermissionFlagsBits, escapeMarkdown } = require('discord.js');
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 
-
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('removewarn')
     .setDescription('Remove a warning from a user.')

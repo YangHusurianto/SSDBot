@@ -1,6 +1,11 @@
-const User = require('../schemas/user');
+import User from '../schemas/user.js';
 
-const updateInfraction = async (guildId, infractionNumber, reason, notes) => {
+export async function updateInfraction(
+  guildId,
+  infractionNumber,
+  reason,
+  notes
+) {
   try {
     let UserDoc = await User.findOne({
       guildId: guildId,
@@ -30,12 +35,12 @@ const updateInfraction = async (guildId, infractionNumber, reason, notes) => {
   } catch (error) {
     console.error(error);
   }
-};
+}
 
-const removeInfraction = async (userId, guildId, infractionNumber) => {
+export async function removeInfraction(userId, guildId, infractionNumber) {
   try {
     return await User.findOneAndUpdate(
-      { userId: userId, guildId: guildId},
+      { userId: userId, guildId: guildId },
       {
         $pull: {
           infractions: { number: infractionNumber },
@@ -45,9 +50,9 @@ const removeInfraction = async (userId, guildId, infractionNumber) => {
   } catch (error) {
     console.error(error);
   }
-};
+}
 
-const findInfraction = async (guildId, infractionNumber) => {
+export async function findInfraction(guildId, infractionNumber) {
   try {
     return await User.findOne({
       guildId: guildId,
@@ -56,6 +61,4 @@ const findInfraction = async (guildId, infractionNumber) => {
   } catch (error) {
     console.error(error);
   }
-};
-
-module.exports = { updateInfraction, removeInfraction, findInfraction };
+}

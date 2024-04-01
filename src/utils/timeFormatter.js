@@ -10,6 +10,6 @@ const parseTime = (time) => {
   }
 
   return parsedTime;
-}
+};
 
 module.exports = { parseTime };

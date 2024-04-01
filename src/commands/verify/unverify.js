@@ -1,10 +1,9 @@
-const { findGuild } = require('../../queries/guildQueries');
-const { findUser } = require('../../queries/userQueries');
+import { findUser } from '../../queries/userQueries.js';
 
-const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
-const { logMessage } = require('../../utils/logMessage');
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
+import { logMessage } from '../../utils/logMessage.js';
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('unverify')
     .setDescription('Unverify a user')
@@ -43,14 +42,20 @@ module.exports = {
             ephemeral: true,
           });
 
-          return await logMessage(guild, `**UNVERIFY** | ${target}\n` +
-          `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-            code: true,
-          })})\n` +
-          `**Moderator:** ${escapeMarkdown(
-            `${member.user.username} (${member.user.id}`,
-            { code: true }
-          )})`)
+          return await logMessage(
+            guild,
+            `**UNVERIFY** | ${target}\n` +
+              `**Target:** ${escapeMarkdown(
+                `${target.username} (${target.id}`,
+                {
+                  code: true,
+                }
+              )})\n` +
+              `**Moderator:** ${escapeMarkdown(
+                `${member.user.username} (${member.user.id}`,
+                { code: true }
+              )})`
+          );
         })
         .catch(console.error);
     } catch (err) {

@@ -1,14 +1,17 @@
-const { findGuild } = require('../../queries/guildQueries');
-const { findAndCreateUser, getRecentByModerator } = require('../../queries/userQueries');
-const { logMessage } = require('../../utils/logMessage');
-const { botSelfCheck, roleHeirarchyCheck } = require('../../utils/checks');
+import { findGuild } from '../../queries/guildQueries.js';
+import {
+  findAndCreateUser,
+  getRecentByModerator,
+} from '../../queries/userQueries.js';
+import { logMessage } from '../../utils/logMessage.js';
+import { botSelfCheck, roleHeirarchyCheck } from '../../utils/checks.js';
 
-const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
-const mongoose = require('mongoose');
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
+import mongoose from 'mongoose';
 
 const DAILY_BAN_LIMIT = 5;
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('ban')
     .setDescription('Ban a user by sending them a private message')
@@ -29,7 +32,8 @@ module.exports = {
     var reason = options.getString('reason');
 
     if (await botSelfCheck(interaction, target, client, 'ban')) return;
-    if (await roleHeirarchyCheck(interaction, guild, target, member, 'ban')) return;
+    if (await roleHeirarchyCheck(interaction, guild, target, member, 'ban'))
+      return;
 
     const modMember = interaction.guild.members.cache.find(
       (member) => member.id === target.id
@@ -48,7 +52,12 @@ module.exports = {
 };
 
 const antiSpamBanCheck = async (interaction, guild, member) => {
-  const recentBans = await getRecentByModerator(guild.id, member.user.id, 'BAN', 1);
+  const recentBans = await getRecentByModerator(
+    guild.id,
+    member.user.id,
+    'BAN',
+    1
+  );
   if (recentBans >= DAILY_BAN_LIMIT) {
     await interaction.reply({
       content:
@@ -109,13 +118,16 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
   else await interaction.reply(banConfirmation);
 
   //log to channel
-  logMessage(guild, `**BAN** | Case #${guildDoc.caseNumber}\n` +
-  `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
-    code: true,
-  })})\n` +
-  `**Moderator:** ${escapeMarkdown(
-    `${member.user.username} (${member.user.id}`,
-    { code: true }
-  )})\n` +
-  `**Reason:** ${reason}\n`)
+  logMessage(
+    guild,
+    `**BAN** | Case #${guildDoc.caseNumber}\n` +
+      `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+        code: true,
+      })})\n` +
+      `**Moderator:** ${escapeMarkdown(
+        `${member.user.username} (${member.user.id}`,
+        { code: true }
+      )})\n` +
+      `**Reason:** ${reason}\n`
+  );
 };

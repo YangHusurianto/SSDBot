@@ -1,8 +1,8 @@
-const { findUser } = require('../../queries/userQueries');
+import { findUser } from '../../queries/userQueries.js';
 
-const { SlashCommandBuilder } = require('discord.js');
+import { SlashCommandBuilder } from 'discord.js';
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('checkverify')
     .setDescription('Check if a user is verified')

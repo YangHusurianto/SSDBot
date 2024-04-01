@@ -1,8 +1,8 @@
-const Guild = require('../schemas/guild');
+import Guild from '../schemas/guild.js';
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-findGuild = async (guild) => {
+export async function findGuild(guild) {
   return await Guild.findOneAndUpdate(
     { guildId: guild.id },
     {
@@ -20,19 +20,19 @@ findGuild = async (guild) => {
     },
     { upsert: true, new: true }
   );
-};
+}
 
-getAutoTags = async (guild) => {
+export async function getAutoTags(guild) {
   const guildDoc = await findGuild(guild);
   return guildDoc.autoTags;
 }
 
-getChannelTags = async (guild) => {
+export async function getChannelTags(guild) {
   const guildDoc = await findGuild(guild);
   return guildDoc.channelTags;
 }
 
-getReplacedReason = async (guild, reason) => {
+export async function getReplacedReason(guild, reason) {
   const guildDoc = await findGuild(guild);
   let finalReason = guildDoc.autoTags.get(reason);
 
@@ -51,5 +51,3 @@ getReplacedReason = async (guild, reason) => {
 
   return finalReason;
 }
-
-module.exports = { findGuild, getAutoTags, getChannelTags, getReplacedReason };

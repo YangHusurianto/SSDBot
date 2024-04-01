@@ -1,9 +1,9 @@
-const { Events } = require('discord.js');
+import { Events } from 'discord.js';
 
-module.exports = {
-	name: Events.ClientReady,
-	once: true,
-	async execute(client) {
-		console.log(`Bot logged in as ${client.user.tag}`);
-	}
-}
+export default {
+  name: Events.ClientReady,
+  once: true,
+  async execute(client) {
+    console.log(`Bot logged in as ${client.user.tag}`);
+  },
+};

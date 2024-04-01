@@ -1,6 +1,6 @@
-const { Events } = require('discord.js');
+import { Events } from 'discord.js';
 
-module.exports = {
+export default {
   name: Events.InteractionCreate,
 
   async execute(interaction, client) {
@@ -20,14 +20,14 @@ module.exports = {
         if (interaction.replied || interaction.deferred) {
           await interaction.followUp({
             content: 'There was an error while executing this command!',
-            ephemeral: true
+            ephemeral: true,
           });
           return;
         }
 
         await interaction.reply({
           content: 'There was an error while executing this command!',
-          ephemeral: true
+          ephemeral: true,
         });
         return;
       }
@@ -47,5 +47,5 @@ module.exports = {
         console.log(error);
       }
     }
-  }
-}
+  },
+};

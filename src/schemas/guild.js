@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+import { Schema, model } from 'mongoose';
 
 const guildSchema = new Schema({
   _id: Schema.Types.ObjectId,
@@ -12,4 +12,4 @@ const guildSchema = new Schema({
   settings: { type: Map, of: String },
 });
 
-module.exports = model('Guild', guildSchema, "guilds");
+export default model('Guild', guildSchema, 'guilds');

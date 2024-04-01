@@ -1,9 +1,10 @@
 {
-  "name": "SSDBot",
+  "name": "@yangh/ssd-bot",
   "version": "1.0.0",
   "main": "index.js",
   "author": "Yang Husurianto <yang.husurianto@gmail.com>",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
     "chalk": "^4.1.2",
     "console-stamp": "^3.1.2",

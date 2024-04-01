@@ -1,20 +1,25 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const { Client, Collection, GatewayIntentBits } = require('discord.js');
-const { connect } = require('mongoose');
+import fs from 'fs';
+import path from 'path';
+import { Client, Collection, GatewayIntentBits } from 'discord.js';
+import { connect } from 'mongoose';
+import { fileURLToPath } from 'url';
+
+import consoleStamp from 'console-stamp';
 
 // setup timestamp logging
-require('console-stamp')(console, {
+consoleStamp(console, {
   format: ':date(yyyy/mm/dd HH:MM:ss.l).blue',
 });
 
-const stderrLogFile = path.join(__dirname, 'error.log');
-const stderrStream = fs.createWriteStream(stderrLogFile, { flags: 'a' });
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const filePath = path.join(__dirname, 'error.log');
 
+const stderrStream = fs.createWriteStream(filePath, { flags: 'a' });
 process.stderr.write = stderrStream.write.bind(stderrStream);
 
 // Access env variables
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Create client instance
 const client = new Client({
@@ -33,14 +38,14 @@ client.commandFilePaths = new Map();
 
 const functionFolders = fs.readdirSync('./src/functions');
 for (const folder of functionFolders) {
-  const functionPath = path.join('./src/functions', folder);
   const functionFiles = fs
-    .readdirSync(functionPath)
+    .readdirSync(path.join('./src/functions', folder))
     .filter((file) => file.endsWith('.js'));
 
   for (const file of functionFiles) {
-    const filePath = path.join(__dirname, functionPath);
-    require(path.join(filePath, file))(client);
+    await import(
+      'file://' + path.join(__dirname, 'src/functions', folder, file)
+    ).then((module) => module.default(client));
   }
 }
 
@@ -48,15 +53,18 @@ client.handleEvents();
 client.handleCommands();
 
 // setup verbosity?
-client
-    .on("debug", console.log)
-    .on("warn", console.log)
+if (process.env.VERBOSE) {
+  client.on('debug', console.log).on('warn', console.log);
+}
 
+console.log("TEST")
 // Log in with token
 client.login(process.env.DISCORD_TOKEN);
+console.log("TEST2")
 
 // Connect to database
 connect(process.env.MONGO_CONNECTION).catch(console.error);
+console.log("TEST3")
 // https://www.youtube.com/watch?v=Ina9qiiujCQ
 // https://github.com/LunarTaku/djs-warn-system
 // https://github.com/ryzyx/discordjs-button-pagination/blob/interaction/index.js

@@ -1,8 +1,8 @@
-const chalk = require('chalk');
+import chalk from 'chalk';
 
-module.exports = {
-  name: "connected",
+export default {
+  name: 'connected',
   execute() {
-    console.log(chalk.green("[Database Status]: Connected! c:"))
+    console.log(chalk.green('[Database Status]: Connected! c:'));
   },
 };

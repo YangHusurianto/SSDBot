@@ -1,6 +1,7 @@
-const { Schema, model } = require('mongoose');
-const { infractionSchema } = require('./infraction');
-const { noteSchema } = require('./note');
+import { infractionSchema } from './infraction.js';
+import { noteSchema } from './note.js';
+
+import { Schema, model } from 'mongoose';
 
 const userSchema = new Schema({
   _id: Schema.Types.ObjectId,
@@ -9,7 +10,7 @@ const userSchema = new Schema({
   verified: Boolean,
   verifiedBy: String,
   notes: [noteSchema],
-  infractions: [infractionSchema]
+  infractions: [infractionSchema],
 });
 
-module.exports = model('User', userSchema, "users");
+export default model('User', userSchema, 'users');

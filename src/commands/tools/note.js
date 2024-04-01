@@ -1,12 +1,11 @@
-const { findGuild } = require('../../queries/guildQueries');
-const { findAndCreateUser } = require('../../queries/userQueries');
-const { logMessage } = require('../../utils/logMessage');
+import { findGuild } from '../../queries/guildQueries.js';
+import { findAndCreateUser } from '../../queries/userQueries.js';
+import { logMessage } from '../../utils/logMessage.js';
 
-const { SlashCommandBuilder, escapeMarkdown } = require('discord.js');
-const mongoose = require('mongoose');
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
+import mongoose from 'mongoose';
 
-
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('note')
     .setDescription('Create a note for a user')

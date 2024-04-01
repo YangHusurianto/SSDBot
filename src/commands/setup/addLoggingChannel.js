@@ -1,9 +1,8 @@
-const Guild = require('../../schemas/guild');
+import Guild from '../../schemas/guild.js';
 
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 
-
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName('logchannel')
     .setDescription('Set the logging channel')
@@ -21,22 +20,28 @@ module.exports = {
     let channel = options.getChannel('channel').id;
 
     try {
-      const guildDoc = await Guild.findOneAndUpdate({
-        guildId: guild.id,
-      }, {
-        $set: {
-          logChannel: channel,
+      const guildDoc = await Guild.findOneAndUpdate(
+        {
+          guildId: guild.id,
         },
-      }, {
-        new: true,
-      });
+        {
+          $set: {
+            logChannel: channel,
+          },
+        },
+        {
+          new: true,
+        }
+      );
 
       if (!guildDoc) {
         await interaction.reply(`:x: Failed to set logging channel.`);
         return;
       }
 
-      await interaction.reply(`:white_check_mark: Logging channel set to <#${channel}>.`);
+      await interaction.reply(
+        `:white_check_mark: Logging channel set to <#${channel}>.`
+      );
     } catch (err) {
       console.error(err);
     }
