@@ -49,8 +49,8 @@ for (const folder of functionFolders) {
   }
 }
 
-client.handleEvents();
-client.handleCommands();
+await client.handleEvents();
+await client.handleCommands();
 
 // setup verbosity?
 if (process.env.VERBOSE === 'true') {
@@ -62,7 +62,9 @@ client.login(process.env.DISCORD_TOKEN);
 
 // Connect to database
 connect(process.env.MONGO_CONNECTION).catch(console.error);
+
 // https://www.youtube.com/watch?v=Ina9qiiujCQ
 // https://github.com/LunarTaku/djs-warn-system
 // https://github.com/ryzyx/discordjs-button-pagination/blob/interaction/index.js
 // https://stackoverflow.com/questions/39785036/reliably-reconnect-to-mongodb
+// https://medium.com/@accidental-feature/building-a-discord-bot-with-node-day-5-mongodb-d085caefe490

@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import pkg from 'mongoose';
-const { connection } = pkg;
+import mongoose from 'mongoose';
 
 export default async function handleEvents(client) {
   client.handleEvents = async () => {
@@ -36,12 +35,12 @@ export default async function handleEvents(client) {
           for (const file of eventFiles) {
             const event = (await import(`../../events/mongo/${file}`)).default;
             if (event.once)
-              connection.once(event.name, (...args) =>
-                event.execute(...args, client)
+              mongoose.connection.once(event.name, (...args) =>
+                event.execute(...args)
               );
             else
-              connection.on(event.name, (...args) =>
-                event.execute(...args, client)
+              mongoose.connection.on(event.name, (...args) =>
+                event.execute(...args)
               );
           }
         default:

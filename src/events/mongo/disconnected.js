@@ -2,7 +2,7 @@ import chalk from 'chalk';
 
 export default {
   name: 'disconnected',
-  async execute(client) {
+  execute() {
     console.log(chalk.red('[Database Status]: Disonnected!!! :c'));
   },
 };
