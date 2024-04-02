@@ -1,45 +1,45 @@
-import { findGuild } from "../../queries/guildQueries.js";
+import { findGuild } from '../../queries/guildQueries.js';
 import {
   findAndCreateUser,
   getRecentByModerator,
-} from "../../queries/userQueries.js";
-import { logMessage } from "../../utils/logMessage.js";
-import { botSelfCheck, roleHeirarchyCheck } from "../../utils/checks.js";
+} from '../../queries/userQueries.js';
+import { logMessage } from '../../utils/logMessage.js';
+import { botSelfCheck, roleHeirarchyCheck } from '../../utils/checks.js';
 
-import { SlashCommandBuilder, escapeMarkdown } from "discord.js";
-import mongoose from "mongoose";
+import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
+import mongoose from 'mongoose';
 
 const DAILY_BAN_LIMIT = 5;
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("ban")
-    .setDescription("Ban a user by sending them a private message")
+    .setName('ban')
+    .setDescription('Ban a user by sending them a private message')
     .addUserOption((option) =>
-      option.setName("user").setDescription("The user to ban").setRequired(true)
+      option.setName('user').setDescription('The user to ban').setRequired(true)
     )
     .addStringOption((option) =>
       option
-        .setName("reason")
-        .setDescription("The reason for banning")
+        .setName('reason')
+        .setDescription('The reason for banning')
         .setRequired(true)
     )
     .setDMPermission(false),
 
   async execute(interaction, client) {
     const { options, guild, member } = interaction;
-    const target = options.getUser("user");
-    var reason = options.getString("reason");
+    const target = options.getUser('user');
+    var reason = options.getString('reason');
 
-    if (await botSelfCheck(interaction, target, client, "ban")) return;
-    if (await roleHeirarchyCheck(interaction, guild, target, member, "ban"))
+    if (await botSelfCheck(interaction, target, client, 'ban')) return;
+    if (await roleHeirarchyCheck(interaction, guild, target, member, 'ban'))
       return;
 
     const modMember = interaction.guild.members.cache.find(
       (member) => member.id === target.id
     );
 
-    if (modMember.roles.cache.has("942541250647695371")) {
+    if (modMember.roles.cache.has('942541250647695371')) {
       if (await antiSpamBanCheck(interaction, guild, member)) return;
     }
 
@@ -55,13 +55,13 @@ const antiSpamBanCheck = async (interaction, guild, member) => {
   const recentBans = await getRecentByModerator(
     guild.id,
     member.user.id,
-    "BAN",
+    'BAN',
     1
   );
   if (recentBans >= DAILY_BAN_LIMIT) {
     await interaction.reply({
       content:
-        "You have banned too many users recently. Please try again later.",
+        'You have banned too many users recently. Please try again later.',
       ephemeral: true,
     });
 
@@ -82,12 +82,12 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
     _id: new mongoose.Types.ObjectId(),
     guildId: guild.id,
     targetUserId: target.id,
-    type: "BAN",
+    type: 'BAN',
     number: guildDoc.caseNumber,
     reason: reason,
     date: new Date(),
     moderatorUserId: member.user.id,
-    moderatorNotes: "",
+    moderatorNotes: '',
   };
 
   let userDoc = await findAndCreateUser(guild.id, target.id);
@@ -102,7 +102,7 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
         `please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp`
     )
     .catch((err) => {
-      console.log("Failed to dm user about ban.");
+      console.log('Failed to dm user about ban.');
       console.error(err);
     });
 
