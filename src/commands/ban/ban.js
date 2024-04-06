@@ -86,7 +86,7 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
     number: guildDoc.caseNumber,
     reason: reason,
     date: new Date(),
-    duration: "inf",
+    duration: 'inf',
     moderatorUserId: member.user.id,
     moderatorNotes: '',
   };
@@ -94,29 +94,32 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
   let userDoc = await findAndCreateUser(guild.id, target.id);
   userDoc.infractions.push(ban);
 
-  await client.users
-    .send(
-      target.id,
-      `You have been banned from ${guild.name}.\n` +
-        `**Reason:** ${reason}\n\n` +
-        'If you feel this ban was not fair or made in error,' +
-        'please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp'
-    )
-    .catch((err) => {
-      console.log('Failed to dm user about ban.');
-      console.error(err);
-    });
+  await guild.members
+    .ban(target.id, { reason: reason })
+    .then(async () => {
+      await client.users
+        .send(
+          target.id,
+          `You have been banned from ${guild.name}.\n` +
+            `**Reason:** ${reason}\n\n` +
+            'If you feel this ban was not fair or made in error,' +
+            'please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp'
+        )
+        .catch((err) => {
+          console.log('Failed to dm user about ban.');
+          console.error(err);
+        });
 
-  await guild.members.ban(target.id, { reason: reason }).catch(console.error);
+      let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
+
+      if (interaction.replied) await interaction.reply(banConfirmation);
+      else await interaction.reply(banConfirmation);
+    })
+    .catch(console.error);
 
   guildDoc.caseNumber++;
   await guildDoc.save().catch(console.error);
   await userDoc.save().catch(console.error);
-
-  let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
-
-  if (interaction.replied) await interaction.reply(banConfirmation);
-  else await interaction.reply(banConfirmation);
 
   //log to channel
   logMessage(
