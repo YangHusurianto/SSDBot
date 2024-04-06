@@ -131,6 +131,20 @@ const muteUser = async (interaction, guild, target, member, time, reason) => {
     `<:check:1196693134067896370> ${target} has been muted for ${formattedTime}.`
   );
 
+  client.users
+    .send(
+      target.id,
+      `You have been muted in ${guild.name}.\n` +
+        `**Duration:** ${formattedTime}\n` +
+        `**Reason:** ${reason}\n\n` +
+        'If you feel this mute was not fair or made in error,' +
+        'please create a ticket in the server at <#852694135927865406>'
+    )
+    .catch((err) => {
+      console.log('Failed to dm user about mute.');
+      console.error(err);
+    });
+
   //log to channel
   await logMessage(
     guild,
@@ -142,7 +156,7 @@ const muteUser = async (interaction, guild, target, member, time, reason) => {
         `${member.user.username} (${member.user.id}`,
         { code: true }
       )})\n` +
-      `**Time:** ${formattedTime}\n` +
+      `**Duration:** ${formattedTime}\n` +
       `**Reason:** ${reason}\n`
   );
 };
@@ -159,4 +173,4 @@ const mutedCheck = async (interaction, guild, target) => {
   }
 
   return check;
-}
+};
