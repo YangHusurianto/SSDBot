@@ -74,14 +74,14 @@ export default {
     }
 
     try {
-      muteUser(interaction, guild, target, member, time, reason);
+      muteUser(interaction, guild, client, target, member, time, reason);
     } catch (err) {
       console.error(err);
     }
   },
 };
 
-const muteUser = async (interaction, guild, target, member, time, reason) => {
+const muteUser = async (interaction, guild, client, target, member, time, reason) => {
   const guildDoc = await findGuild(guild);
 
   reason = await getReplacedReason(guild, reason);
