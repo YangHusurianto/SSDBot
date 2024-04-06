@@ -35,9 +35,7 @@ export default {
     if (await roleHeirarchyCheck(interaction, guild, target, member, 'ban'))
       return;
 
-    const modMember = interaction.guild.members.cache.find(
-      (member) => member.id === target.id
-    );
+    const modMember = interaction.guild.members.fetch(target.id)
 
     if (modMember.roles.cache.has('942541250647695371')) {
       if (await antiSpamBanCheck(interaction, guild, member)) return;
