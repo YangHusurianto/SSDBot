@@ -1,6 +1,7 @@
 import { getMutedUsers } from '../../queries/userQueries.js';
 import { logMessage } from '../../utils/logMessage.js';
 
+import { escapeMarkdown } from 'discord.js';
 import ms from 'ms';
 
 export default async function handleMutes(client) {
@@ -41,6 +42,6 @@ export default async function handleMutes(client) {
       } catch (err) {
         console.error(err);
       }
-     }, 1000 * 30); // Every 30 seconds
+     }, 1000 * 10); // Every 30 seconds
   };
 }
