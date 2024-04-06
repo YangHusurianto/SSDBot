@@ -1,4 +1,5 @@
 import { getMutedUsers } from '../../queries/userQueries.js';
+import user from '../../schemas/user.js';
 import { logMessage } from '../../utils/logMessage.js';
 
 import { escapeMarkdown } from 'discord.js';
@@ -16,7 +17,6 @@ export default async function handleMutes(client) {
           if (infraction.type !== 'MUTE') continue;
 
           const time = new Date(infraction.date).getTime() + ms(infraction.duration);
-          console.l
           if (time > Date.now()) continue;
 
           const guild = client.guilds.cache.get(userDoc.guildId);
@@ -29,6 +29,11 @@ export default async function handleMutes(client) {
           if (!role) continue;
 
           member.roles.set(userDoc.roles);
+
+          userDoc.muted = false;
+          await userDoc.save().catch((err) => {
+            console.error(err);
+          });
 
           await logMessage(
             guild,

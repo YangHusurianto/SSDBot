@@ -12,6 +12,7 @@ const userSchema = new Schema({
   notes: [noteSchema],
   infractions: [infractionSchema],
   roles: [String],
+  muted: Boolean,
 });
 
 export default model('User', userSchema, 'users');

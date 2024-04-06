@@ -116,6 +116,7 @@ const muteUser = async (interaction, guild, target, member, time, reason) => {
     savedRoles.push(role[0]);
   }
   userDoc.roles = savedRoles;
+  userDoc.muted = true;
 
   await userDoc.save().catch(async (err) => {
     console.error(err);
