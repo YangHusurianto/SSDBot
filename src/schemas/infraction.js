@@ -7,7 +7,7 @@ export const infractionSchema = new Schema({
   number: Number,
   reason: String,
   date: Date,
-  time: Number,
+  duration: String,
   moderatorUserId: String,
   moderatorNotes: String,
 });

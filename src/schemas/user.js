@@ -11,6 +11,7 @@ const userSchema = new Schema({
   verifiedBy: String,
   notes: [noteSchema],
   infractions: [infractionSchema],
+  roles: [String],
 });
 
 export default model('User', userSchema, 'users');

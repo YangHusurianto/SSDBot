@@ -101,7 +101,7 @@ const muteUser = async (
     number: guildDoc.caseNumber,
     reason: reason,
     date: new Date(),
-    time: time,
+    duration: time,
     moderatorUserId: member.user.id,
     moderatorNotes: '',
   };
@@ -115,13 +115,18 @@ const muteUser = async (
     console.error(err);
   });
 
+  const targetMember = await guild.members.fetch(target.id);
+  const savedRolesMap = targetMember.roles.valueOf();
+  let savedRoles = [];
+  for (const role of savedRolesMap) {
+    savedRoles.push(role.key);
+  }
+  userDoc.roles = savedRoles;
+
   await userDoc.save().catch(async (err) => {
     await interaction.reply(':x: Failed to save mute.');
     console.error(err);
   });
-
-  const targetMember = await guild.members.fetch(target.id);
-  const savedRoles = targetMember.roles.valueOf();
 
   targetMember.roles.set(['878334561094873109']);
 
@@ -144,8 +149,4 @@ const muteUser = async (
       `**Time:** ${formattedTime}\n` +
       `**Reason:** ${reason}\n`
   );
-
-  setTimeout(() => {
-    target.roles.set(savedRoles);
-  }, time);
 };

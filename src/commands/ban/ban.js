@@ -86,6 +86,7 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
     number: guildDoc.caseNumber,
     reason: reason,
     date: new Date(),
+    duration: "inf",
     moderatorUserId: member.user.id,
     moderatorNotes: '',
   };

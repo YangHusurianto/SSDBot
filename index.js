@@ -63,6 +63,9 @@ client.login(process.env.DISCORD_TOKEN);
 // Connect to database
 connect(process.env.MONGO_CONNECTION).catch(console.error);
 
+// check for mutes
+client.handleMutes();
+
 // https://www.youtube.com/watch?v=Ina9qiiujCQ
 // https://github.com/LunarTaku/djs-warn-system
 // https://github.com/ryzyx/discordjs-button-pagination/blob/interaction/index.js

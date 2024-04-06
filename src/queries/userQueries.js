@@ -48,8 +48,20 @@ export async function findAndCreateUser(guildId, userId) {
         verifiedBy: '',
         notes: [],
         infractions: [],
+        roles: [],
       },
     },
     { upsert: true, new: true }
   );
+}
+
+export async function getMutedUsers() {
+  return await User.aggregate([
+    { $unwind: '$infractions' },
+    {
+      $match: {
+        'infractions.type': type,
+      },
+    },
+  ]);
 }

@@ -83,6 +83,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     number: guildDoc.caseNumber,
     reason: reason,
     date: new Date(),
+    duration: 'null',
     moderatorUserId: member.user.id,
     moderatorNotes: '',
   };
