@@ -38,6 +38,8 @@ export async function getReplacedReason(guild, reason) {
 
   if (!finalReason) {
     const channelTags = guildDoc.channelTags;
+    if (!channelTags.size) return reason;
+
     const tagPattern = new RegExp(
       Object.keys(channelTags.toJSON()).join('|'),
       'g'

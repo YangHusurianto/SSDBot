@@ -58,9 +58,29 @@ export async function findAndCreateUser(guildId, userId) {
 export async function getMutedUsers() {
   return await User.aggregate([
     { $unwind: '$infractions' },
+    { $sort: { 'infractions.date': -1 } },
+    { $limit: 1 },
     {
       $match: {
-        'infractions.type': type,
+        $or: [{ 'infractions.type': 'MUTE' }, { 'infractions.type': 'UNMUTE' }],
+        $expr: {
+          $and: [
+            {
+              $lte: [
+                {
+                  $add: [
+                    '$infractions.date',
+                    { $toInt: '$infractions.duration' },
+                  ],
+                },
+                new Date(),
+              ],
+            },
+            {
+              $gte: ['$infractions.date', new Date(Date.now() - 90000)],
+            },
+          ],
+        },
       },
     },
   ]);

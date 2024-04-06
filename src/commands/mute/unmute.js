@@ -11,18 +11,12 @@ import prettyMilliseconds from 'pretty-ms';
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('mute')
-    .setDescription('Mute a user for a specified amount of time and reason')
+    .setName('unmute')
+    .setDescription('Unmute a user for a reason')
     .addUserOption((option) =>
       option
         .setName('user')
-        .setDescription('The user to mute')
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName('time')
-        .setDescription('The amount of time to mute the user for')
+        .setDescription('The user to umute')
         .setRequired(true)
     )
     .addStringOption((option) =>
@@ -30,58 +24,28 @@ export default {
         .setName('reason')
         .setDescription('The reason')
         .setRequired(true)
-        .setAutocomplete(true)
     )
     .setDMPermission(false),
-
-  async autocomplete(interaction) {
-    const focusedValue = interaction.options.getFocused();
-    const guild = await findGuild(interaction.guild);
-    let tags = guild.autoTags;
-
-    const filtered = Array.from(tags).filter(([key, _value]) =>
-      key.startsWith(focusedValue)
-    );
-
-    if (!filtered.length && focusedValue.length === 0) {
-      return await interaction.respond(
-        Array.from(tags).map(([key, _value]) => ({ name: key, value: key }))
-      );
-    }
-
-    return await interaction.respond(
-      filtered.map(([key, _value]) => ({ name: key, value: key }))
-    );
-  },
 
   async execute(interaction, client) {
     const { options, guild, member } = interaction;
     const target = options.getUser('user');
-    var time = options.getString('time');
     var reason = options.getString('reason');
 
     if (await botSelfCheck(interaction, target, client, 'warn')) return;
     if (await roleHeirarchyCheck(interaction, guild, target, member, 'warn'))
       return;
-    if (await mutedCheck(interaction, guild, target)) return;
-
-    time = ms(time);
-    if (!time) {
-      return await interaction.reply({
-        content: 'Invalid time format, please try again.',
-        ephemeral: true,
-      });
-    }
+    if (await unmutedCheck(interaction, guild, target)) return;
 
     try {
-      muteUser(interaction, guild, target, member, time, reason);
+      unmuteUser(interaction, guild, target, member, reason);
     } catch (err) {
       console.error(err);
     }
   },
 };
 
-const muteUser = async (interaction, guild, target, member, time, reason) => {
+const unmuteUser = async (interaction, guild, target, member, reason) => {
   const guildDoc = await findGuild(guild);
 
   reason = await getReplacedReason(guild, reason);
@@ -91,11 +55,11 @@ const muteUser = async (interaction, guild, target, member, time, reason) => {
     _id: new mongoose.Types.ObjectId(),
     guildId: guild.id,
     targetUserId: target.id,
-    type: 'MUTE',
+    type: 'UNMUTE',
     number: guildDoc.caseNumber,
     reason: reason,
     date: new Date(),
-    duration: time,
+    duration: 0,
     moderatorUserId: member.user.id,
     moderatorNotes: '',
   };
@@ -109,31 +73,22 @@ const muteUser = async (interaction, guild, target, member, time, reason) => {
     console.error(err);
   });
 
-  const targetMember = await guild.members.fetch(target.id);
-  const savedRolesMap = targetMember.roles.valueOf();
-  let savedRoles = [];
-  for (const role of savedRolesMap) {
-    savedRoles.push(role[0]);
-  }
-  userDoc.roles = savedRoles;
-
   await userDoc.save().catch(async (err) => {
     console.error(err);
     return await interaction.reply(':x: Failed to save mute.');
   });
 
-  const role = guild.roles.cache.find((role) => role.name === 'MUTE');
-  targetMember.roles.set([role.id]);
+  const targetMember = await guild.members.fetch(target.id);
+  targetMember.roles.set(userDoc.roles);
 
-  const formattedTime = prettyMilliseconds(time, { verbose: true });
   await interaction.reply(
-    `<:check:1196693134067896370> ${target} has been muted for ${formattedTime}.`
+    `<:check:1196693134067896370> ${target} has been unmuted.`
   );
 
   //log to channel
   await logMessage(
     guild,
-    `**MUTE** | Case #${guildDoc.caseNumber - 1}\n` +
+    `**UNMUTE** | Case #${guildDoc.caseNumber - 1}\n` +
       `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
         code: true,
       })})\n` +
@@ -141,21 +96,20 @@ const muteUser = async (interaction, guild, target, member, time, reason) => {
         `${member.user.username} (${member.user.id}`,
         { code: true }
       )})\n` +
-      `**Time:** ${formattedTime}\n` +
       `**Reason:** ${reason}\n`
   );
 };
 
-const mutedCheck = async (interaction, guild, target) => {
-  let check = false;
+const unmutedCheck = async (interaction, guild, target) => {
   const targetMember = await guild.members.fetch(target.id);
   // check if user is already muted
   if (targetMember.roles.cache.some((role) => role.name === 'MUTE')) {
-    check = await interaction.reply({
-      content: `${target} is already muted.`,
-      ephemeral: true,
-    });
+    return false;
   }
 
-  return check;
+  await interaction.reply({
+    content: `${target} is already unmuted.`,
+    ephemeral: true,
+  });
+  return true;
 }
