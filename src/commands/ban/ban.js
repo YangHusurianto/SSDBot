@@ -94,15 +94,7 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
   let userDoc = await findAndCreateUser(guild.id, target.id);
   userDoc.infractions.push(ban);
 
-  await guild.members
-    .ban(target.id, { reason: reason })
-    .then(async () => {
-      let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
-
-      if (interaction.replied) await interaction.reply(banConfirmation);
-      else await interaction.reply(banConfirmation);
-
-      await client.users
+  client.users
         .send(
           target.id,
           `You have been banned from ${guild.name}.\n` +
@@ -114,6 +106,14 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
           console.log('Failed to dm user about ban.');
           console.error(err);
         });
+
+  await guild.members
+    .ban(target.id, { reason: reason })
+    .then(async () => {
+      let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
+
+      if (interaction.replied) await interaction.reply(banConfirmation);
+      else await interaction.reply(banConfirmation);
     })
     .catch(console.error);
 
