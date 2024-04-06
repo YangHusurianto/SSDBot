@@ -1,5 +1,4 @@
-import { getMutedUsers } from '../../queries/userQueries.js';
-import user from '../../schemas/user.js';
+import { updateUser, getMutedUsers } from '../../queries/userQueries.js';
 import { logMessage } from '../../utils/logMessage.js';
 
 import { escapeMarkdown } from 'discord.js';
@@ -14,26 +13,18 @@ export default async function handleMutes(client) {
         for (const userDoc of mutedUsers) {
           const infraction = userDoc.infractions;
 
-          if (infraction.type !== 'MUTE') continue;
-
           const time = new Date(infraction.date).getTime() + ms(infraction.duration);
           if (time > Date.now()) continue;
 
           const guild = client.guilds.cache.get(userDoc.guildId);
           if (!guild) continue;
 
-          const member = guild.members.cache.get(userDoc.userId);
+          const member = await guild.members.fetch(userDoc.userId);
           if (!member) continue;
-
-          const role = guild.roles.cache.find((role) => role.name === 'MUTE');
-          if (!role) continue;
 
           member.roles.set(userDoc.roles);
 
-          userDoc.muted = false;
-          await userDoc.save().catch((err) => {
-            console.error(err);
-          });
+          updateUser(userDoc.guildId, userDoc.userId, { muted: false });
 
           await logMessage(
             guild,

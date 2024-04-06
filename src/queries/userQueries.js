@@ -2,6 +2,14 @@ import User from '../schemas/user.js';
 
 import mongoose from 'mongoose';
 
+export async function updateUser(guildId, userId, update) {
+  return await User.findOneAndUpdate(
+    { guildId: guildId, userId: userId },
+    update,
+    { new: true }
+  );
+}
+
 export async function getRecentByModerator(guildId, userId, timeLimit, type) {
   const afterDate = new Date();
   afterDate.setDate(afterDate.getDate() - timeLimit);
@@ -63,12 +71,26 @@ export async function getMutedUsers() {
     { $limit: 1 },
     {
       $match: {
-        $or: [{ 'infractions.type': 'MUTE' }, { 'infractions.type': 'UNMUTE' }],
-        $lte: [
+        $and: [
           {
-            $add: ['$infractions.date', { $toInt: '$infractions.duration' }],
+            $or: [
+              { 'infractions.type': 'MUTE' },
+              { 'infractions.type': 'UNMUTE' },
+            ],
           },
-          new Date(),
+          {
+            $expr: {
+              $lt: [
+                {
+                  $add: [
+                    '$infractions.date',
+                    { $toInt: '$infractions.duration' },
+                  ],
+                },
+                new Date(),
+              ],
+            },
+          },
         ],
       },
     },
