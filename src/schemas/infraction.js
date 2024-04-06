@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema } from 'mongoose';
 
 export const infractionSchema = new Schema({
   _id: Schema.Types.ObjectId,

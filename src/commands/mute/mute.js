@@ -111,12 +111,12 @@ const muteUser = async (
 
   guildDoc.caseNumber++;
   await guildDoc.save().catch(async (err) => {
-    await interaction.reply(`:x: Failed to update case number.`);
+    await interaction.reply(':x: Failed to update case number.');
     console.error(err);
   });
 
   await userDoc.save().catch(async (err) => {
-    await interaction.reply(`:x: Failed to save mute.`);
+    await interaction.reply(':x: Failed to save mute.');
     console.error(err);
   });
 
