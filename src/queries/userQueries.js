@@ -65,33 +65,29 @@ export async function findAndCreateUser(guildId, userId) {
 
 export async function getMutedUsers() {
   return await User.aggregate([
-    { $match: { muted: true } },
-    { $unwind: '$infractions' },
-    { $sort: { 'infractions.date': -1 } },
-    { $limit: 1 },
-    {
+    { $match: { muted: true } }, 
+    { $unwind: '$infractions' }, 
+    { 
       $match: {
-        $and: [
-          {
-            $or: [
-              { 'infractions.type': 'MUTE' },
-              { 'infractions.type': 'UNMUTE' },
-            ],
-          },
-          {
-            $expr: {
-              $lt: [
-                {
-                  $add: [
-                    '$infractions.date',
-                    { $toInt: '$infractions.duration' },
-                  ],
-                },
-                new Date(),
-              ],
-            },
-          },
-        ],
+        $expr: {
+          $and: [
+            { $ne: ['$infractions.duration', '0'] },
+            { $lt: [{ $add: ['$infractions.date', { $toInt: '$infractions.duration' }] }, new Date()] }
+          ]
+        }
+      }
+    },
+    { $sort: { 'infractions.date': -1 } }, // Sort by date in descending order
+    {
+      $group: {
+        _id: '$_id',
+        mostRecentInfraction: { $first: '$infractions' },
+        user: { $first: '$$ROOT' },
+      },
+    },
+    {
+      $replaceRoot: {
+        newRoot: { $mergeObjects: ['$mostRecentInfraction', '$user'] },
       },
     },
   ]);

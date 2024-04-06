@@ -65,13 +65,17 @@ export default {
       return;
     if (await mutedCheck(interaction, guild, target)) return;
 
-    time = ms(time);
-    if (!time) {
-      return await interaction.reply({
-        content: 'Invalid time format, please try again.',
-        ephemeral: true,
-      });
-    }
+    if (time !== '0') {
+      time = ms(time);
+      if (!time) {
+        return await interaction.reply({
+          content: 'Invalid time format, please try again.',
+          ephemeral: true,
+        });
+      }
+  }
+
+    
 
     try {
       muteUser(interaction, guild, client, target, member, time, reason);
@@ -81,7 +85,15 @@ export default {
   },
 };
 
-const muteUser = async (interaction, guild, client, target, member, time, reason) => {
+const muteUser = async (
+  interaction,
+  guild,
+  client,
+  target,
+  member,
+  time,
+  reason
+) => {
   const guildDoc = await findGuild(guild);
 
   reason = await getReplacedReason(guild, reason);
@@ -126,7 +138,9 @@ const muteUser = async (interaction, guild, client, target, member, time, reason
   const role = guild.roles.cache.find((role) => role.name === 'MUTE');
   targetMember.roles.set([role.id]);
 
-  const formattedTime = prettyMilliseconds(time, { verbose: true });
+  const formattedTime = time;
+  if (time !== 'Infinity')
+    formattedTime = prettyMilliseconds(time, { verbose: true });
   await interaction.reply(
     `<:check:1196693134067896370> ${target} has been muted for ${formattedTime}.`
   );
