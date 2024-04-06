@@ -73,9 +73,7 @@ export default {
           ephemeral: true,
         });
       }
-  }
-
-    
+    }
 
     try {
       muteUser(interaction, guild, client, target, member, time, reason);
@@ -138,9 +136,9 @@ const muteUser = async (
   const role = guild.roles.cache.find((role) => role.name === 'MUTE');
   targetMember.roles.set([role.id]);
 
-  const formattedTime = time;
-  if (time !== 'Infinity')
-    formattedTime = prettyMilliseconds(time, { verbose: true });
+  let formattedTime = time;
+  if (time === '0') formattedTime = 'Indefinite';
+  else formattedTime = prettyMilliseconds(time, { verbose: true });
   await interaction.reply(
     `<:check:1196693134067896370> ${target} has been muted for ${formattedTime}.`
   );
