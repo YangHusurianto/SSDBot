@@ -1,4 +1,5 @@
 import { getMutedUsers } from '../../queries/userQueries.js';
+import { logMessage } from '../../utils/logMessage.js';
 
 import ms from 'ms';
 
@@ -27,6 +28,15 @@ export default async function handleMutes(client) {
           if (!role) continue;
 
           member.roles.set(userDoc.roles);
+
+          await logMessage(
+            guild,
+            `**UNMUTE** | Case #${infraction.number}\n` +
+              `**Target:** ${escapeMarkdown(`${member.user.username} (${member.id}`, {
+                code: true,
+              })})\n` +
+              `**Reason:** Auto Unmute\n`
+          );
         }
       } catch (err) {
         console.error(err);
