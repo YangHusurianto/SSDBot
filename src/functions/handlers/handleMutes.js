@@ -4,7 +4,6 @@ import ms from 'ms';
 
 export default async function handleMutes(client) {
   client.handleMutes = async () => {
-    console.log("Starting mute handler")
     setInterval(async () => {
       try {
         const mutedUsers = await getMutedUsers();
