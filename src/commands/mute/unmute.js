@@ -6,9 +6,6 @@ import { botSelfCheck, roleHeirarchyCheck } from '../../utils/checks.js';
 import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 import mongoose from 'mongoose';
 
-import ms from 'ms';
-import prettyMilliseconds from 'pretty-ms';
-
 export default {
   data: new SlashCommandBuilder()
     .setName('unmute')
@@ -59,7 +56,7 @@ const unmuteUser = async (interaction, guild, target, member, reason) => {
     number: guildDoc.caseNumber,
     reason: reason,
     date: new Date(),
-    duration: 0,
+    duration: -1,
     moderatorUserId: member.user.id,
     moderatorNotes: '',
   };

@@ -48,7 +48,7 @@ const unbanUser = async (interaction, guild, target, member, reason) => {
     number: guildDoc.caseNumber,
     reason: reason,
     date: new Date(),
-    duration: 'null',
+    duration: '',
     moderatorUserId: member.user.id,
     moderatorNotes: '',
   };

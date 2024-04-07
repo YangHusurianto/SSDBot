@@ -66,7 +66,8 @@ export default {
     if (await mutedCheck(interaction, guild, target)) return;
 
     if (time !== '0') {
-      time = ms(time);
+      if (!isNaN(time)) time *= 1000;
+      else time = ms(time);
       if (!time) {
         return await interaction.reply({
           content: 'Invalid time format, please try again.',
