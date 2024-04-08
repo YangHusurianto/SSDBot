@@ -29,7 +29,7 @@ export default {
       return await interaction
         .reply(`<:check:1196693134067896370> ${target} is verified!`)
         .then(async () => {
-          const targetMember = interaction.guild.members.fetch(target.id);
+          const targetMember = await interaction.guild.members.fetch(target.id);
           targetMember.roles.add('926253317284323389');
           return await interaction.editReply(
             `<:check:1196693134067896370> ${target} is verified, but missing the verified role.\nGiving the role now.`
