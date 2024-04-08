@@ -10,8 +10,11 @@ export default async function handleMutes(client) {
       try {
         const mutedUsers = await getMutedUsers();
 
-        for (const userDoc of mutedUsers) {
+        for (const user of mutedUsers) {
+          const userDoc = user.user;
+
           const infraction = userDoc.infractions;
+          if (infraction.duration === '0') continue;
 
           const time = new Date(infraction.date).getTime() + ms(infraction.duration);
           if (time > Date.now()) continue;
@@ -22,9 +25,9 @@ export default async function handleMutes(client) {
           const member = await guild.members.fetch(userDoc.userId);
           if (!member) continue;
 
-          member.roles.set(userDoc.roles);
+          await updateUser(userDoc.guildId, userDoc.userId, { muted: false });
 
-          updateUser(userDoc.guildId, userDoc.userId, { muted: false });
+          member.roles.set(userDoc.roles);
 
           await logMessage(
             guild,
@@ -38,6 +41,6 @@ export default async function handleMutes(client) {
       } catch (err) {
         console.error(err);
       }
-     }, 1000 * 10); // Every 30 seconds
+     }, 1000 * 10); // Every 10 seconds
   };
 }
