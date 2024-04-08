@@ -54,11 +54,11 @@ export default {
       return await updateInfraction(guild.id, infractionNumber, reason, notes)
         .then(async (value) => {
           if (value) {
-            await await interaction.reply(
+            await logMessage(guild, loggedMessage);
+
+            return await await interaction.reply(
               `<:check:1196693134067896370> Infraction #${infractionNumber} edited.`
             );
-
-            return await logMessage(guild, loggedMessage);
           }
 
           return await interaction.reply(
