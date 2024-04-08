@@ -2,7 +2,7 @@ import {
   findInfraction,
   removeInfraction,
 } from '../../queries/infractionQueries.js';
-import { logMessage } from '../../utils/logMessage.js';
+import { logAction } from '../../utils/logs.js';
 
 import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 
@@ -48,7 +48,7 @@ export default {
 
           const target = await guild.members.fetch(infraction.targetUserId);
 
-          return await logMessage(
+          return await logAction(
             guild,
             `**REMOVE WARN** | Case #${warnNumber}\n` +
               `**Target:** ${escapeMarkdown(

@@ -1,5 +1,5 @@
 import { findAndCreateUser } from '../../queries/userQueries.js';
-import { logMessage } from '../../utils/logMessage.js';
+import { logAction } from '../../utils/logs.js';
 
 import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 
@@ -47,7 +47,7 @@ export default {
           );
 
           //log to channel
-          return await logMessage(
+          return await logAction(
             guild,
             `**VERIFY** | ${target}\n` +
               `**Target:** ${escapeMarkdown(

@@ -75,7 +75,7 @@ export default {
             new EmbedBuilder()
               .setAuthor({
                 name: `${user.username} (${user.id})`,
-                iconURL: user.avatarURL(),
+                iconURL: user.displayAvatarURL(),
               })
               .addFields({
                 name: 'No Infractions or Notes',
@@ -234,7 +234,7 @@ export default {
 const logsEmbed = (target, page, infractions, recents, notes) => {
   const embed = new EmbedBuilder().setAuthor({
     name: `${target.username} (${target.id})`,
-    iconURL: target.avatarURL(),
+    iconURL: target.displayAvatarURL(),
   });
 
   if (infractions.length > 5) {
@@ -285,7 +285,7 @@ const logsEmbed = (target, page, infractions, recents, notes) => {
 const notesEmbed = (target, notesPage, notes) => {
   const embed = new EmbedBuilder().setAuthor({
     name: `${target.username} (${target.id})`,
-    iconURL: target.avatarURL(),
+    iconURL: target.displayAvatarURL(),
   });
 
   if (notes.length > 5) {

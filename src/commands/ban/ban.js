@@ -3,7 +3,7 @@ import {
   findAndCreateUser,
   getRecentByModerator,
 } from '../../queries/userQueries.js';
-import { logMessage } from '../../utils/logMessage.js';
+import { logAction } from '../../utils/logs.js';
 import { botSelfCheck, roleHeirarchyCheck } from '../../utils/checks.js';
 
 import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
@@ -119,7 +119,7 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
   await userDoc.save().catch(console.error);
 
   //log to channel
-  logMessage(
+  logAction(
     guild,
     `**BAN** | Case #${guildDoc.caseNumber}\n` +
       `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {

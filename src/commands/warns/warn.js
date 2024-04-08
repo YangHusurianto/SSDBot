@@ -1,6 +1,6 @@
 import { findGuild, getReplacedReason } from '../../queries/guildQueries.js';
 import { findAndCreateUser } from '../../queries/userQueries.js';
-import { logMessage } from '../../utils/logMessage.js';
+import { logAction } from '../../utils/logs.js';
 import { botSelfCheck, roleHeirarchyCheck } from '../../utils/checks.js';
 
 import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
@@ -123,7 +123,7 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     });
 
   //log to channel
-  return await logMessage(
+  return await logAction(
     guild,
     `**WARN** | Case #${guildDoc.caseNumber - 1}\n` +
       `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {

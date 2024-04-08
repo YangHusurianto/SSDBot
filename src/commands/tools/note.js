@@ -1,6 +1,6 @@
 import { findGuild } from '../../queries/guildQueries.js';
 import { findAndCreateUser } from '../../queries/userQueries.js';
-import { logMessage } from '../../utils/logMessage.js';
+import { logAction } from '../../utils/logs.js';
 
 import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 import mongoose from 'mongoose';
@@ -58,7 +58,7 @@ export default {
       });
 
       //log to channel
-      return await logMessage(
+      return await logAction(
         guild,
         `**NOTE** | Case #${guildDoc.caseNumber++}\n` +
           `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {

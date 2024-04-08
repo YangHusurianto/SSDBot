@@ -1,7 +1,7 @@
 import { findUser } from '../../queries/userQueries.js';
 
 import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
-import { logMessage } from '../../utils/logMessage.js';
+import { logAction } from '../../utils/logs.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -42,7 +42,7 @@ export default {
             ephemeral: true,
           });
 
-          return await logMessage(
+          return await logAction(
             guild,
             `**UNVERIFY** | ${target}\n` +
               `**Target:** ${escapeMarkdown(

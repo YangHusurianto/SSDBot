@@ -3,7 +3,7 @@ import {
   updateInfraction,
 } from '../../queries/infractionQueries.js';
 
-import { logMessage } from '../../utils/logMessage.js';
+import { logAction } from '../../utils/logs.js';
 
 import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 
@@ -54,7 +54,7 @@ export default {
       return await updateInfraction(guild.id, infractionNumber, reason, notes)
         .then(async (value) => {
           if (value) {
-            await logMessage(guild, loggedMessage);
+            await logAction(guild, loggedMessage);
 
             return await await interaction.reply(
               `<:check:1196693134067896370> Infraction #${infractionNumber} edited.`

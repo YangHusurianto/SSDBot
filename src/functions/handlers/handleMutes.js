@@ -1,5 +1,5 @@
 import { updateUser, getMutedUsers } from '../../queries/userQueries.js';
-import { logMessage } from '../../utils/logMessage.js';
+import { logAction } from '../../utils/logs.js';
 
 import { escapeMarkdown } from 'discord.js';
 import ms from 'ms';
@@ -29,7 +29,7 @@ export default async function handleMutes(client) {
 
           member.roles.set(userDoc.roles);
 
-          await logMessage(
+          await logAction(
             guild,
             `**UNMUTE** | Case #${infraction.number}\n` +
               `**Target:** ${escapeMarkdown(`${member.user.username} (${member.id}`, {

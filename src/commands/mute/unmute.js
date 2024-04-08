@@ -1,6 +1,6 @@
 import { findGuild, getReplacedReason } from '../../queries/guildQueries.js';
 import { findAndCreateUser } from '../../queries/userQueries.js';
-import { logMessage } from '../../utils/logMessage.js';
+import { logAction } from '../../utils/logs.js';
 import { botSelfCheck, roleHeirarchyCheck } from '../../utils/checks.js';
 
 import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
@@ -83,7 +83,7 @@ const unmuteUser = async (interaction, guild, target, member, reason) => {
   );
 
   //log to channel
-  await logMessage(
+  await logAction(
     guild,
     `**UNMUTE** | Case #${guildDoc.caseNumber - 1}\n` +
       `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {

@@ -1,6 +1,6 @@
 import { findGuild } from '../../queries/guildQueries.js';
 import { findUser } from '../../queries/userQueries.js';
-import { logMessage } from '../../utils/logMessage.js';
+import { logAction } from '../../utils/logs.js';
 
 import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 import mongoose from 'mongoose';
@@ -72,7 +72,7 @@ const unbanUser = async (interaction, guild, target, member, reason) => {
   );
 
   //log to channel
-  logMessage(
+  logAction(
     guild,
     `**UNBAN** | Case #${guildDoc.caseNumber}\n` +
       `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
