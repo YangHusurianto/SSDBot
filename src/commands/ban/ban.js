@@ -27,9 +27,11 @@ export default {
     .setDMPermission(false),
 
   async execute(interaction, client) {
+    console.log("ban command")
     const { options, guild, member } = interaction;
     const target = options.getUser('user');
     var reason = options.getString('reason');
+    console.log("test")
 
     if (await botSelfCheck(interaction, target, client, 'ban')) return;
     if (await roleHeirarchyCheck(interaction, guild, target, member, 'ban'))
@@ -40,6 +42,7 @@ export default {
     if (modMember.roles.cache.has('942541250647695371')) {
       if (await antiSpamBanCheck(interaction, guild, member)) return;
     }
+    console.log("checks passed")
 
     try {
       banUser(interaction, client, guild, target, member, reason);
