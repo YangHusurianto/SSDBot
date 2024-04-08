@@ -3,6 +3,8 @@ import {
   updateInfraction,
 } from '../../queries/infractionQueries.js';
 
+import { logMessage } from '../../utils/logMessage.js';
+
 import { SlashCommandBuilder, escapeMarkdown } from 'discord.js';
 
 export default {
