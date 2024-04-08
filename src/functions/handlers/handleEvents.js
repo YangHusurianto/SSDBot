@@ -31,6 +31,22 @@ export default async function handleEvents(client) {
           }
           break;
 
+          case 'guildEvents':
+            for (const file of eventFiles) {
+              const event = (await import(`../../events/guildEvents/${file}`)).default;
+  
+              if (event.once) {
+                client.once(event.name, (...args) =>
+                  event.execute(...args, client)
+                );
+              } else {
+                client.on(event.name, (...args) =>
+                  event.execute(...args, client)
+                );
+              }
+            }
+            break;
+
         case 'mongo':
           for (const file of eventFiles) {
             const event = (await import(`../../events/mongo/${file}`)).default;
