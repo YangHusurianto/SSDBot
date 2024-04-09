@@ -25,6 +25,9 @@
             "error",
             "always"
         ],
-        "SwitchCase": 1,
+        "SwitchCase": [
+            "error",
+            1
+        ],
     }
 }
