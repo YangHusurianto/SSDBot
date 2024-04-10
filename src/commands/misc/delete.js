@@ -19,8 +19,9 @@ export default {
     const { options, guild, member } = interaction;
     const messageId = options.getString('id');
 
+    let message;
     try {
-      const message = await interaction.channel.messages.fetch(messageId);
+      message = await interaction.channel.messages.fetch(messageId);
     } catch (err) {
       console.error(err);
       return await interaction.reply({
