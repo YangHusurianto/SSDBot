@@ -51,6 +51,8 @@ export default {
     )
       return;
 
+    if (await channelCheck(interaction, message)) return;
+
     try {
       deleteMessage(interaction, message, guild, target, member);
     } catch (err) {
@@ -88,4 +90,17 @@ const deleteMessage = async (interaction, message, guild, target, member) => {
         ephemeral: true,
       });
     });
+};
+
+const channelCheck = async (interaction, message) => {
+  let channelName = message.channel.name;
+
+  if (channelName === 'mod-actions' || channelName === 'logs') {
+    return await interaction.reply({
+      content: 'You cannot delete messages in this channel.',
+      ephemeral: true,
+    });
+  }
+
+  return false;
 };
