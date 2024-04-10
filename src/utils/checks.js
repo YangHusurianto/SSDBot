@@ -38,6 +38,16 @@ export async function roleHeirarchyCheck(
       return false;
     })
     .catch(async (err) => {
+      
+      if (type === 'ban') {
+        await interaction.reply({
+          content: 'Failed to fetch member for permissions check. Attempting to ban user anyway...',
+          ephemeral: true,
+        });
+
+        return false;
+      }
+
       console.error(err);
       return await interaction.reply({
         content: 'Failed to fetch member for permissions check.',

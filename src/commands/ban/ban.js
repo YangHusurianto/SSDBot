@@ -32,11 +32,17 @@ export default {
     var reason = options.getString('reason');
 
     if (await botSelfCheck(interaction, target, client, 'ban')) return;
-    if (await roleHeirarchyCheck(interaction, guild, target, member, 'ban'))
-      return;
+    let test = await roleHeirarchyCheck(
+      interaction,
+      guild,
+      target,
+      member,
+      'ban'
+    );
+    console.log(test);
+    if (test) return;
 
-    const modMember = await interaction.guild.members.fetch(target.id)
-    if (modMember.roles.cache.has('942541250647695371')) {
+    if (member.roles.cache.has('942541250647695371')) {
       if (await antiSpamBanCheck(interaction, guild, member)) return;
     }
 
@@ -56,11 +62,14 @@ const antiSpamBanCheck = async (interaction, guild, member) => {
     1
   );
   if (recentBans >= DAILY_BAN_LIMIT) {
-    await interaction.reply({
+    let banLimit = {
       content:
         'You have banned too many users recently. Please try again later.',
       ephemeral: true,
-    });
+    };
+
+    if (interaction.replied) await interaction.editReply(banLimit);
+    else await interaction.reply(banLimit);
 
     return true;
   }
@@ -92,24 +101,24 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
   userDoc.infractions.push(ban);
 
   client.users
-        .send(
-          target.id,
-          `You have been banned from ${guild.name}.\n` +
-            `**Reason:** ${reason}\n\n` +
-            'If you feel this ban was not fair or made in error,' +
-            'please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp'
-        )
-        .catch((err) => {
-          console.log('Failed to dm user about ban.');
-          console.error(err);
-        });
+    .send(
+      target.id,
+      `You have been banned from ${guild.name}.\n` +
+        `**Reason:** ${reason}\n\n` +
+        'If you feel this ban was not fair or made in error,' +
+        'please create a ticket in the unban server at https://discord.gg/Hwtt2V8CKp'
+    )
+    .catch((err) => {
+      console.log('Failed to dm user about ban.');
+      console.error(err);
+    });
 
   await guild.members
     .ban(target.id, { reason: reason })
     .then(async () => {
       let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
 
-      if (interaction.replied) await interaction.reply(banConfirmation);
+      if (interaction.replied) await interaction.editReply(banConfirmation);
       else await interaction.reply(banConfirmation);
     })
     .catch(console.error);
