@@ -23,7 +23,6 @@ export default {
     try {
       message = await interaction.channel.messages.fetch(messageId);
     } catch (err) {
-      console.error(err);
       return await interaction.reply({
         content: 'Failed to fetch message or invalid message id.',
         ephemeral: true,

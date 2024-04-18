@@ -47,8 +47,8 @@ const unmuteUser = async (interaction, guild, target, member, reason) => {
 
   reason = await getReplacedReason(guild, reason);
 
-  // create the warning first so we can insert regardless of whether the user exists
-  const mute = {
+  // create the unmute first so we can insert regardless of whether the user exists
+  const ummute = {
     _id: new mongoose.Types.ObjectId(),
     guildId: guild.id,
     targetUserId: target.id,
@@ -62,7 +62,7 @@ const unmuteUser = async (interaction, guild, target, member, reason) => {
   };
 
   let userDoc = await findAndCreateUser(guild.id, target.id, true);
-  userDoc.infractions.push(mute);
+  userDoc.infractions.push(ummute);
 
   guildDoc.caseNumber++;
   await guildDoc.save().catch(async (err) => {
