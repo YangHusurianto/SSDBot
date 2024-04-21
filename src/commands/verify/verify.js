@@ -43,7 +43,10 @@ export default {
           targetMember.roles.add('926253317284323389');
 
           await interaction.reply(
-            `<:check:1196693134067896370> ${target} has been verified!`
+            `<:check:1196693134067896370> ${target} has been verified!\n` +
+            'Your photos will not be saved and are used for verification purposes only.\n' +
+            'You may remove your photos/close the ticket when ready.\n' +
+            'If you have any questions, feel free to ask!'
           );
 
           //log to channel
