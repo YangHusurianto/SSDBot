@@ -32,15 +32,8 @@ export default {
     var reason = options.getString('reason');
 
     if (await botSelfCheck(interaction, target, client, 'ban')) return;
-    let test = await roleHeirarchyCheck(
-      interaction,
-      guild,
-      target,
-      member,
-      'ban'
-    );
-    console.log(test);
-    if (test) return;
+    if (await roleHeirarchyCheck(interaction, guild, target, member, 'ban'))
+      return;
 
     if (member.roles.cache.has('942541250647695371')) {
       if (await antiSpamBanCheck(interaction, guild, member)) return;
