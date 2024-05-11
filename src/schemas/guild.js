@@ -9,6 +9,7 @@ const guildSchema = new Schema({
   autoTags: { type: Map, of: String },
   channelTags: { type: Map, of: String },
   settings: { type: Map, of: String },
+  settingsMap: { type: Map, of: Map },
 });
 
 export default model('Guild', guildSchema, 'guilds');

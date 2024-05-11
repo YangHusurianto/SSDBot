@@ -16,6 +16,8 @@ export async function findGuild(guild) {
         users: [],
         autoTags: new Map(),
         channelTags: new Map(),
+        settings: new Map(),
+        settingsMap: new Map(),
       },
     },
     { upsert: true, new: true }
