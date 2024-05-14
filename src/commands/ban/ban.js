@@ -93,7 +93,7 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
   let userDoc = await findAndCreateUser(guild.id, target.id);
   userDoc.infractions.push(ban);
 
-  await client.users
+  client.users
     .send(
       target.id,
       `You have been banned from ${guild.name}.\n` +
