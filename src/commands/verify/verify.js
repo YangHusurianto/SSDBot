@@ -42,16 +42,20 @@ export default {
         .then(async () => {
           targetMember.roles.add('926253317284323389');
 
-          if (targetMember.roles.cache.has('878334561094873109')) {
-            targetMember.roles.remove('878334561094873109');
-          }
-
           await interaction.reply(
             `<:check:1196693134067896370> ${target} has been verified!\n` +
             'Your photos will not be saved and are used for verification purposes only.\n' +
             'You may remove your photos/close the ticket when ready.\n' +
             'If you have any questions, feel free to ask!'
           );
+
+          // remove mute role once we swap to verified role
+          if (targetMember.roles.cache.has('878334561094873109')) { 
+            interaction.followUp({
+              content: `${target} is muted, don't forget to unmute them!`,
+              ephemeral: true,
+            });
+          }
 
           //log to channel
           return await logAction(
