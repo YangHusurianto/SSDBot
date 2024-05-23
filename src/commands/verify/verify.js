@@ -42,6 +42,10 @@ export default {
         .then(async () => {
           targetMember.roles.add('926253317284323389');
 
+          if (targetMember.roles.cache.has('878334561094873109')) {
+            targetMember.roles.remove('878334561094873109');
+          }
+
           await interaction.reply(
             `<:check:1196693134067896370> ${target} has been verified!\n` +
             'Your photos will not be saved and are used for verification purposes only.\n' +
