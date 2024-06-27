@@ -52,7 +52,8 @@ export default {
           // remove mute role once we swap to verified role
           if (targetMember.roles.cache.has('878334561094873109')) { 
             interaction.followUp({
-              content: `${target} is muted, don't forget to unmute them!`,
+              content: `${target} is muted, don't forget to unmute them!\n` +
+                        `-unmute ${target.id} verified`,
               ephemeral: true,
             });
           }
