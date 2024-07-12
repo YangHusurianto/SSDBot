@@ -31,6 +31,8 @@ export default {
     const target = options.getUser('user');
     var reason = options.getString('reason');
 
+    interaction.deferReply();
+
     if (await botSelfCheck(interaction, target, client, 'ban')) return;
     if (await roleHeirarchyCheck(interaction, guild, target, member, 'ban'))
       return;
@@ -47,14 +49,15 @@ export default {
   },
 };
 
-const antiSpamBanCheck = async (interaction, guild, member) => {
+const antiSpamBanCheck = async (interaction, guild, member): Promise<boolean> => {
   const recentBans = await getRecentByModerator(
     guild.id,
     member.user.id,
     'BAN',
     1
   );
-  if (recentBans >= DAILY_BAN_LIMIT) {
+  
+  if (recentBans.length >= DAILY_BAN_LIMIT) {
     let banLimit = {
       content:
         'You have banned too many users recently. Please try again later.',
@@ -87,7 +90,6 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
     date: new Date(),
     duration: '0',
     moderatorUserId: member.user.id,
-    moderatorNotes: '',
   };
 
   let userDoc = await findAndCreateUser(guild.id, target.id);

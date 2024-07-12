@@ -18,10 +18,7 @@ export default {
         .setRequired(true)
     )
     .addStringOption((option) =>
-      option.setName('reason').setDescription('The new reason')
-    )
-    .addStringOption((option) =>
-      option.setName('notes').setDescription('Notes about the infraction')
+      option.setName('reason').setDescription('The new reason').required(true)
     )
     .setDMPermission(false),
 
@@ -29,11 +26,10 @@ export default {
     const { options, guild, member } = interaction;
     const infractionNumber = options.getInteger('infraction_number');
     let reason = options.getString('reason') ?? null;
-    let notes = options.getString('notes') ?? null;
 
-    if (!reason && !notes) {
+    if (!reason) {
       return await interaction.reply(
-        `:x: You must provide a reason or notes to edit an infraction.`
+        `:x: You must provide a reason to edit an infraction.`
       );
     }
 
@@ -42,8 +38,7 @@ export default {
         guild,
         member,
         infractionNumber,
-        reason,
-        notes
+        reason
       );
       if (!loggedMessage) {
         return await interaction.reply(
@@ -51,7 +46,7 @@ export default {
         );
       }
 
-      return await updateInfraction(guild.id, infractionNumber, reason, notes)
+      return await updateInfraction(guild.id, infractionNumber, reason)
         .then(async (value) => {
           if (value) {
             await logAction(guild, loggedMessage);
@@ -77,7 +72,7 @@ export default {
   },
 };
 
-const logUpdates = async (guild, member, infractionNumber, reason, notes) => {
+const logUpdates = async (guild, member, infractionNumber, reason) => {
   const userDoc = await findInfraction(guild.id, infractionNumber);
   if (!userDoc) {
     return null;
@@ -102,11 +97,6 @@ const logUpdates = async (guild, member, infractionNumber, reason, notes) => {
   if (reason) {
     updates += `**Old Reason**: ${infraction.reason}\n`;
     updates += `**New Reason**: ${reason}\n`;
-  }
-
-  if (notes) {
-    updates += `**Old Notes**: ${infraction.moderatorNotes}\n`;
-    updates += `**New Notes**: ${notes}\n`;
   }
 
   return updates;

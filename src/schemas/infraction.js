@@ -9,5 +9,4 @@ export const infractionSchema = new Schema({
   date: Date,
   duration: String,
   moderatorUserId: String,
-  moderatorNotes: String,
 });

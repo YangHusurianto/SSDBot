@@ -3,8 +3,7 @@ import User from '../schemas/user.js';
 export async function updateInfraction(
   guildId,
   infractionNumber,
-  reason,
-  notes
+  reason
 ) {
   try {
     let UserDoc = await User.findOne({
@@ -17,7 +16,6 @@ export async function updateInfraction(
     }
 
     if (!reason) reason = UserDoc.infractions.reason;
-    if (!notes) notes = UserDoc.infractions.moderatorNotes;
 
     return await User.findOneAndUpdate(
       {
@@ -27,7 +25,6 @@ export async function updateInfraction(
       {
         $set: {
           'infractions.$.reason': reason,
-          'infractions.$.moderatorNotes': notes,
         },
       },
       { new: true }

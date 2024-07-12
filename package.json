@@ -1,7 +1,7 @@
 {
   "name": "@yangh/ssd-bot",
   "version": "2.0.0",
-  "main": "index.js",
+  "main": "index.ts",
   "author": "Yang Husurianto <yang.husurianto@gmail.com>",
   "license": "MIT",
   "type": "module",
@@ -9,12 +9,22 @@
     "chalk": "^4.1.2",
     "console-stamp": "^3.1.2",
     "discord.js": "14.14.1",
-    "dotenv": "^10.0.0",
+    "dotenv": "^16.4.5",
     "mongoose": "^8.0.4",
     "ms": "^2.1.3",
-    "pretty-ms": "^9.0.0"
+    "pretty-ms": "^9.0.0",
+    "tsimp": "^2.0.11"
   },
   "devDependencies": {
-    "eslint": "^8.57.0"
+    "@tsconfig/node22": "^22.0.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.5.3"
+  },
+  "scripts": {
+    "start": "node --import=tsimp/import index.ts",
+    "dev": "nodemon index.ts",
+    "lint": "eslint . --ext .ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

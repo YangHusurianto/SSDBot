@@ -58,7 +58,6 @@ const unmuteUser = async (interaction, guild, target, member, reason) => {
     date: new Date(),
     duration: -1,
     moderatorUserId: member.user.id,
-    moderatorNotes: '',
   };
 
   let userDoc = await findAndCreateUser(guild.id, target.id, true);

@@ -85,7 +85,6 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
     date: new Date(),
     duration: 'null',
     moderatorUserId: member.user.id,
-    moderatorNotes: '',
   };
 
   let userDoc = await findAndCreateUser(guild.id, target.id, true);
@@ -109,17 +108,16 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
   client.users
     .send(
       target.id,
-      'You have been warned in Sweet Sugar Dreams, ' +
+      `You have been warned in ${guild.name}, ` +
         'these warnings are to inform you that a rule ' +
         'may have been broken and for us to keep track ' +
         'of your history on the server. Warnings are not ' +
         'serious, unless you keep repeating what we warned you for.\n' +
-        'If you believe this warn was made in error, please make a <#852694135927865406>.\n\n' +
+        'If you believe this warn was made in error, please make a ticket here: <#1245144267199086623>.\n\n' +
         `Warning: ${reason}`
     )
     .catch((err) => {
       console.log('Failed to dm user about warn.');
-      console.err('Failed to dm user about warn.');
     });
 
   //log to channel

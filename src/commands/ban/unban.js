@@ -50,7 +50,6 @@ const unbanUser = async (interaction, guild, target, member, reason) => {
     date: new Date(),
     duration: '',
     moderatorUserId: member.user.id,
-    moderatorNotes: '',
   };
 
   let userDoc = await findUser(guild.id, target.id);

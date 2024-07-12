@@ -108,7 +108,7 @@ const muteUser = async (
     date: new Date(),
     duration: time,
     moderatorUserId: member.user.id,
-    moderatorNotes: '',
+
   };
 
   let userDoc = await findAndCreateUser(guild.id, target.id, true);

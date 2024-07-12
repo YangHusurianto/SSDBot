@@ -263,15 +263,10 @@ const logsEmbed = (target, page, infractions, recents, notes) => {
     );
     const moderator = infraction.moderatorUserId;
 
-    const notes = infraction.moderatorNotes
-      ? `**Notes:** ${infraction.moderatorNotes}\n`
-      : '';
-
     embed.addFields({
       name: `${infraction.type} | Case #${infraction.number}`,
       value:
         `**Reason:** ${infraction.reason}\n` +
-        notes +
         `**Moderator:** <@${moderator}> ${escapeMarkdown(`(${moderator})`, {
           code: true,
         })}\n` +
