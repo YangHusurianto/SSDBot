@@ -69,9 +69,6 @@ if (!mongoConnection) {
 }
 connect(mongoConnection).catch(console.error);
 
-// load guild settings
-client.handleCache();
-
 // check for mutes
 client.handleMutes();
 
