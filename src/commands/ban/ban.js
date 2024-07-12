@@ -49,7 +49,7 @@ export default {
   },
 };
 
-const antiSpamBanCheck = async (interaction, guild, member): Promise<boolean> => {
+const antiSpamBanCheck = async (interaction, guild, member) => {
   const recentBans = await getRecentByModerator(
     guild.id,
     member.user.id,
