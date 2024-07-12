@@ -18,7 +18,7 @@ export default {
         .setRequired(true)
     )
     .addStringOption((option) =>
-      option.setName('reason').setDescription('The new reason').required(true)
+      option.setName('reason').setDescription('The new reason').setRequired(true)
     )
     .setDMPermission(false),
 
