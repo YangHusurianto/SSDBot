@@ -19,7 +19,7 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const filePath = path.join(__dirname, 'error.log');
 
 const stderrStream = fs.createWriteStream(filePath, { flags: 'a' });
-process.stderr.write = stderrStream.write.bind(stderrStream) as (data: string) => boolean;
+process.stderr.write = stderrStream.write.bind(stderrStream);
 
 // Create client instance
 const client = new Client({
