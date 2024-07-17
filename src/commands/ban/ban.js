@@ -113,7 +113,7 @@ const banUser = async (interaction, client, guild, target, member, reason) => {
     .then(async () => {
       let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
 
-      if (interaction.replied) await interaction.editReply(banConfirmation);
+      if (interaction.replied || interaction.deferred) await interaction.editReply(banConfirmation);
       else await interaction.reply(banConfirmation);
     })
     .catch(console.error);
