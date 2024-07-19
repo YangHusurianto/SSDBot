@@ -102,7 +102,8 @@ const warnUser = async (interaction, client, guild, target, member, reason) => {
   });
 
   await interaction.reply(
-    `<:check:1196693134067896370> ${target} has been warned.`
+    `<:check:1196693134067896370> ${target} has been warned.\n` + 
+    `Reason: ${reason}`
   );
 
   client.users
