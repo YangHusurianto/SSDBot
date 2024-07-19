@@ -37,7 +37,7 @@ export async function roleHeirarchyCheck(
           content: `You cannot ${type} a member with a higher or equal role than you!`,
           ephemeral: true,
         };
-        if (interaction.replied) return await interaction.editReply(banCheck);
+        if (interaction.replied || interaction.deferred) return await interaction.editReply(banCheck);
         else return await interaction.reply(banCheck);
       }
 
